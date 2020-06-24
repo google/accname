@@ -1,0 +1,35 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "inlineSources": true,
+    "outDir": "dist",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "lib": ["es6","dom"]
+  },
+  "include": [
+    "src",
+    "spec"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules"
+  ],
+  "types": [
+    "@types/jasmine",
+    "@types/node"
+  ],
+  "typeRoots": [
+    "node_modules/@types"
+  ]
+}
