@@ -1,0 +1,4 @@
+/node_modules/
+
+# Compiler output
+/dist/

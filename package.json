@@ -1,0 +1,29 @@
+{
+  "name": "accessible-name",
+  "version": "1.0.0",
+  "description": "This library will contain a TypeScript implementation of the [Accessible Name Computation](https://www.w3.org/TR/accname-1.1/).",
+  "main": "accessible-name.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "dependencies": {
+    "tslint": "^6.1.2",
+    "typescript": "^3.9.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/googleinterns/accessible-name.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/googleinterns/accessible-name/issues"
+  },
+  "homepage": "https://github.com/googleinterns/accessible-name#readme"
+}
