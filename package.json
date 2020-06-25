@@ -7,12 +7,17 @@
     "doc": "docs"
   },
   "devDependencies": {
+    "jasmine": "^3.5.0",
+    "jasmine-core": "^3.5.0",
+    "karma": "^5.1.0",
+    "karma-chrome-launcher": "^3.1.0",
+    "karma-jasmine": "^3.3.1",
     "tslint": "^6.1.2",
     "typescript": "^3.9.5"
   },
   "scripts": {
     "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jasmine"
   },
   "repository": {
     "type": "git",
@@ -24,5 +29,9 @@
   "bugs": {
     "url": "https://github.com/googleinterns/accessible-name/issues"
   },
-  "homepage": "https://github.com/googleinterns/accessible-name#readme"
+  "homepage": "https://github.com/googleinterns/accessible-name#readme",
+  "dependencies": {
+    "dom-parser": "^0.1.6",
+    "jsdom": "^16.2.2"
+  }
 }
