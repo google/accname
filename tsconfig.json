@@ -1,7 +1,8 @@
 {
+  "compileOnSave": true,
   "compilerOptions": {
-    "target": "es6",
-    "module": "es6",
+    "target": "es5",
+    "module": "commonjs",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
@@ -14,10 +15,21 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
-    "lib": ["ES6","DOM"]
+    "lib": ["es6","dom"]
   },
   "include": [
-    "src/**/*.ts"
+    "src",
+    "spec"
   ],
-  "exclude": []
+  "exclude": [
+    "dist",
+    "node_modules"
+  ],
+  "types": [
+    "@types/jasmine",
+    "@types/node"
+  ],
+  "typeRoots": [
+    "node_modules/@types"
+  ]
 }

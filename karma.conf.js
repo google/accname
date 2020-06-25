@@ -1,40 +1,35 @@
 // Karma configuration
-// Generated on Thu Jun 25 2020 12:28:46 GMT+0100 (Irish Standard Time)
+// Generated on Thu Jun 25 2020 17:12:25 GMT+0200 (Central European Summer Time)
 
 module.exports = function(config) {
   config.set({
-
-    // base path that will be used to resolve all patterns (eg. files, exclude)
-    basePath: '',
-
-
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['jasmine'],
+    frameworks: ['jasmine', 'karma-typescript'],
 
 
     // list of files / patterns to load in the browser
     files: [
-      {pattern: 'dist/*.js', type: 'module'},
-      {pattern: 'spec/*Spec.js', type: 'module'}
+      'src/**/*.ts',
+      'spec/*Spec.ts'
     ],
 
-
-    // list of files / patterns to exclude
-    exclude: [
-    ],
-
+    client: {
+      // leave Jasmine Spec Runner output visible in browser
+      clearContext: false
+    },
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
+      "**/*.ts": ['karma-typescript']
     },
 
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['progress'],
+    reporters: ['spec', 'progress', 'karma-typescript'],
 
 
     // web server port
@@ -65,6 +60,11 @@ module.exports = function(config) {
 
     // Concurrency level
     // how many browser should be started simultaneous
-    concurrency: Infinity
+    concurrency: Infinity,
+
+    // Config for karma-typescript
+    karmaTypescriptConfig: {
+        tsconfig: "./tsconfig.json"
+    }
   })
 }
