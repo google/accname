@@ -1,7 +1,8 @@
-export default function getAccessibleName(elem: HTMLElement): string {
+// Example function used to experiment with testing & DOM access/manipulation
+export function getTextNodeAccessibleName(textNode: Node): string {
     let accessibleName: string = '';
-    if (elem.nodeType === 3 && elem.textContent) {
-        accessibleName = elem.textContent;
+    if (textNode && textNode.nodeType === Node.TEXT_NODE && textNode.textContent) {
+        accessibleName = textNode.textContent;
     }
     return accessibleName;
 }
