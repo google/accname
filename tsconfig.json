@@ -1,7 +1,8 @@
 {
+  "compileOnSave": true,
   "compilerOptions": {
-    "target": "es2017",
-    "module": "es2015",
+    "target": "es5",
+    "module": "commonjs",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
@@ -13,10 +14,22 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
-    "noImplicitThis": true
+    "noImplicitThis": true,
+    "lib": ["es6","dom"]
   },
   "include": [
-    "src/**/*.ts"
+    "src",
+    "spec"
   ],
-  "exclude": []
+  "exclude": [
+    "dist",
+    "node_modules"
+  ],
+  "types": [
+    "@types/jasmine",
+    "@types/node"
+  ],
+  "typeRoots": [
+    "node_modules/@types"
+  ]
 }

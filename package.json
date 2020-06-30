@@ -7,12 +7,24 @@
     "doc": "docs"
   },
   "devDependencies": {
+    "@types/jasmine": "^3.5.11",
+    "jasmine": "^3.5.0",
+    "jasmine-core": "^3.5.0",
+    "jsdom": "^16.2.2",
+    "karma": "^5.1.0",
+    "karma-chrome-launcher": "^3.1.0",
+    "karma-cli": "^2.0.0",
+    "karma-firefox-launcher": "^1.3.0",
+    "karma-jasmine": "^3.3.1",
+    "karma-spec-reporter": "0.0.32",
+    "karma-typescript": "^5.0.3",
+    "karma-typescript-es6-transform": "^5.0.3",
     "tslint": "^6.1.2",
     "typescript": "^3.9.5"
   },
   "scripts": {
     "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "karma start"
   },
   "repository": {
     "type": "git",
@@ -24,5 +36,6 @@
   "bugs": {
     "url": "https://github.com/googleinterns/accessible-name/issues"
   },
-  "homepage": "https://github.com/googleinterns/accessible-name#readme"
+  "homepage": "https://github.com/googleinterns/accessible-name#readme",
+  "dependencies": {}
 }
