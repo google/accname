@@ -10,8 +10,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'src/**/*.ts',
-      'spec/*Spec.ts'
+      'src/**/*.ts'
     ],
 
     client: {
@@ -51,7 +50,7 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Chrome'],
+    browsers: ['Chrome', 'Firefox'], //TODO: Add more browsers (Edge, IE)
 
 
     // Continuous Integration mode
