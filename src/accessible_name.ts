@@ -1,12 +1,32 @@
-/** This function is just an example to check the testing frameworks out
- * and will not be included in the actual implementation
- * @param {Node} textNode - A DOM node
- * @return {string} The accessible name for textNode
+import {rules} from './lib/rules';
+import {Context} from './lib/context';
+
+/**
+ * @param {HTMLElement} elem - The element whose accessible name will be calculated
+ * @param {Context} context - Additional information relevant to the name computation for elem
+ * @return {string} - The accessible name for elem
  */
-export function getTextNodeAccessibleName(textNode: Node): string {
-    let accessibleName: string = '';
-    if (textNode && textNode.nodeType === Node.TEXT_NODE && textNode.textContent) {
-        accessibleName = textNode.textContent;
+function _getAccessibleName(elem: HTMLElement, context: Context): string {
+  let accessibleName = '';
+  let result;
+  // Iterate over the rules used to calculate the accessible name, stop
+  // iterating if a valid string is returned (i.e. if result is not null).
+  const ruleKeys = Object.keys(rules);
+  for (let i = 0; i < ruleKeys.length && !result; ++i) {
+    result = rules[ruleKeys[i]](elem, context);
+    if (result) {
+      accessibleName = result;
     }
-    return accessibleName;
+  }
+  return accessibleName;
+}
+
+/**
+ * Main exported function for the library. Initialises traversal with an empty context.
+ * @param {HTMLElement} elem - The element whose accessible name will be calculated
+ * @return {string} - The accessible name for elem
+ */
+export function getAccessibleName(elem: HTMLElement): string {
+  const initialContext = {};
+  return _getAccessibleName(elem, initialContext);
 }

@@ -10,7 +10,8 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'src/**/*.ts'
+      'src/**/*.ts',
+      'src/lib/*.ts'
     ],
 
     client: {
@@ -63,7 +64,12 @@ module.exports = function(config) {
 
     // Config for karma-typescript
     karmaTypescriptConfig: {
-        tsconfig: "./tsconfig.json"
+        tsconfig: "./tsconfig.json",
+        bundlerOptions: {
+          transforms: [
+              require("karma-typescript-es6-transform")()
+          ]
+      }
     }
   })
 }
