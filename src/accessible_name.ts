@@ -1,12 +1,20 @@
-/** This function is just an example to check the testing frameworks out
- * and will not be included in the actual implementation
- * @param {Node} textNode - A DOM node
- * @return {string} The accessible name for textNode
+import {rules} from './lib/rules';
+
+/**
+ * @param {HTMLElement} elem - The element whose accessible name will be calculated
+ * @return {string} - The accessible name for elem
  */
-export function getTextNodeAccessibleName(textNode: Node): string {
-    let accessibleName: string = '';
-    if (textNode && textNode.nodeType === Node.TEXT_NODE && textNode.textContent) {
-        accessibleName = textNode.textContent;
+export function getAccessibleName(elem: HTMLElement): string {
+  let accessibleName = '';
+  let result;
+  // Iterate over the rules used to calculate the accessible name, stop
+  // iterating if a valid string is returned (i.e. if result is not null).
+  const ruleKeys = Object.keys(rules);
+  for (let i = 0; i < ruleKeys.length && !result; ++i) {
+    result = rules[ruleKeys[i]](elem);
+    if (result) {
+      accessibleName = result;
     }
-    return accessibleName;
+  }
+  return accessibleName;
 }

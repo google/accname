@@ -21,11 +21,19 @@
     "karma-typescript": "^5.0.3",
     "karma-typescript-es6-transform": "^5.0.3",
     "tslint": "^6.1.2",
-    "typescript": "^3.9.5"
+    "typescript": "^3.9.5",
+    "@types/node": "^13.11.1"
   },
   "scripts": {
     "build": "tsc",
-    "test": "karma start"
+    "test": "karma start",
+    "check": "gts check",
+    "clean": "gts clean",
+    "compile": "tsc",
+    "fix": "gts fix",
+    "prepare": "npm run compile",
+    "pretest": "npm run compile",
+    "posttest": "npm run check"
   },
   "repository": {
     "type": "git",
