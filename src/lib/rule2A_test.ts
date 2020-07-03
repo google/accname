@@ -1,7 +1,7 @@
 import {rule2A} from './rule2A';
 import {html, render} from 'lit-html';
 
-describe('The hiddenNode function for rule 2A', () => {
+describe('The function for rule 2A', () => {
 
   let container: HTMLElement;
   beforeEach(() => {
@@ -69,19 +69,6 @@ describe('The hiddenNode function for rule 2A', () => {
     expect(rule2A(elem!, {})).toBe('');
   });
 
-  it('considers CSS opacity 0', () => {
-    render(html`
-      <div id="foo">Hello world</div>
-      <style>
-        #foo {
-          opacity: 0;
-        }
-      </style>
-    `, container);
-    const elem = document.getElementById('foo');
-    expect(rule2A(elem!, {})).toBe('');
-  });
-
   it('considers hidden ancestors', () => {
     render(html`
       <div hidden>
@@ -91,6 +78,44 @@ describe('The hiddenNode function for rule 2A', () => {
           </div>
         </div>
       </div>
+    `, container);
+    const elem = document.getElementById('foo');
+    expect(rule2A(elem!, {})).toBe('');
+  });
+
+  it('considers display:none ancestors', () => {
+    render(html`
+      <div id="bar">
+        <div>
+          <div>
+            <div id="foo">Hello world</div>
+          </div>
+        </div>
+      </div>
+      <style>
+        #bar {
+          display: none;
+        }
+      </style>
+    `, container);
+    const elem = document.getElementById('foo');
+    expect(rule2A(elem!, {})).toBe('');
+  });
+
+  it('considers visibility:hidden ancestors', () => {
+    render(html`
+      <div id="bar">
+        <div>
+          <div>
+            <div id="foo">Hello world</div>
+          </div>
+        </div>
+      </div>
+      <style>
+        #bar {
+          visibility: hidden;
+        }
+      </style>
     `, container);
     const elem = document.getElementById('foo');
     expect(rule2A(elem!, {})).toBe('');

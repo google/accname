@@ -2,9 +2,9 @@ import {Context} from './lib/context';
 import {rule2A} from './lib/rule2A';
 
 /**
- * @param elem - The element whose accessible name will be calculated
- * @param  context - Additional information relevant to the name computation for elem
- * @return - The accessible name for elem
+ * @param currentNode - The node whose text alternative will be calculated
+ * @param  context - Additional information relevant to the text alternative computation for node
+ * @return - The text alternative for node
  */
 function computeTextAlternative(currentNode: Node, context: Context): string {
 
