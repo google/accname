@@ -49,8 +49,6 @@ describe('The function for rule 2B', () => {
     });
 
   /*
-   * Many more tests needed here but can't be verified yet due to lack
-   * of other rules, (i.e 2F, 2G) along with the fact that the default
-   * acc name is the empty string.
+   * TODO: Add tests to check aria-labelledby traversal (using rules 2F, 2G)
    */
 });
