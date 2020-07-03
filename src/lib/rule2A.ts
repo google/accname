@@ -34,8 +34,10 @@ function isHidden(node: Node): boolean {
  */
 function rule2ACondition(node: Node, context: Context): boolean {
   return (
-      isHidden(node) && !context.ariaLabelledbyReference &&
-      !context.labelReference);
+    isHidden(node) &&
+    !context.ariaLabelledbyReference &&
+    !context.labelReference
+  );
 }
 
 /**
@@ -47,7 +49,7 @@ function rule2ACondition(node: Node, context: Context): boolean {
  * null is returned otherwise, indicating that the condition of this rule was
  * not satisfied.
  */
-export function rule2A(node: Node, context: Context): string|null {
+export function rule2A(node: Node, context: Context): string | null {
   let result = null;
   if (rule2ACondition(node, context)) {
     result = '';
