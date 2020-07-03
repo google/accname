@@ -9,6 +9,7 @@
   "devDependencies": {
     "@types/jasmine": "^3.5.11",
     "@types/node": "^13.11.1",
+    "clang-format": "^1.4.0",
     "gts": "^2.0.2",
     "jasmine": "^3.5.0",
     "jasmine-core": "^3.5.0",
@@ -34,7 +35,8 @@
     "fix": "gts fix",
     "prepare": "npm run compile",
     "pretest": "npm run compile",
-    "posttest": "npm run check"
+    "posttest": "npm run check",
+    "format": "clang-format --version; find src | grep '\\.js$\\|\\.ts$' | xargs clang-format --style=file -i"
   },
   "repository": {
     "type": "git",

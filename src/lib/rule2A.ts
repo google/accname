@@ -7,47 +7,49 @@ import {Context} from './context';
  * @return - whether or not the node is considered hidden
  */
 function isHidden(node: Node): boolean {
-  if (node instanceof HTMLElement) {
-    const nodeStyle = window.getComputedStyle(node);
-
-    const hiddenByStyle = (
-      nodeStyle.visibility === 'hidden' ||
-      // measurement of pixels used on screen (checks for display:none)
-      node.offsetHeight <= 0 ||
-      node.offsetWidth <= 0
-    );
-
-    const hiddenByAttribute = (
-      node.closest('[hidden],[aria-hidden="true"]') !== null
-    );
-
-    return (hiddenByAttribute || hiddenByStyle);
+  if (!(node instanceof HTMLElement)) {
+    return false;
   }
+
+  const visibility = window.getComputedStyle(node).visibility;
+  const notDisplayed = node.offsetHeight === 0 && node.offsetWidth === 0;
+  if (visibility === 'hidden' || notDisplayed) {
+    return true;
+  }
+
+  const hiddenAncestor = node.closest('[hidden],[aria-hidden="true"]');
+  if (hiddenAncestor !== null) {
+    return true;
+  }
+
   return false;
 }
+
+export const TEST_ONLY = {isHidden};
 
 /**
  * Condition for applying rule 2A
  * @param node - The node whose text alternative is being calculated
- * @param context - Additional information relevant to the text alternative computation for node
+ * @param context - Additional information relevant to the text alternative
+ *     computation for node
  * @return - Whether or not node satisfies the condition for rule 2A
  */
 function rule2ACondition(node: Node, context: Context): boolean {
   return (
-    isHidden(node) &&
-    !context.ariaLabelledbyReference &&
-    !context.labelReference
-  );
+      isHidden(node) && !context.ariaLabelledbyReference &&
+      !context.labelReference);
 }
 
 /**
  * Implementation of rule 2A
  * @param node - The element whose text alternative is being calculated
- * @param context - Additional information relevant to the text alternative computation for node
+ * @param context - Additional information relevant to the text alternative
+ *     computation for node
  * @return - The text alternative string is returned if condition is true,
- * null is returned otherwise, indicating that the condition of this rule was not satisfied.
+ * null is returned otherwise, indicating that the condition of this rule was
+ * not satisfied.
  */
-export function rule2A(node: Node, context: Context): string | null {
+export function rule2A(node: Node, context: Context): string|null {
   let result = null;
   if (rule2ACondition(node, context)) {
     result = '';

@@ -1,8 +1,8 @@
-import {rule2A} from './rule2A';
 import {html, render} from 'lit-html';
 
-describe('The function for rule 2A', () => {
+import {rule2A, TEST_ONLY} from './rule2A';
 
+describe('The function for rule 2A', () => {
   let container: HTMLElement;
   beforeEach(() => {
     container = document.createElement('div');
@@ -19,17 +19,19 @@ describe('The function for rule 2A', () => {
     expect(rule2A(elem!, {})).toBe('');
   });
 
-  it('returns null for hidden elems that are referenced in an aria-labelledby', () => {
-    render(html`<div id="foo" hidden>Hello world</div>`, container);
-    const elem = document.getElementById('foo');
-    expect(rule2A(elem!, {ariaLabelledbyReference: true})).toBe(null);
-  });
+  it('returns null for hidden elems that are referenced in an aria-labelledby',
+     () => {
+       render(html`<div id="foo" hidden>Hello world</div>`, container);
+       const elem = document.getElementById('foo');
+       expect(rule2A(elem!, {ariaLabelledbyReference: true})).toBe(null);
+     });
 
-  it('returns null for hidden elems that are referenced by a label element', () => {
-    render(html`<div id="foo" hidden>Hello world</div>`, container);
-    const elem = document.getElementById('foo');
-    expect(rule2A(elem!, {labelReference: true})).toBe(null);
-  });
+  it('returns null for hidden elems that are referenced by a label element',
+     () => {
+       render(html`<div id="foo" hidden>Hello world</div>`, container);
+       const elem = document.getElementById('foo');
+       expect(rule2A(elem!, {labelReference: true})).toBe(null);
+     });
 
   it('returns null for elem that is not hidden', () => {
     render(html`<div id="foo">Hello world</div>`, container);
@@ -40,37 +42,42 @@ describe('The function for rule 2A', () => {
   it('considers aria-hidden', () => {
     render(html`<div id="foo" aria-hidden="true">Hello world</div>`, container);
     const elem = document.getElementById('foo');
-    expect(rule2A(elem!, {})).toBe('');
+    expect(TEST_ONLY(elem!)).toBe(true);
   });
 
   it('considers CSS display none', () => {
-    render(html`
+    render(
+        html`
       <div id="foo">Hello world</div>
       <style>
         #foo {
           display: none;
         }
       </style>
-    `, container);
+    `,
+        container);
     const elem = document.getElementById('foo');
     expect(rule2A(elem!, {})).toBe('');
   });
 
   it('considers CSS visibility hidden', () => {
-    render(html`
+    render(
+        html`
       <div id="foo">Hello world</div>
       <style>
         #foo {
           visibility: hidden;
         }
       </style>
-    `, container);
+    `,
+        container);
     const elem = document.getElementById('foo');
     expect(rule2A(elem!, {})).toBe('');
   });
 
   it('considers hidden ancestors', () => {
-    render(html`
+    render(
+        html`
       <div hidden>
         <div>
           <div>
@@ -78,13 +85,15 @@ describe('The function for rule 2A', () => {
           </div>
         </div>
       </div>
-    `, container);
+    `,
+        container);
     const elem = document.getElementById('foo');
     expect(rule2A(elem!, {})).toBe('');
   });
 
   it('considers display:none ancestors', () => {
-    render(html`
+    render(
+        html`
       <div id="bar">
         <div>
           <div>
@@ -97,13 +106,15 @@ describe('The function for rule 2A', () => {
           display: none;
         }
       </style>
-    `, container);
+    `,
+        container);
     const elem = document.getElementById('foo');
     expect(rule2A(elem!, {})).toBe('');
   });
 
   it('considers visibility:hidden ancestors', () => {
-    render(html`
+    render(
+        html`
       <div id="bar">
         <div>
           <div>
@@ -116,9 +127,9 @@ describe('The function for rule 2A', () => {
           visibility: hidden;
         }
       </style>
-    `, container);
+    `,
+        container);
     const elem = document.getElementById('foo');
     expect(rule2A(elem!, {})).toBe('');
   });
-
 });
