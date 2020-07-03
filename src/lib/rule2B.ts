@@ -9,17 +9,15 @@ import {Context} from './context';
  * by elem's aria-labelledby
  */
 function resolveValidAriaLabelledbyIdrefs(elem: HTMLElement): HTMLElement[] {
-  // Get a list of idref strings
   const idrefs = elem.getAttribute('aria-labelledby')?.split(' ') ?? [];
-  // Any idref that points to an element that exists in the document
-  // is considered valid here.
+
   const validElems: HTMLElement[] = [];
-  idrefs.forEach(idref => {
-    const elem = document.getElementById(idref);
+  for (const id of idrefs) {
+    const elem = document.getElementById(id);
     if (elem) {
       validElems.push(elem);
     }
-  });
+  }
   return validElems;
 }
 
@@ -37,22 +35,19 @@ export function rule2B(node: Node, context: Context): string | null {
     return null;
   }
 
-  // Check if node is part of an aria-labelledby traversal
   if (context.ariaLabelledbyReference) {
     return null;
   }
 
-  // Check that aria-labelledby contains at least one valid idref
   const labelElems = resolveValidAriaLabelledbyIdrefs(node);
   if (labelElems.length === 0) {
     return null;
   }
 
-  // Node text alternative = concatenate the text alternative for each labelElem.
   return labelElems
     .map(labelElem =>
       computeTextAlternative(labelElem, {ariaLabelledbyReference: true})
     )
     .join(' ')
-    .trim(); // (styles by gts - I swear I'm not responsible)
+    .trim();
 }
