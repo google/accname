@@ -1,6 +1,6 @@
 import {html, render} from 'lit-html';
 
-import {rule2A, TEST_ONLY} from './rule2A';
+import {rule2A} from './rule2A';
 
 describe('The function for rule 2A', () => {
   let container: HTMLElement;
@@ -42,7 +42,7 @@ describe('The function for rule 2A', () => {
   it('considers aria-hidden', () => {
     render(html`<div id="foo" aria-hidden="true">Hello world</div>`, container);
     const elem = document.getElementById('foo');
-    expect(TEST_ONLY(elem!)).toBe(true);
+    expect(rule2A(elem!, {})).toBe('');
   });
 
   it('considers CSS display none', () => {

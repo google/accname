@@ -25,8 +25,6 @@ function isHidden(node: Node): boolean {
   return false;
 }
 
-export const TEST_ONLY = {isHidden};
-
 /**
  * Condition for applying rule 2A
  * @param node - The node whose text alternative is being calculated
