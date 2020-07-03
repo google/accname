@@ -8,6 +8,9 @@
   },
   "devDependencies": {
     "@types/jasmine": "^3.5.11",
+    "@types/node": "^13.11.1",
+    "clang-format": "^1.4.0",
+    "gts": "^2.0.2",
     "jasmine": "^3.5.0",
     "jasmine-core": "^3.5.0",
     "jsdom": "^16.2.2",
@@ -19,12 +22,21 @@
     "karma-spec-reporter": "0.0.32",
     "karma-typescript": "^5.0.3",
     "karma-typescript-es6-transform": "^5.0.3",
+    "lit-html": "^1.2.1",
     "tslint": "^6.1.2",
     "typescript": "^3.9.5"
   },
   "scripts": {
     "build": "tsc",
-    "test": "karma start"
+    "test": "karma start",
+    "check": "gts check",
+    "clean": "gts clean",
+    "compile": "tsc",
+    "fix": "gts fix",
+    "prepare": "npm run compile",
+    "pretest": "npm run compile",
+    "posttest": "npm run check",
+    "format": "clang-format --version; find src | grep '\\.js$\\|\\.ts$' | xargs clang-format --style=file -i"
   },
   "repository": {
     "type": "git",
