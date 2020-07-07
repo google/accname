@@ -1,5 +1,5 @@
 import {computeTextAlternative} from './lib/compute_text_alternative';
-import {getEmptyContext} from './lib/context';
+import {getDefaultContext} from './lib/context';
 
 /**
  * Main exported function for the library. Initialises traversal with an empty
@@ -8,6 +8,5 @@ import {getEmptyContext} from './lib/context';
  * @return - The accessible name for elem
  */
 export function getAccessibleName(elem: HTMLElement): string {
-  const initialContext = getEmptyContext();
-  return computeTextAlternative(elem, initialContext);
+  return computeTextAlternative(elem, getDefaultContext());
 }

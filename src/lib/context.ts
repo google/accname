@@ -9,9 +9,10 @@ export interface Context {
    */
   ariaLabelledbyReference: boolean;
   /**
-   * Indicates whether a node is a label for another node,
-   * i.e. a HTML label
-   * This would be set to true by rule 2D.
+   * Indicates whether a node is a label for another node
+   * whose text alternative is being computed.
+   * i.e 'referenced' by a node that has been traversed
+   * by the algorithm.
    */
   isLabelReference: boolean;
   /**
@@ -26,9 +27,9 @@ export interface Context {
 }
 
 /**
- * Returns a context instance in its 'default' state.
+ * Returns a context instance in its default state.
  */
-export function getEmptyContext(): Context {
+export function getDefaultContext(): Context {
   return {
     ariaLabelledbyReference: false,
     isLabelReference: false,
@@ -37,19 +38,4 @@ export function getEmptyContext(): Context {
       visitedNodes: [],
     },
   };
-}
-
-/**
- * Resets all context properties to default except for
- * the inherited object, which remains the same in the
- * new context.
- * @param context - the context instance that is being reset
- * @return - a new context instance whose values are default
- * except for its inherited object.
- */
-export function resetUninherited(context: Context): Context {
-  const inherited = context.inherited;
-  const newContext = getEmptyContext();
-  newContext.inherited = inherited;
-  return newContext;
 }

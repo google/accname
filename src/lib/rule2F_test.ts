@@ -1,6 +1,6 @@
 import {html, render} from 'lit-html';
 import {rule2F, allowsNameFromContent_TEST} from './rule2F';
-import {Context, getEmptyContext} from './context';
+import {Context, getDefaultContext} from './context';
 
 describe('The function for rule 2F', () => {
   let container: HTMLElement;
@@ -8,7 +8,7 @@ describe('The function for rule 2F', () => {
   beforeEach(() => {
     container = document.createElement('div');
     document.body.appendChild(container);
-    context = getEmptyContext();
+    context = getDefaultContext();
   });
 
   afterEach(() => {
@@ -71,7 +71,7 @@ describe('The function for rule 2F', () => {
     );
     const elem = document.getElementById('foo');
     context.isLabelReference = true;
-    expect(rule2F(elem!, context)).toBe('Hello world !');
+    expect(rule2F(elem!, context)).toBe('Helloworld!');
   });
 
   it('considers entire subtree for descendants of label reference', () => {

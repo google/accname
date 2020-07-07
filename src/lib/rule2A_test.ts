@@ -1,5 +1,5 @@
 import {html, render} from 'lit-html';
-import {Context, getEmptyContext} from './context';
+import {Context, getDefaultContext} from './context';
 import {rule2A} from './rule2A';
 
 describe('The function for rule 2A', () => {
@@ -8,7 +8,7 @@ describe('The function for rule 2A', () => {
   beforeEach(() => {
     container = document.createElement('div');
     document.body.appendChild(container);
-    context = getEmptyContext();
+    context = getDefaultContext();
   });
 
   afterEach(() => {
