@@ -97,7 +97,7 @@ const NAME_FROM_CONTENT_FUNCTION_OF_ELEM: {[key: string]: Function} = {
 /**
  * Calculates whether or not an element's name may be calculated using
  * its contents. Elements may allow name from content when they have certain
- * roles, be they implicit (role attribute) or explicit (semantic HTML).
+ * roles, be they explicit (role attribute) or implicit (semantic HTML).
  * @param elem - the function checks if 'elem' allows name from content
  * @return - true if elem allows name from content, false otherwise
  */
