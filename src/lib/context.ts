@@ -34,8 +34,8 @@ export function getEmptyContext(): Context {
     isLabelReference: false,
     inherited: {
       isLabelDescendant: false,
-      visitedNodes: []
-    }
+      visitedNodes: [],
+    },
   };
 }
 

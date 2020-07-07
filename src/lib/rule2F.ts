@@ -23,7 +23,7 @@ const nameFromContentRoles = [
   'tab',
   'tooltip',
   'tree',
-  'treeitem'
+  'treeitem',
 ];
 
 /**
@@ -40,7 +40,7 @@ const nameFromContentElemNodeName = [
   'h6',
   'tbody',
   'thead',
-  'tfoot'
+  'tfoot',
 ];
 
 /**
@@ -54,7 +54,7 @@ const nameFromContentInputTypes = [
   'image',
   'radio',
   'reset',
-  'submit'
+  'submit',
 ];
 
 /**
@@ -64,36 +64,33 @@ const nameFromContentInputTypes = [
  * (https://www.w3.org/TR/html-aam-1.0/#html-element-role-mappings)
  */
 const nameFromContentFunctionOfElem: {[key: string]: Function} = {
-  'th': (elem: HTMLElement) => {
+  th: (elem: HTMLElement) => {
     return (
       elem.closest('table') !== null ||
       elem.closest('[role="table"]') !== null ||
       elem.closest('[role="grid"]') !== null
     );
   },
-  'td': (elem: HTMLElement) => {
+  td: (elem: HTMLElement) => {
     return (
       elem.closest('table') !== null ||
       elem.closest('[role="table"]') !== null ||
       elem.closest('[role="grid"]') !== null
     );
   },
-  'option': (elem: HTMLElement) => {
-    return (
-      elem.closest('select') !== null ||
-      elem.closest('datalist') !== null
-    );
+  option: (elem: HTMLElement) => {
+    return elem.closest('select') !== null || elem.closest('datalist') !== null;
   },
-  'input': (elem: HTMLElement) => {
+  input: (elem: HTMLElement) => {
     const inputType = elem.getAttribute('type')?.trim().toLowerCase() ?? '';
     return nameFromContentInputTypes.includes(inputType);
   },
-  'a': (elem: HTMLElement) => {
+  a: (elem: HTMLElement) => {
     return elem.hasAttribute('href');
   },
-  'area': (elem: HTMLElement) => {
+  area: (elem: HTMLElement) => {
     return elem.hasAttribute('href');
-  }
+  },
 };
 
 /**
@@ -101,8 +98,8 @@ const nameFromContentFunctionOfElem: {[key: string]: Function} = {
  * @return - true if elem allows name from content, false otherwise
  */
 function allowsNameFromContent(elem: HTMLElement): boolean {
-
-  const elemRole: string = elem.getAttribute('role')?.trim().toLowerCase() ?? '';
+  const elemRole: string =
+    elem.getAttribute('role')?.trim().toLowerCase() ?? '';
   if (nameFromContentRoles.includes(elemRole)) {
     return true;
   }
@@ -169,11 +166,15 @@ export function rule2F(node: Node, context: Context): string | null {
 
   // CSS generated text seems to have value 'on' if it doesn't exist. (rather than null?)
   // Not sure if this is a bug or I've done something wrong.
-  let cssBeforeContent: string = window.getComputedStyle(node, ':before').content.slice(1, -1);
+  let cssBeforeContent: string = window
+    .getComputedStyle(node, ':before')
+    .content.slice(1, -1);
   if (cssBeforeContent === 'on') {
     cssBeforeContent = '';
   }
-  let cssAfterContent: string = window.getComputedStyle(node, ':after').content.slice(1, -1);
+  let cssAfterContent: string = window
+    .getComputedStyle(node, ':after')
+    .content.slice(1, -1);
   if (cssAfterContent === 'on') {
     cssAfterContent = '';
   }
@@ -182,7 +183,10 @@ export function rule2F(node: Node, context: Context): string | null {
   node.childNodes.forEach(childNode => {
     if (!context.inherited.visitedNodes.includes(childNode)) {
       context.inherited.visitedNodes.push(childNode);
-      const textAlterantive = computeTextAlternative(childNode, resetUninherited(context));
+      const textAlterantive = computeTextAlternative(
+        childNode,
+        resetUninherited(context)
+      );
       // Only consider non-empty text alternatives to avoid multiple spaces
       // between words from .join(' ')
       if (textAlterantive !== '') {
@@ -193,5 +197,11 @@ export function rule2F(node: Node, context: Context): string | null {
 
   const accumulatedText = textAlterantives.join(' ');
 
-  return (cssBeforeContent + ' ' + accumulatedText + ' ' + cssAfterContent).trim();
+  return (
+    cssBeforeContent +
+    ' ' +
+    accumulatedText +
+    ' ' +
+    cssAfterContent
+  ).trim();
 }

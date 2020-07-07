@@ -28,38 +28,39 @@ describe('The function for rule 2B', () => {
   });
 
   it('returns concatenation of text alternatives of idreffed elements', () => {
-      render(
-        html`
-      <div id="foo" aria-labelledby="bar baz">Hello</div>
-      <div id="bar"></div>
-      <div id="baz"></div>
-    `,
-        container);
+    render(
+      html`
+        <div id="foo" aria-labelledby="bar baz">Hello</div>
+        <div id="bar"></div>
+        <div id="baz"></div>
+      `,
+      container
+    );
     const elem = document.getElementById('foo');
     expect(rule2B(elem!, context)).toBe('');
   });
 
-  it('returns null if the node is already part of an aria-labelledby traversal',
-    () => {
-        render(
-          html`
+  it('returns null if the node is already part of an aria-labelledby traversal', () => {
+    render(
+      html`
         <div id="foo" aria-labelledby="bar">Hello</div>
         <div id="bar"></div>
       `,
-        container);
+      container
+    );
     const elem = document.getElementById('foo');
     context.ariaLabelledbyReference = true;
     expect(rule2B(elem!, context)).toBe(null);
   });
 
-  it('returns text alternative of aria-labelledby referenced node',
-    () => {
-        render(
-          html`
+  it('returns text alternative of aria-labelledby referenced node', () => {
+    render(
+      html`
         <div id="foo" aria-labelledby="bar"></div>
         <div id="bar">Hello</div>
       `,
-        container);
+      container
+    );
     const elem = document.getElementById('foo');
     expect(rule2B(elem!, context)).toBe('Hello');
   });

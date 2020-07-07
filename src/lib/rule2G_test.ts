@@ -13,54 +13,59 @@ describe('The function for rule 2G', () => {
   });
 
   it('returns text content text nodes', () => {
-    render(html`
-    <div id="foo">
-      Hello world
-    </div>
-    `, container);
+    render(
+      html`
+        <div id="foo">
+          Hello world
+        </div>
+      `,
+      container
+    );
     const node = document.getElementById('foo')?.childNodes[0];
     expect(rule2G(node!)).toBe('Hello world');
   });
 
   it('returns text content of text nodes as a flat string', () => {
-    render(html`
-    <div id="foo">
-      Hello world
-
-      newline
-    </div>
-    `, container);
+    render(
+      html`
+        <div id="foo">
+          Hello world newline
+        </div>
+      `,
+      container
+    );
     const node = document.getElementById('foo')?.childNodes[0];
     expect(rule2G(node!)).toBe('Hello world newline');
   });
 
   it('trims any excess whitespace from the resulting string', () => {
-    render(html`
-    <div id="foo">
-      Hello world             
-    </div>
-    `, container);
+    render(
+      html`
+        <div id="foo">
+          Hello world
+        </div>
+      `,
+      container
+    );
     const node = document.getElementById('foo')?.childNodes[0];
     expect(rule2G(node!)).toBe('Hello world');
   });
 
   it('returns the empty string if no text content is present', () => {
-    render(html`
-    <div id="foo">
-    </div>
-    `, container);
+    render(html` <div id="foo"></div> `, container);
     const node = document.getElementById('foo')?.childNodes[0];
     expect(rule2G(node!)).toBe('');
   });
 
   it('returns null if the node is not a text node', () => {
-    render(html`
-    <div id="foo">
-      Hello world
-
-      newline
-    </div>
-    `, container);
+    render(
+      html`
+        <div id="foo">
+          Hello world newline
+        </div>
+      `,
+      container
+    );
     const node = document.getElementById('foo');
     expect(rule2G(node!)).toBe(null);
   });

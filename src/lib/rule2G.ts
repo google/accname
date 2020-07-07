@@ -7,7 +7,7 @@
 export function rule2G(node: Node): string | null {
   if (node.nodeType === Node.TEXT_NODE) {
     // 'Flattening' the string with .replace()
-    return (node.textContent)?.replace(/\s\s+/g, ' ').trim() ?? '';
+    return node.textContent?.replace(/\s\s+/g, ' ').trim() ?? '';
   }
   return null;
 }
