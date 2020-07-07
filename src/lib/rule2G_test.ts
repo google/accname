@@ -52,9 +52,8 @@ describe('The function for rule 2G', () => {
   });
 
   it('returns the empty string if no text content is present', () => {
-    render(html` <div id="foo"></div> `, container);
-    const node = document.getElementById('foo')?.childNodes[0];
-    expect(rule2G(node!)).toBe('');
+    const node = document.createTextNode('');
+    expect(rule2G(node)).toBe('');
   });
 
   it('returns null if the node is not a text node', () => {
