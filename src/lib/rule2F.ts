@@ -42,6 +42,7 @@ const NAME_FROM_CONTENT_ELEM_NODE_NAME = [
   'tbody',
   'thead',
   'tfoot',
+  'summary'
 ];
 
 /**
@@ -90,6 +91,9 @@ const NAME_FROM_CONTENT_FUNCTION_OF_ELEM: {[key: string]: Function} = {
     return elem.hasAttribute('href');
   },
   area: (elem: HTMLElement) => {
+    return elem.hasAttribute('href');
+  },
+  link: (elem: HTMLElement) => {
     return elem.hasAttribute('href');
   },
 };
