@@ -1,6 +1,8 @@
 import {Context} from './context';
 import {rule2A} from './rule2A';
 import {rule2B} from './rule2B';
+import {rule2F} from './rule2F';
+import {rule2G} from './rule2G';
 
 /**
  * @param currentNode - The node whose text alternative will be calculated
@@ -20,6 +22,16 @@ export function computeTextAlternative(
   }
 
   result = rule2B(currentNode, context);
+  if (result !== null) {
+    return result;
+  }
+
+  result = rule2F(currentNode, context);
+  if (result !== null) {
+    return result;
+  }
+
+  result = rule2G(currentNode);
   if (result !== null) {
     return result;
   }

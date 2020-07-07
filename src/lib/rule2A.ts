@@ -36,7 +36,7 @@ function rule2ACondition(node: Node, context: Context): boolean {
   return (
     isHidden(node) &&
     !context.ariaLabelledbyReference &&
-    !context.labelReference
+    !context.isLabelReference
   );
 }
 

@@ -1,5 +1,5 @@
 import {computeTextAlternative} from './compute_text_alternative';
-import {Context} from './context';
+import {Context, resetUninherited} from './context';
 
 /**
  * Get any HTMLElement referenced in the aria-labelledby attribute
@@ -45,9 +45,11 @@ export function rule2B(node: Node, context: Context): string | null {
   }
 
   return labelElems
-    .map(labelElem =>
-      computeTextAlternative(labelElem, {ariaLabelledbyReference: true})
-    )
+    .map(labelElem => {
+      context = resetUninherited(context);
+      context.ariaLabelledbyReference = true;
+      return computeTextAlternative(labelElem, context);
+    })
     .join(' ')
     .trim();
 }
