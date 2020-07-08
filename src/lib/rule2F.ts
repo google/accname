@@ -2,8 +2,7 @@ import {Context, getDefaultContext} from './context';
 import {computeTextAlternative} from './compute_text_alternative';
 
 // Explicit roles allowing 'name from content'
-// (https://www.w3.org/TR/wai-aria/#namefromcontent)
-// *Spec version 1.1
+// (https://www.w3.org/TR/wai-aria-1.1/#namefromcontent)
 const NAME_FROM_CONTENT_ROLES = [
   'button',
   'cell',
@@ -65,7 +64,8 @@ const NAME_FROM_CONTENT_INPUT_TYPES = [
  * determine if a specific element of that type allows name from content
  * (https://www.w3.org/TR/html-aam-1.0/#html-element-role-mappings)
  */
-const NAME_FROM_CONTENT_FUNCTION_OF_ELEM: {[key: string]: Function} = {
+const NAME_FROM_CONTENT_FUNCTION_OF_ELEM:
+  {[key: string]: (elem: HTMLElement) => boolean} = {
   th: (elem: HTMLElement) => {
     return (
       elem.closest('table') !== null ||
@@ -170,6 +170,8 @@ function getCssContent(elem: HTMLElement, pseudoElementName: string): string {
   if (cssContent === 'none') {
     return '';
   } else {
+    // slicing off unnecessary double quotes (")
+    // from either end of the string.
     return cssContent.slice(1, -1);
   }
 }

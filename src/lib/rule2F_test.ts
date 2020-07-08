@@ -28,7 +28,7 @@ describe('The function for rule 2F', () => {
     expect(rule2F(elem!, context)).toBe('Hello world');
   });
 
-  it('returns text content of subtree if node label element', () => {
+  it('returns text content of subtree if node is a label element', () => {
     render(
       html`
         <label id="foo">
@@ -50,7 +50,7 @@ describe('The function for rule 2F', () => {
     expect(rule2F(elem!, context)).toBe('Hello world !');
   });
 
-  it('considers CSS generated text content', () => {
+  it('returns a string concatenated with CSS generated text content', () => {
     render(
       html`
         <div id="foo">
@@ -74,7 +74,7 @@ describe('The function for rule 2F', () => {
     expect(rule2F(elem!, context)).toBe('Helloworld!');
   });
 
-  it('considers entire subtree for descendants of label reference', () => {
+  it('doesn\'t visit the same node twice during a recursive traversal', () => {
     render(
       html`
         <div id="foo">
@@ -91,6 +91,27 @@ describe('The function for rule 2F', () => {
     const elem = document.getElementById('foo');
     context.isLabelReference = true;
     expect(rule2F(elem!, context)).toBe('Hello world');
+  });
+
+  it('returns text alternative for entire subtree of node referenced by aria-labelledby', () => {
+    render(
+      html`
+        <div id="foo" aria-labelledby="bar">
+        <div id="bar">
+          Hello
+          <div>
+            world
+            <div>
+              !
+            </div>
+          </div>
+        </div>
+      `,
+      container
+    );
+    const elem = document.getElementById('foo');
+    context.isLabelReference = true;
+    expect(rule2F(elem!, context)).toBe('Hello world !');
   });
 });
 
@@ -131,7 +152,7 @@ describe('The function allowsNameFromContent', () => {
     expect(allowsNameFromContent_TEST(elem!)).toBe(false);
   });
 
-  it('recognises semantic html elements', () => {
+  it('returns true for semantic html elements that imply a role that allows name from content', () => {
     render(
       html`
         <h1 id="foo">
@@ -144,7 +165,7 @@ describe('The function allowsNameFromContent', () => {
     expect(allowsNameFromContent_TEST(elem!)).toBe(true);
   });
 
-  it('allows table calls only if they are within a table', () => {
+  it('returns true for td elements only if they are within a table', () => {
     render(
       html`
         <table>
@@ -157,13 +178,13 @@ describe('The function allowsNameFromContent', () => {
     expect(allowsNameFromContent_TEST(elem!)).toBe(true);
   });
 
-  it('allows options only if they are within a datalist or select', () => {
+  it('returns false for option elements if they are not within a datalist or select', () => {
     render(html` <option id="foo"></option> `, container);
     const elem = document.getElementById('foo');
     expect(allowsNameFromContent_TEST(elem!)).toBe(false);
   });
 
-  it('allows options only if they are within a datalist or select', () => {
+  it('returns true for option elements only if they are within a datalist or select', () => {
     render(
       html`
         <select>
@@ -176,7 +197,7 @@ describe('The function allowsNameFromContent', () => {
     expect(allowsNameFromContent_TEST(elem!)).toBe(true);
   });
 
-  it('allows options only if they are within a datalist or select', () => {
+  it('returns true for option elements only if they are within a datalist or select', () => {
     render(
       html`
         <datalist>
@@ -189,25 +210,25 @@ describe('The function allowsNameFromContent', () => {
     expect(allowsNameFromContent_TEST(elem!)).toBe(true);
   });
 
-  it('allows inputs of certain types', () => {
+  it('returns true for inputs with a type that allows name from content (i.e. button)', () => {
     render(html` <input id="foo" type="button" /> `, container);
     const elem = document.getElementById('foo');
     expect(allowsNameFromContent_TEST(elem!)).toBe(true);
   });
 
-  it('allows inputs of certain types', () => {
+  it('returns false for inputs whose type does not allow name from content', () => {
     render(html` <input id="foo" type="other" /> `, container);
     const elem = document.getElementById('foo');
     expect(allowsNameFromContent_TEST(elem!)).toBe(false);
   });
 
-  it('allows links only if they have a href attribute', () => {
+  it('returns true for links only if they have a href attribute', () => {
     render(html` <a id="foo"></a> `, container);
     const elem = document.getElementById('foo');
     expect(allowsNameFromContent_TEST(elem!)).toBe(false);
   });
 
-  it('allows links only if they have a href attribute', () => {
+  it('returns false for links if they do not have a href attribute', () => {
     render(html` <a id="foo" href="#"></a> `, container);
     const elem = document.getElementById('foo');
     expect(allowsNameFromContent_TEST(elem!)).toBe(true);
