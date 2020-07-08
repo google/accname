@@ -15,7 +15,7 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
-    "lib": ["es6","dom"]
+    "lib": ["es6","dom","DOM.Iterable"]
   },
   "include": [
     "src",

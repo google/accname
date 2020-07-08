@@ -1,14 +1,12 @@
 import {html, render} from 'lit-html';
-import {Context, getDefaultContext} from './context';
+import {getDefaultContext} from './context';
 import {rule2B} from './rule2B';
 
 describe('The function for rule 2B', () => {
   let container: HTMLElement;
-  let context: Context;
   beforeEach(() => {
     container = document.createElement('div');
     document.body.appendChild(container);
-    context = getDefaultContext();
   });
 
   afterEach(() => {
@@ -18,13 +16,13 @@ describe('The function for rule 2B', () => {
   it('returns null if the element has no aria-labelledby attribute', () => {
     render(html`<div id="foo">Hello</div>`, container);
     const elem = document.getElementById('foo');
-    expect(rule2B(elem!, context)).toBe(null);
+    expect(rule2B(elem!)).toBe(null);
   });
 
   it('returns null if the element has no valid aria-labelledby idrefs', () => {
     render(html`<div id="foo" aria-labelledby="bar">Hello</div>`, container);
     const elem = document.getElementById('foo');
-    expect(rule2B(elem!, context)).toBe(null);
+    expect(rule2B(elem!)).toBe(null);
   });
 
   it('returns concatenation of text alternatives of idreffed elements', () => {
@@ -37,7 +35,7 @@ describe('The function for rule 2B', () => {
       container
     );
     const elem = document.getElementById('foo');
-    expect(rule2B(elem!, context)).toBe('');
+    expect(rule2B(elem!)).toBe('');
   });
 
   it('returns null if the node is already part of an aria-labelledby traversal', () => {
@@ -49,7 +47,8 @@ describe('The function for rule 2B', () => {
       container
     );
     const elem = document.getElementById('foo');
-    context.ariaLabelledbyReference = true;
+    const context = getDefaultContext();
+    context.wasAriaLabelledbyReferenced = true;
     expect(rule2B(elem!, context)).toBe(null);
   });
 
@@ -62,7 +61,7 @@ describe('The function for rule 2B', () => {
       container
     );
     const elem = document.getElementById('foo');
-    expect(rule2B(elem!, context)).toBe('Hello');
+    expect(rule2B(elem!)).toBe('Hello');
   });
 
   /*

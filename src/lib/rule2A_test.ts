@@ -1,50 +1,50 @@
 import {html, render} from 'lit-html';
-import {Context, getDefaultContext} from './context';
+import {getDefaultContext} from './context';
 import {rule2A} from './rule2A';
 
 describe('The function for rule 2A', () => {
   let container: HTMLElement;
-  let context: Context;
   beforeEach(() => {
     container = document.createElement('div');
     document.body.appendChild(container);
-    context = getDefaultContext();
   });
 
   afterEach(() => {
     document.body.removeChild(container);
   });
 
-  it("returns empty string for hidden elems that aren't referenced", () => {
+  it('returns empty string for hidden elems that aren\'t referenced', () => {
     render(html`<div id="foo" hidden>Hello world</div>`, container);
     const elem = document.getElementById('foo');
-    expect(rule2A(elem!, context)).toBe('');
+    expect(rule2A(elem!)).toBe('');
   });
 
   it('returns null for hidden elems that are referenced in an aria-labelledby', () => {
     render(html`<div id="foo" hidden>Hello world</div>`, container);
     const elem = document.getElementById('foo');
-    context.ariaLabelledbyReference = true;
+    const context = getDefaultContext();
+    context.wasAriaLabelledbyReferenced = true;
     expect(rule2A(elem!, context)).toBe(null);
   });
 
   it('returns null for hidden elems that are referenced by a label element', () => {
     render(html`<div id="foo" hidden>Hello world</div>`, container);
     const elem = document.getElementById('foo');
-    context.ariaLabelledbyReference = true;
+    const context = getDefaultContext();
+    context.wasAriaLabelledbyReferenced = true;
     expect(rule2A(elem!, context)).toBe(null);
   });
 
   it('returns null for elem that is not hidden', () => {
     render(html`<div id="foo">Hello world</div>`, container);
     const elem = document.getElementById('foo');
-    expect(rule2A(elem!, context)).toBe(null);
+    expect(rule2A(elem!)).toBe(null);
   });
 
   it('considers aria-hidden', () => {
     render(html`<div id="foo" aria-hidden="true">Hello world</div>`, container);
     const elem = document.getElementById('foo');
-    expect(rule2A(elem!, context)).toBe('');
+    expect(rule2A(elem!)).toBe('');
   });
 
   it('considers CSS display none', () => {
@@ -60,7 +60,7 @@ describe('The function for rule 2A', () => {
       container
     );
     const elem = document.getElementById('foo');
-    expect(rule2A(elem!, context)).toBe('');
+    expect(rule2A(elem!)).toBe('');
   });
 
   it('considers CSS visibility hidden', () => {
@@ -76,7 +76,7 @@ describe('The function for rule 2A', () => {
       container
     );
     const elem = document.getElementById('foo');
-    expect(rule2A(elem!, context)).toBe('');
+    expect(rule2A(elem!)).toBe('');
   });
 
   it('considers hidden ancestors', () => {
@@ -93,7 +93,7 @@ describe('The function for rule 2A', () => {
       container
     );
     const elem = document.getElementById('foo');
-    expect(rule2A(elem!, context)).toBe('');
+    expect(rule2A(elem!)).toBe('');
   });
 
   it('considers display:none ancestors', () => {
@@ -115,7 +115,7 @@ describe('The function for rule 2A', () => {
       container
     );
     const elem = document.getElementById('foo');
-    expect(rule2A(elem!, context)).toBe('');
+    expect(rule2A(elem!)).toBe('');
   });
 
   it('considers visibility:hidden ancestors', () => {
@@ -137,6 +137,6 @@ describe('The function for rule 2A', () => {
       container
     );
     const elem = document.getElementById('foo');
-    expect(rule2A(elem!, context)).toBe('');
+    expect(rule2A(elem!)).toBe('');
   });
 });

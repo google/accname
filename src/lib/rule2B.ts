@@ -30,12 +30,13 @@ function resolveValidAriaLabelledbyIdrefs(elem: HTMLElement): HTMLElement[] {
  * null is returned otherwise, indicating that the condition of this rule was
  * not satisfied.
  */
-export function rule2B(node: Node, context: Context): string | null {
+export function rule2B(node: Node, context: Context = getDefaultContext()): string | null {
   if (!(node instanceof HTMLElement)) {
     return null;
   }
 
-  if (context.ariaLabelledbyReference) {
+  // #SPEC_ASSUMPTION (B.1) : definition of 'part of an aria-labelledby traversal'
+  if (context.wasAriaLabelledbyReferenced) {
     return null;
   }
 
@@ -46,12 +47,7 @@ export function rule2B(node: Node, context: Context): string | null {
 
   return labelElems
     .map(labelElem => {
-      // Carry the inherited context properties on to
-      // the new context
-      const newContext = getDefaultContext();
-      newContext.inherited = context.inherited;
-      newContext.ariaLabelledbyReference = true;
-      return computeTextAlternative(labelElem, newContext);
+      return computeTextAlternative(labelElem, {wasAriaLabelledbyReferenced: true, inherited: context.inherited});
     })
     .join(' ')
     .trim();

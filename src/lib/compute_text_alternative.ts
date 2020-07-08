@@ -1,4 +1,4 @@
-import {Context} from './context';
+import {Context, getDefaultContext} from './context';
 import {rule2A} from './rule2A';
 import {rule2B} from './rule2B';
 import {rule2F} from './rule2F';
@@ -7,12 +7,12 @@ import {rule2G} from './rule2G';
 /**
  * @param currentNode - The node whose text alternative will be calculated
  * @param  context - Additional information relevant to the text alternative
- *     computation for node
+ *     computation for node. Optional paramater is 'getDefaultContext' be default.
  * @return - The text alternative for node
  */
 export function computeTextAlternative(
   currentNode: Node,
-  context: Context
+  context: Context = getDefaultContext()
 ): string {
   let result: string | null = '';
 

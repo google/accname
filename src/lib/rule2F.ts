@@ -29,7 +29,7 @@ const NAME_FROM_CONTENT_ROLES = [
 /**
  * HTML element types that allow name from content according
  * to their implicit aria roles.
- * (https://www.w3.org/TR/html-aam-1.0/#html-element-role-mappings)
+ * (https://www.w3.org/TR/html-aria/#docconformance)
  */
 const NAME_FROM_CONTENT_ELEM_NODE_NAME = [
   'h1',
@@ -47,7 +47,7 @@ const NAME_FROM_CONTENT_ELEM_NODE_NAME = [
 /**
  * HTML input elements allow name from content when
  * they have the following values for 'type' attribute
- * (https://www.w3.org/TR/html-aam-1.0/#html-element-role-mappings)
+ * (https://www.w3.org/TR/html-aria/#docconformance)
  */
 const NAME_FROM_CONTENT_INPUT_TYPES = [
   'button',
@@ -60,43 +60,53 @@ const NAME_FROM_CONTENT_INPUT_TYPES = [
 
 /**
  * Some HTML elements allow name from context only if certain
- * conditions apply. This maps element types to functions that
+ * conditions apply. This function maps element types to functions that
  * determine if a specific element of that type allows name from content
- * (https://www.w3.org/TR/html-aam-1.0/#html-element-role-mappings)
+ * (https://www.w3.org/TR/html-aria/#docconformance)
+ * @param elemNodeName - the nodeName (tag type) of the element whose ability
+ * to allow name from content is being calculated.
+ * @return - a function that may be applied to an element of type elemNodeName
+ * that returns true if that node allows name from content, and false otherwise.
  */
-const NAME_FROM_CONTENT_FUNCTION_OF_ELEM:
-  {[key: string]: (elem: HTMLElement) => boolean} = {
-  th: (elem: HTMLElement) => {
-    return (
-      elem.closest('table') !== null ||
-      elem.closest('[role="table"]') !== null ||
-      elem.closest('[role="grid"]') !== null
-    );
-  },
-  td: (elem: HTMLElement) => {
-    return (
-      elem.closest('table') !== null ||
-      elem.closest('[role="table"]') !== null ||
-      elem.closest('[role="grid"]') !== null
-    );
-  },
-  option: (elem: HTMLElement) => {
-    return elem.closest('select') !== null || elem.closest('datalist') !== null;
-  },
-  input: (elem: HTMLElement) => {
-    const inputType = elem.getAttribute('type')?.trim().toLowerCase() ?? '';
-    return NAME_FROM_CONTENT_INPUT_TYPES.includes(inputType);
-  },
-  a: (elem: HTMLElement) => {
-    return elem.hasAttribute('href');
-  },
-  area: (elem: HTMLElement) => {
-    return elem.hasAttribute('href');
-  },
-  link: (elem: HTMLElement) => {
-    return elem.hasAttribute('href');
-  },
-};
+function getFunctionCalculatingAllowsNameFromContent(elemNodeName: string): ((elem: HTMLElement) => boolean) | null {
+  switch (elemNodeName) {
+    case 'th':
+      return (elem: HTMLElement) => {
+        return (
+          elem.closest('table') !== null
+        );
+      };
+    case 'td':
+      return (elem: HTMLElement) => {
+        return (
+          elem.closest('table') !== null
+        );
+      };
+    case 'option':
+      return (elem: HTMLElement) => {
+        return elem.closest('select,datalist') !== null;
+      };
+    case 'input':
+      return (elem: HTMLElement) => {
+        const inputType = elem.getAttribute('type')?.trim().toLowerCase() ?? '';
+        return NAME_FROM_CONTENT_INPUT_TYPES.includes(inputType);
+      };
+    case 'a':
+      return (elem: HTMLElement) => {
+        return elem.hasAttribute('href');
+      };
+    case 'area':
+      return (elem: HTMLElement) => {
+        return elem.hasAttribute('href');
+      };
+    case 'link':
+      return (elem: HTMLElement) => {
+        return elem.hasAttribute('href');
+      };
+    default:
+      return null;
+  }
+}
 
 /**
  * Calculates whether or not an element's name may be calculated using
@@ -106,18 +116,18 @@ const NAME_FROM_CONTENT_FUNCTION_OF_ELEM:
  * @return - true if elem allows name from content, false otherwise
  */
 function allowsNameFromContent(elem: HTMLElement): boolean {
-  const elemRole: string =
+  const explicitRole =
     elem.getAttribute('role')?.trim().toLowerCase() ?? '';
-  if (NAME_FROM_CONTENT_ROLES.includes(elemRole)) {
+  if (NAME_FROM_CONTENT_ROLES.includes(explicitRole)) {
     return true;
   }
 
-  const elemNodeName: string = elem.nodeName.toLowerCase();
+  const elemNodeName = elem.nodeName.toLowerCase();
   if (NAME_FROM_CONTENT_ELEM_NODE_NAME.includes(elemNodeName)) {
     return true;
   }
 
-  const nameFromContentFunction = NAME_FROM_CONTENT_FUNCTION_OF_ELEM[elemNodeName];
+  const nameFromContentFunction = getFunctionCalculatingAllowsNameFromContent(elemNodeName);
   if (nameFromContentFunction) {
     return nameFromContentFunction(elem);
   }
@@ -125,7 +135,7 @@ function allowsNameFromContent(elem: HTMLElement): boolean {
   return false;
 }
 
-export {allowsNameFromContent as allowsNameFromContent_TEST};
+export const TEST_ONLY = {allowsNameFromContent};
 
 /**
  * Checks if 'elem' in with 'context' satisfies the conditions
@@ -139,7 +149,7 @@ function rule2FCondition(elem: HTMLElement, context: Context): boolean {
     return true;
   }
 
-  if (context.ariaLabelledbyReference) {
+  if (context.wasAriaLabelledbyReferenced) {
     return true;
   }
 
@@ -184,7 +194,7 @@ function getCssContent(elem: HTMLElement, pseudoElementName: string): string {
  * @return - text alternative for node if the conditions of 2F are satisfied,
  * null otherwise.
  */
-export function rule2F(node: Node, context: Context): string | null {
+export function rule2F(node: Node, context: Context = getDefaultContext()): string | null {
   if (!(node instanceof HTMLElement)) {
     return null;
   }
@@ -201,25 +211,25 @@ export function rule2F(node: Node, context: Context): string | null {
     if (!context.inherited.visitedNodes.includes(childNode)) {
       context.inherited.visitedNodes.push(childNode);
 
-      // Carry the inherited context properties on to
-      // the new context
-      const newContext = getDefaultContext();
-      newContext.inherited = context.inherited;
-
       const textAlterantive = computeTextAlternative(
         childNode,
-        newContext
+        {inherited: context.inherited}
       );
-      // Only consider non-empty text alternatives to avoid multiple spaces
-      // between words from .join(' ')
-      if (textAlterantive !== '') {
-        textAlterantives.push(textAlterantive);
-      }
+
+      textAlterantives.push(textAlterantive);
     }
   });
 
-  const accumulatedText = textAlterantives.join(' ');
+  // Consider only non-empty text alternatives to prevent double
+  // spacing between text alternatives in accumulatedText.
+  // #SPEC_ASSUMPTION (F.1) : that accumulated texts should be space separated
+  // for readability
+  const accumulatedText = textAlterantives
+  .filter(textAlterantive => textAlterantive !== '')
+  .join(' ');
 
+  // #SPEC_ASSUMPTION (F.2) : that CSS generated content should be
+  // concatenated to accumulatedText
   return (
     cssBeforeContent +
     accumulatedText +
