@@ -7,7 +7,7 @@ import {rule2G} from './rule2G';
 /**
  * @param currentNode - The node whose text alternative will be calculated
  * @param  context - Additional information relevant to the text alternative
- *     computation for node. Optional paramater is 'getDefaultContext' be default.
+ *     computation for node. Optional paramater is 'getDefaultContext' by default.
  * @return - The text alternative for node
  */
 export function computeTextAlternative(
