@@ -74,7 +74,7 @@ describe('The function for rule 2F', () => {
     expect(rule2F(elem!, context)).toBe('Helloworld!');
   });
 
-  it('doesn\'t visit the same node twice during a recursive traversal', () => {
+  it("doesn't visit the same node twice during a recursive traversal", () => {
     render(
       html`
         <div id="foo">
@@ -98,12 +98,13 @@ describe('The function for rule 2F', () => {
     render(
       html`
         <div id="foo" aria-labelledby="bar">
-        <div id="bar">
-          Hello
-          <div>
-            world
+          <div id="bar">
+            Hello
             <div>
-              !
+              world
+              <div>
+                !
+              </div>
             </div>
           </div>
         </div>
