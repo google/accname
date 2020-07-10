@@ -1,8 +1,8 @@
-name: Test
+name: Lint
 on: pull_request
 
 jobs:
-  test:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -10,4 +10,4 @@ jobs:
         with:
           node-version: 13
       - run: npm install
-      - run: npm run test-headless
+      - run: npm run lint
