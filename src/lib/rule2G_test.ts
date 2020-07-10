@@ -27,9 +27,12 @@ describe('The function for rule 2G', () => {
 
   it('returns text content of text nodes as a flat string', () => {
     render(
+      // prettier-ignore
       html`
         <div id="foo">
-          Hello world newline
+          Hello world
+
+          newline
         </div>
       `,
       container
@@ -40,9 +43,10 @@ describe('The function for rule 2G', () => {
 
   it('removes excess whitespace from the resulting string', () => {
     render(
+      // prettier-ignore
       html`
         <div id="foo">
-          Hello world
+          Hello    world
         </div>
       `,
       container
