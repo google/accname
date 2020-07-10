@@ -29,6 +29,7 @@
   "scripts": {
     "build": "tsc",
     "test": "karma start",
+    "test-headless": "karma start --single-run --browsers ChromeHeadless,FirefoxHeadless",
     "check": "gts check",
     "clean": "gts clean",
     "compile": "tsc",
