@@ -36,10 +36,10 @@
     "build": "tsc",
     "test": "karma start",
     "test-headless": "karma start --single-run --browsers ChromeHeadless,FirefoxHeadless",
-    "check": "gts check src/**/*.ts",
-    "clean": "gts clean",
+    "check": "npx gts check src/**/*.ts",
+    "clean": "npx gts clean src/**/*.ts",
     "compile": "tsc",
-    "fix": "gts fix",
+    "fix": "npx gts fix",
     "prepare": "npm run compile",
     "pretest": "npm run compile",
     "posttest": "npm run check",
@@ -59,7 +59,6 @@
   "dependencies": {},
   "husky": {
     "hooks": {
-      "pre-commit": "npm run fix src/*.ts src/lib/*.ts"
     }
   }
 }

@@ -1,4 +1,5 @@
 import {html, render} from 'lit-html';
+import {getDefaultContext} from './context';
 import {rule2B} from './rule2B';
 
 describe('The function for rule 2B', () => {
@@ -15,13 +16,13 @@ describe('The function for rule 2B', () => {
   it('returns null if the element has no aria-labelledby attribute', () => {
     render(html`<div id="foo">Hello</div>`, container);
     const elem = document.getElementById('foo');
-    expect(rule2B(elem!, {})).toBe(null);
+    expect(rule2B(elem!)).toBe(null);
   });
 
   it('returns null if the element has no valid aria-labelledby idrefs', () => {
     render(html`<div id="foo" aria-labelledby="bar">Hello</div>`, container);
     const elem = document.getElementById('foo');
-    expect(rule2B(elem!, {})).toBe(null);
+    expect(rule2B(elem!)).toBe(null);
   });
 
   it('returns concatenation of text alternatives of idreffed elements', () => {
@@ -34,7 +35,7 @@ describe('The function for rule 2B', () => {
       container
     );
     const elem = document.getElementById('foo');
-    expect(rule2B(elem!, {})).toBe('');
+    expect(rule2B(elem!)).toBe('');
   });
 
   it('returns null if the node is already part of an aria-labelledby traversal', () => {
@@ -46,7 +47,21 @@ describe('The function for rule 2B', () => {
       container
     );
     const elem = document.getElementById('foo');
-    expect(rule2B(elem!, {ariaLabelledbyReference: true})).toBe(null);
+    const context = getDefaultContext();
+    context.wasAriaLabelledbyReferenced = true;
+    expect(rule2B(elem!, context)).toBe(null);
+  });
+
+  it('returns text alternative of aria-labelledby referenced node', () => {
+    render(
+      html`
+        <div id="foo" aria-labelledby="bar"></div>
+        <div id="bar">Hello</div>
+      `,
+      container
+    );
+    const elem = document.getElementById('foo');
+    expect(rule2B(elem!)).toBe('Hello');
   });
 
   /*
