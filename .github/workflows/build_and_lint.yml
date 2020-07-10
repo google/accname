@@ -12,7 +12,7 @@ jobs:
           node-version: '12.x'
       - name: Install dependencies
         run: npm install
-      - name: Build
-        run: npm run build
       - name: Lint
         run: npm run check
+      - name: Build
+        run: npm run build
