@@ -60,7 +60,6 @@ describe('The function for rule 2E', () => {
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
     context.inherited.partOfName = true;
-    context.directLabelReference = true;
     expect(rule2E(elem!, context)).toBe('world');
   });
 
@@ -74,7 +73,46 @@ describe('The function for rule 2E', () => {
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
     context.inherited.partOfName = true;
-    context.directLabelReference = true;
     expect(rule2E(elem!, context)).toBe('Hello world');
+  });
+
+  it('returns aria-valuetext value if present in range input', () => {
+    render(html`
+      <input id="foo" type="range" aria-valuetext="5" />
+    `, container);
+    const elem = document.getElementById('foo');
+    const context = getDefaultContext();
+    context.inherited.partOfName = true;
+    expect(rule2E(elem!, context)).toBe('5');
+  });
+
+  it('returns aria-valuenow value if present in range input', () => {
+    render(html`
+      <input id="foo" type="range" aria-valuenow="5" />
+    `, container);
+    const elem = document.getElementById('foo');
+    const context = getDefaultContext();
+    context.inherited.partOfName = true;
+    expect(rule2E(elem!, context)).toBe('5');
+  });
+
+  it('gives aria-valuetext priority over aria-valuenow for range input', () => {
+    render(html`
+      <input id="foo" type="range" aria-valuenow="6" aria-valuetext="5" />
+    `, container);
+    const elem = document.getElementById('foo');
+    const context = getDefaultContext();
+    context.inherited.partOfName = true;
+    expect(rule2E(elem!, context)).toBe('5');
+  });
+
+  it('returns range input value if neither aria-valuetext nor aria-valuenow are present', () => {
+    render(html`
+      <input id="foo" type="range" value="5" />
+    `, container);
+    const elem = document.getElementById('foo');
+    const context = getDefaultContext();
+    context.inherited.partOfName = true;
+    expect(rule2E(elem!, context)).toBe('5');
   });
 });
