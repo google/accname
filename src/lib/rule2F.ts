@@ -41,7 +41,7 @@ const NAME_FROM_CONTENT_ELEM_NODE_NAME = [
   'tbody',
   'thead',
   'tfoot',
-  'summary'
+  'summary',
 ];
 
 /**
@@ -68,19 +68,17 @@ const NAME_FROM_CONTENT_INPUT_TYPES = [
  * @return - a function that may be applied to an element of type elemNodeName
  * that returns true if that node allows name from content, and false otherwise.
  */
-function getFunctionCalculatingAllowsNameFromContent(elemNodeName: string): ((elem: HTMLElement) => boolean) | null {
+function getFunctionCalculatingAllowsNameFromContent(
+  elemNodeName: string
+): ((elem: HTMLElement) => boolean) | null {
   switch (elemNodeName) {
     case 'th':
       return (elem: HTMLElement) => {
-        return (
-          elem.closest('table') !== null
-        );
+        return elem.closest('table') !== null;
       };
     case 'td':
       return (elem: HTMLElement) => {
-        return (
-          elem.closest('table') !== null
-        );
+        return elem.closest('table') !== null;
       };
     case 'option':
       return (elem: HTMLElement) => {
@@ -116,8 +114,7 @@ function getFunctionCalculatingAllowsNameFromContent(elemNodeName: string): ((el
  * @return - true if elem allows name from content, false otherwise
  */
 function allowsNameFromContent(elem: HTMLElement): boolean {
-  const explicitRole =
-    elem.getAttribute('role')?.trim().toLowerCase() ?? '';
+  const explicitRole = elem.getAttribute('role')?.trim().toLowerCase() ?? '';
   if (NAME_FROM_CONTENT_ROLES.includes(explicitRole)) {
     return true;
   }
@@ -127,7 +124,9 @@ function allowsNameFromContent(elem: HTMLElement): boolean {
     return true;
   }
 
-  const nameFromContentFunction = getFunctionCalculatingAllowsNameFromContent(elemNodeName);
+  const nameFromContentFunction = getFunctionCalculatingAllowsNameFromContent(
+    elemNodeName
+  );
   if (nameFromContentFunction) {
     return nameFromContentFunction(elem);
   }
@@ -174,8 +173,7 @@ function rule2FCondition(elem: HTMLElement, context: Context): boolean {
  * empty string otherwise.
  */
 function getCssContent(elem: HTMLElement, pseudoElementName: string): string {
-  const cssContent: string = window
-    .getComputedStyle(elem, pseudoElementName)
+  const cssContent: string = window.getComputedStyle(elem, pseudoElementName)
     .content;
   if (cssContent === 'none') {
     return '';
@@ -194,7 +192,10 @@ function getCssContent(elem: HTMLElement, pseudoElementName: string): string {
  * @return - text alternative for node if the conditions of 2F are satisfied,
  * null otherwise.
  */
-export function rule2F(node: Node, context: Context = getDefaultContext()): string | null {
+export function rule2F(
+  node: Node,
+  context: Context = getDefaultContext()
+): string | null {
   if (!(node instanceof HTMLElement)) {
     return null;
   }
@@ -211,10 +212,9 @@ export function rule2F(node: Node, context: Context = getDefaultContext()): stri
     if (!context.inherited.visitedNodes.includes(childNode)) {
       context.inherited.visitedNodes.push(childNode);
 
-      const textAlterantive = computeTextAlternative(
-        childNode,
-        {inherited: context.inherited}
-      );
+      const textAlterantive = computeTextAlternative(childNode, {
+        inherited: context.inherited,
+      });
 
       textAlterantives.push(textAlterantive);
     }
@@ -225,14 +225,10 @@ export function rule2F(node: Node, context: Context = getDefaultContext()): stri
   // #SPEC_ASSUMPTION (F.1) : that accumulated texts should be space separated
   // for readability
   const accumulatedText = textAlterantives
-  .filter(textAlterantive => textAlterantive !== '')
-  .join(' ');
+    .filter(textAlterantive => textAlterantive !== '')
+    .join(' ');
 
   // #SPEC_ASSUMPTION (F.2) : that CSS generated content should be
   // concatenated to accumulatedText
-  return (
-    cssBeforeContent +
-    accumulatedText +
-    cssAfterContent
-  ).trim();
+  return (cssBeforeContent + accumulatedText + cssAfterContent).trim();
 }

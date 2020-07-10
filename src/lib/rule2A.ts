@@ -51,7 +51,10 @@ function rule2ACondition(node: Node, context: Context): boolean {
  * null is returned otherwise, indicating that the condition of this rule was
  * not satisfied.
  */
-export function rule2A(node: Node, context: Context = getDefaultContext()): string | null {
+export function rule2A(
+  node: Node,
+  context: Context = getDefaultContext()
+): string | null {
   let result = null;
   if (rule2ACondition(node, context)) {
     result = '';

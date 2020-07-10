@@ -9,6 +9,8 @@
   "devDependencies": {
     "@types/jasmine": "^3.5.11",
     "@types/node": "^13.11.1",
+    "@typescript-eslint/eslint-plugin": "^3.6.0",
+    "@typescript-eslint/parser": "^3.6.0",
     "clang-format": "^1.4.0",
     "gts": "^2.0.2",
     "husky": "^4.2.5",
@@ -27,11 +29,15 @@
     "tslint": "^6.1.2",
     "typescript": "^3.9.5"
   },
+  "files": [
+    "!/src/lib/*_test.ts"
+  ],
   "scripts": {
     "build": "tsc",
     "test": "karma start",
-    "check": "npx gts check",
-    "clean": "npx gts clean",
+    "test-headless": "karma start --single-run --browsers ChromeHeadless,FirefoxHeadless",
+    "check": "npx gts check src/**/*.ts",
+    "clean": "npx gts clean src/**/*.ts",
     "compile": "tsc",
     "fix": "npx gts fix",
     "prepare": "npm run compile",

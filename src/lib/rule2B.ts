@@ -30,7 +30,10 @@ function resolveValidAriaLabelledbyIdrefs(elem: HTMLElement): HTMLElement[] {
  * null is returned otherwise, indicating that the condition of this rule was
  * not satisfied.
  */
-export function rule2B(node: Node, context: Context = getDefaultContext()): string | null {
+export function rule2B(
+  node: Node,
+  context: Context = getDefaultContext()
+): string | null {
   if (!(node instanceof HTMLElement)) {
     return null;
   }
@@ -47,7 +50,10 @@ export function rule2B(node: Node, context: Context = getDefaultContext()): stri
 
   return labelElems
     .map(labelElem => {
-      return computeTextAlternative(labelElem, {wasAriaLabelledbyReferenced: true, inherited: context.inherited});
+      return computeTextAlternative(labelElem, {
+        wasAriaLabelledbyReferenced: true,
+        inherited: context.inherited,
+      });
     })
     .join(' ')
     .trim();

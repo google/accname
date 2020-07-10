@@ -13,7 +13,7 @@ describe('The function for rule 2A', () => {
     document.body.removeChild(container);
   });
 
-  it('returns empty string for hidden elems that aren\'t referenced', () => {
+  it("returns empty string for hidden elems that aren't referenced", () => {
     render(html`<div id="foo" hidden>Hello world</div>`, container);
     const elem = document.getElementById('foo');
     expect(rule2A(elem!)).toBe('');
