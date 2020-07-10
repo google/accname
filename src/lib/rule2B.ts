@@ -1,5 +1,5 @@
 import {computeTextAlternative} from './compute_text_alternative';
-import {Context} from './context';
+import {Context, getDefaultContext} from './context';
 
 /**
  * Get any HTMLElement referenced in the aria-labelledby attribute
@@ -30,12 +30,13 @@ function resolveValidAriaLabelledbyIdrefs(elem: HTMLElement): HTMLElement[] {
  * null is returned otherwise, indicating that the condition of this rule was
  * not satisfied.
  */
-export function rule2B(node: Node, context: Context): string | null {
+export function rule2B(node: Node, context: Context = getDefaultContext()): string | null {
   if (!(node instanceof HTMLElement)) {
     return null;
   }
 
-  if (context.ariaLabelledbyReference) {
+  // #SPEC_ASSUMPTION (B.1) : definition of 'part of an aria-labelledby traversal'
+  if (context.wasAriaLabelledbyReferenced) {
     return null;
   }
 
@@ -45,9 +46,9 @@ export function rule2B(node: Node, context: Context): string | null {
   }
 
   return labelElems
-    .map(labelElem =>
-      computeTextAlternative(labelElem, {ariaLabelledbyReference: true})
-    )
+    .map(labelElem => {
+      return computeTextAlternative(labelElem, {wasAriaLabelledbyReferenced: true, inherited: context.inherited});
+    })
     .join(' ')
     .trim();
 }
