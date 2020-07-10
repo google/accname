@@ -45,7 +45,7 @@ describe('The function for rule 2F', () => {
     );
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
-    context.isLabelReference = true;
+    context.inherited.isRecursive = true;
     expect(rule2F(elem!, context)).toBe('Hello world !');
   });
 
@@ -70,7 +70,7 @@ describe('The function for rule 2F', () => {
     );
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
-    context.isLabelReference = true;
+    context.inherited.isRecursive = true;
     expect(rule2F(elem!, context)).toBe('Helloworld!');
   });
 
@@ -90,7 +90,7 @@ describe('The function for rule 2F', () => {
     );
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
-    context.isLabelReference = true;
+    context.inherited.isRecursive = true;
     expect(rule2F(elem!, context)).toBe('Hello world');
   });
 
@@ -112,7 +112,7 @@ describe('The function for rule 2F', () => {
     );
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
-    context.isLabelReference = true;
+    context.inherited.isRecursive = true;
     expect(rule2F(elem!, context)).toBe('Hello world !');
   });
 });

@@ -149,16 +149,11 @@ function rule2FCondition(elem: HTMLElement, context: Context): boolean {
     return true;
   }
 
-  if (context.wasAriaLabelledbyReferenced) {
+  if (context.directLabelReference) {
     return true;
   }
 
-  if (context.isLabelReference) {
-    context.inherited.isLabelDescendant = true;
-    return true;
-  }
-
-  if (context.inherited.isLabelDescendant) {
+  if (context.inherited.isRecursive) {
     return true;
   }
 
@@ -209,7 +204,9 @@ export function rule2F(node: Node, context: Context = getDefaultContext()): stri
   const textAlterantives: string[] = [];
   node.childNodes.forEach(childNode => {
     if (!context.inherited.visitedNodes.includes(childNode)) {
+
       context.inherited.visitedNodes.push(childNode);
+      context.inherited.isRecursive = true;
 
       const textAlterantive = computeTextAlternative(
         childNode,

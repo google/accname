@@ -48,7 +48,7 @@ describe('The function for rule 2B', () => {
     );
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
-    context.wasAriaLabelledbyReferenced = true;
+    context.directLabelReference = true;
     expect(rule2B(elem!, context)).toBe(null);
   });
 

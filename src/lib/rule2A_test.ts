@@ -23,15 +23,7 @@ describe('The function for rule 2A', () => {
     render(html`<div id="foo" hidden>Hello world</div>`, container);
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
-    context.wasAriaLabelledbyReferenced = true;
-    expect(rule2A(elem!, context)).toBe(null);
-  });
-
-  it('returns null for hidden elems that are referenced by a label element', () => {
-    render(html`<div id="foo" hidden>Hello world</div>`, container);
-    const elem = document.getElementById('foo');
-    const context = getDefaultContext();
-    context.wasAriaLabelledbyReferenced = true;
+    context.directLabelReference = true;
     expect(rule2A(elem!, context)).toBe(null);
   });
 
