@@ -66,6 +66,19 @@ describe('The function allowsNameFromContent', () => {
     expect(allowsNameFromContent(elem!)).toBe(true);
   });
 
+  it('returns true for th elements if they are within a table', () => {
+    render(
+      html`
+        <table>
+          <th id="foo"></th>
+        </table>
+      `,
+      container
+    );
+    const elem = document.getElementById('foo');
+    expect(allowsNameFromContent(elem!)).toBe(true);
+  });
+
   it('returns false for option elements if they are not within a datalist or select', () => {
     render(html` <option id="foo"></option> `, container);
     const elem = document.getElementById('foo');
@@ -118,6 +131,36 @@ describe('The function allowsNameFromContent', () => {
 
   it('returns false for links if they do not have a href attribute', () => {
     render(html` <a id="foo"></a> `, container);
+    const elem = document.getElementById('foo');
+    expect(allowsNameFromContent(elem!)).toBe(false);
+  });
+
+  it('returns true for area elements if they have a href attribute', () => {
+    render(html` <area id="foo" href="#"></area> `, container);
+    const elem = document.getElementById('foo');
+    expect(allowsNameFromContent(elem!)).toBe(true);
+  });
+
+  it('returns false for area elements if they do not have a href attribute', () => {
+    render(html` <area id="foo"></area> `, container);
+    const elem = document.getElementById('foo');
+    expect(allowsNameFromContent(elem!)).toBe(false);
+  });
+
+  it('returns true for link elements if they have a href attribute', () => {
+    render(html` <link id="foo" href="#"></link> `, container);
+    const elem = document.getElementById('foo');
+    expect(allowsNameFromContent(elem!)).toBe(true);
+  });
+
+  it('returns false for link elements if they do not have a href attribute', () => {
+    render(html` <link id="foo"></link> `, container);
+    const elem = document.getElementById('foo');
+    expect(allowsNameFromContent(elem!)).toBe(false);
+  });
+
+  it('returns false for input elements if they do not have a type attribute', () => {
+    render(html` <input id="foo"></link> `, container);
     const elem = document.getElementById('foo');
     expect(allowsNameFromContent(elem!)).toBe(false);
   });
