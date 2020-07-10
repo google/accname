@@ -50,7 +50,10 @@ export function rule2E(node: Node, context: Context = getDefaultContext()): stri
   if (node instanceof HTMLSelectElement) {
     const textAlterantives = [];
     for (const optionNode of node.selectedOptions) {
-      const textAlterantive = computeTextAlternative(optionNode);
+      // Options are 'hidden' in Chrome, so we have two options here:
+      // allow hidden elements to be part of a name if context.partOfName,
+      // OR consider option elements to be directLabels.
+      const textAlterantive = computeTextAlternative(optionNode, {directLabelReference: true, inherited: context.inherited});
       textAlterantives.push(textAlterantive);
     }
     return textAlterantives.filter((text) => text !== '').join(' ');
