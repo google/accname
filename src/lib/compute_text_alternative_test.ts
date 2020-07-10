@@ -28,7 +28,7 @@ describe('The computeTextAlternative function', () => {
     expect(computeTextAlternative(elem!)).toBe('Hello world');
   });
 
-  it('uses aria-labelledby references when computing \'name from content\' nodes', () => {
+  it("uses aria-labelledby references when computing 'name from content' nodes", () => {
     render(
       html`
         <div id="bar">Hello world</div>
