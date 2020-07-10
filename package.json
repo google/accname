@@ -11,6 +11,7 @@
     "@types/node": "^13.11.1",
     "clang-format": "^1.4.0",
     "gts": "^2.0.2",
+    "husky": "^4.2.5",
     "jasmine": "^3.5.0",
     "jasmine-core": "^3.5.0",
     "jsdom": "^16.2.2",
@@ -29,10 +30,10 @@
   "scripts": {
     "build": "tsc",
     "test": "karma start",
-    "check": "gts check",
-    "clean": "gts clean",
+    "check": "npx gts check",
+    "clean": "npx gts clean",
     "compile": "tsc",
-    "fix": "gts fix",
+    "fix": "npx gts fix",
     "prepare": "npm run compile",
     "pretest": "npm run compile",
     "posttest": "npm run check",
@@ -49,5 +50,9 @@
     "url": "https://github.com/googleinterns/accessible-name/issues"
   },
   "homepage": "https://github.com/googleinterns/accessible-name#readme",
-  "dependencies": {}
+  "dependencies": {},
+  "husky": {
+    "hooks": {
+    }
+  }
 }

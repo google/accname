@@ -4,14 +4,36 @@
  */
 export interface Context {
   /**
-   * Indicates whether a node is referenced by aria-labelledby.
+   * Indicates whether a node was referenced by aria-labelledby by
+   * a node previously traversed by the algorithm.
    * This would be set to true as nodes are processed in rule 2B.
    */
-  ariaLabelledbyReference?: boolean;
+  wasAriaLabelledbyReferenced?: boolean;
   /**
-   * Indicates whether a node is a label for another node,
-   * i.e. a HTML label
-   * This would be set to true by rule 2D.
+   * Indicates whether a node is a label for another node
+   * whose text alternative is being computed.
+   * i.e 'referenced' by a node that has been traversed
+   * by the algorithm.
    */
-  labelReference?: boolean;
+  isLabelReference?: boolean;
+  /**
+   * 'inherited' object stores any context properties
+   * that are to be passed on to a new 'current node'
+   * from the previous 'current node'.
+   */
+  inherited: {
+    isLabelDescendant?: boolean;
+    visitedNodes: Node[];
+  };
+}
+
+/**
+ * Returns a context instance in its default state.
+ */
+export function getDefaultContext(): Context {
+  return {
+    inherited: {
+      visitedNodes: []
+    },
+  };
 }
