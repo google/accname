@@ -153,7 +153,7 @@ function rule2FCondition(elem: HTMLElement, context: Context): boolean {
     return true;
   }
 
-  if (context.inherited.isRecursive) {
+  if (context.inherited.partOfName) {
     return true;
   }
 
@@ -206,7 +206,7 @@ export function rule2F(node: Node, context: Context = getDefaultContext()): stri
     if (!context.inherited.visitedNodes.includes(childNode)) {
 
       context.inherited.visitedNodes.push(childNode);
-      context.inherited.isRecursive = true;
+      context.inherited.partOfName = true;
 
       const textAlterantive = computeTextAlternative(
         childNode,
