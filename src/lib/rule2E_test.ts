@@ -35,7 +35,7 @@ describe('The function for rule 2E', () => {
   });
 
   it('returns text content for inputs whose types imply textbox role', () => {
-    render(html`<input id="foo" type="email" value="hello"/>`, container);
+    render(html`<input id="foo" type="email" value="hello" />`, container);
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
     context.inherited.partOfName = true;
@@ -43,7 +43,7 @@ describe('The function for rule 2E', () => {
   });
 
   it('returns text content for inputs with list attributes', () => {
-    render(html`<input id="foo" list value="hello"/>`, container);
+    render(html`<input id="foo" list value="hello" />`, container);
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
     context.inherited.partOfName = true;
@@ -51,12 +51,15 @@ describe('The function for rule 2E', () => {
   });
 
   it('returns text alternative of selected option in select element', () => {
-    render(html`
-      <select id="foo">
-        <option>Hello</option>
-        <option selected>world</option>
-      </select>
-    `, container);
+    render(
+      html`
+        <select id="foo">
+          <option>Hello</option>
+          <option selected>world</option>
+        </select>
+      `,
+      container
+    );
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
     context.inherited.partOfName = true;
@@ -64,12 +67,15 @@ describe('The function for rule 2E', () => {
   });
 
   it('returns text alternative for multiple selected options in select element', () => {
-    render(html`
-      <select id="foo" multiple>
-        <option selected>Hello</option>
-        <option selected>world</option>
-      </select>
-    `, container);
+    render(
+      html`
+        <select id="foo" multiple>
+          <option selected>Hello</option>
+          <option selected>world</option>
+        </select>
+      `,
+      container
+    );
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
     context.inherited.partOfName = true;
@@ -77,9 +83,10 @@ describe('The function for rule 2E', () => {
   });
 
   it('returns aria-valuetext value if present in range input', () => {
-    render(html`
-      <input id="foo" type="range" aria-valuetext="5" />
-    `, container);
+    render(
+      html` <input id="foo" type="range" aria-valuetext="5" /> `,
+      container
+    );
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
     context.inherited.partOfName = true;
@@ -87,9 +94,10 @@ describe('The function for rule 2E', () => {
   });
 
   it('returns aria-valuenow value if present in range input', () => {
-    render(html`
-      <input id="foo" type="range" aria-valuenow="5" />
-    `, container);
+    render(
+      html` <input id="foo" type="range" aria-valuenow="5" /> `,
+      container
+    );
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
     context.inherited.partOfName = true;
@@ -97,9 +105,12 @@ describe('The function for rule 2E', () => {
   });
 
   it('gives aria-valuetext priority over aria-valuenow for range input', () => {
-    render(html`
-      <input id="foo" type="range" aria-valuenow="6" aria-valuetext="5" />
-    `, container);
+    render(
+      html`
+        <input id="foo" type="range" aria-valuenow="6" aria-valuetext="5" />
+      `,
+      container
+    );
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
     context.inherited.partOfName = true;
@@ -107,9 +118,7 @@ describe('The function for rule 2E', () => {
   });
 
   it('returns range input value if neither aria-valuetext nor aria-valuenow are present', () => {
-    render(html`
-      <input id="foo" type="range" value="5" />
-    `, container);
+    render(html` <input id="foo" type="range" value="5" /> `, container);
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
     context.inherited.partOfName = true;

@@ -13,7 +13,7 @@ function isHidden(node: Node, context: Context): boolean {
   }
 
   // #SPEC_ASSUMPTION (A.3) : options shouldn't be hidden
-  const isOption = (node instanceof HTMLOptionElement);
+  const isOption = node instanceof HTMLOptionElement;
   const isInsideSelect = node.closest('select') !== null;
   if (isOption && isInsideSelect && context.inherited.partOfName) {
     return false;

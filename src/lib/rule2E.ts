@@ -1,13 +1,8 @@
-import { Context, getDefaultContext } from './context';
-import { computeTextAlternative } from './compute_text_alternative';
+import {Context, getDefaultContext} from './context';
+import {computeTextAlternative} from './compute_text_alternative';
 
 // Input types that imply role 'textbox'
-const TEXTBOX_INPUT_TYPES = [
-  'email',
-  'tel',
-  'text',
-  'url'
-];
+const TEXTBOX_INPUT_TYPES = ['email', 'tel', 'text', 'url'];
 
 /**
  * Checks if input elem has role 'textbox' or has a list attribute
@@ -17,17 +12,11 @@ const TEXTBOX_INPUT_TYPES = [
  */
 function isTextboxOrListInput(elem: HTMLInputElement): boolean {
   const inputType = elem.getAttribute('type')?.toLowerCase() ?? '';
-  return (
-    TEXTBOX_INPUT_TYPES.includes(inputType) ||
-    elem.hasAttribute('list')
-  );
+  return TEXTBOX_INPUT_TYPES.includes(inputType) || elem.hasAttribute('list');
 }
 
 // Input types that imply role 'range'
-const RANGE_INPUT_TYPES = [
-  'number',
-  'range'
-];
+const RANGE_INPUT_TYPES = ['number', 'range'];
 
 /**
  * Checks if input elem has role 'range'
@@ -46,7 +35,10 @@ function isRangeInput(elem: HTMLInputElement): boolean {
  * alternative for node.
  * @return text alternative for 'node' if rule 2E accepts 'node', null otherwise.
  */
-export function rule2E(node: Node, context: Context = getDefaultContext()): string | null {
+export function rule2E(
+  node: Node,
+  context: Context = getDefaultContext()
+): string | null {
   if (!(node instanceof HTMLElement)) {
     return null;
   }
@@ -71,13 +63,15 @@ export function rule2E(node: Node, context: Context = getDefaultContext()): stri
     // alternatives, joining them with a space as in 2B.ii.c
     for (const optionNode of node.selectedOptions) {
       context.inherited.partOfName = true;
-      const textAlterantive = computeTextAlternative(optionNode, {inherited: context.inherited});
+      const textAlterantive = computeTextAlternative(optionNode, {
+        inherited: context.inherited,
+      });
       textAlterantives.push(textAlterantive);
     }
-    return textAlterantives.filter((text) => text !== '').join(' ');
+    return textAlterantives.filter(text => text !== '').join(' ');
   }
 
-  if ((node instanceof HTMLInputElement) && isRangeInput(node)) {
+  if (node instanceof HTMLInputElement && isRangeInput(node)) {
     if (node.hasAttribute('aria-valuetext')) {
       return node.getAttribute('aria-valuetext');
     }

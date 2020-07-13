@@ -19,6 +19,12 @@ describe('The function for rule 2C', () => {
     expect(rule2C(elem!)).toBe(null);
   });
 
+  it('returns null if node is not HTMLElement', () => {
+    const elem = document.createTextNode('Hello');
+    expect(rule2C(elem)).toBe(null);
+  });
+
+
   it('returns aria-label value if node contains a non-empty aria-label attribute', () => {
     render(html`<div id="foo" aria-label="hello"></div>`, container);
     const elem = document.getElementById('foo');
@@ -32,17 +38,23 @@ describe('The function for rule 2C', () => {
   });
 
   it('returns aria-label value for controls if they are not already part of a name', () => {
-    render(html`
-      <input id="foo" aria-label="hello there" type="range" value="5" />
-    `, container);
+    render(
+      html`
+        <input id="foo" aria-label="hello there" type="range" value="5" />
+      `,
+      container
+    );
     const elem = document.getElementById('foo');
     expect(rule2C(elem!)).toBe('hello there');
   });
 
   it('returns text alternative for controls if they are part of a name', () => {
-    render(html`
-      <input id="foo" aria-label="hello there" type="range" value="5" />
-    `, container);
+    render(
+      html`
+        <input id="foo" aria-label="hello there" type="range" value="5" />
+      `,
+      container
+    );
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
     context.inherited.partOfName = true;
@@ -50,9 +62,7 @@ describe('The function for rule 2C', () => {
   });
 
   it('returns aria-label value for elements that are not controls, even if they are part of a name', () => {
-    render(html`
-      <div id="foo" aria-label="hello there" />
-    `, container);
+    render(html` <div id="foo" aria-label="hello there" /> `, container);
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
     context.inherited.partOfName = true;

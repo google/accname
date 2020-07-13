@@ -7,7 +7,10 @@ import {rule2E} from './rule2E';
  * @param context - information relevant to the computation of node's text alternative
  * @return text alternative for 'node' if rule 2C accepts 'node', null otherwise.
  */
-export function rule2C(node: Node, context: Context = getDefaultContext()): string | null {
+export function rule2C(
+  node: Node,
+  context: Context = getDefaultContext()
+): string | null {
   if (!(node instanceof HTMLElement)) {
     return null;
   }
