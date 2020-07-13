@@ -13,13 +13,21 @@ describe('The function for rule 2A', () => {
     document.body.removeChild(container);
   });
 
-  it('returns empty string for hidden elems that aren\'t referenced', () => {
+  it("returns empty string for hidden elems that aren't referenced", () => {
     render(html`<div id="foo" hidden>Hello world</div>`, container);
     const elem = document.getElementById('foo');
     expect(rule2A(elem!)).toBe('');
   });
 
   it('returns null for hidden elems that are referenced in an aria-labelledby', () => {
+    render(html`<div id="foo" hidden>Hello world</div>`, container);
+    const elem = document.getElementById('foo');
+    const context = getDefaultContext();
+    context.directLabelReference = true;
+    expect(rule2A(elem!, context)).toBe(null);
+  });
+
+  it('returns null for hidden elems that are referenced by a label element', () => {
     render(html`<div id="foo" hidden>Hello world</div>`, container);
     const elem = document.getElementById('foo');
     const context = getDefaultContext();

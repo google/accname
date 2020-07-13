@@ -7,7 +7,7 @@ import {Context, getDefaultContext} from './context';
  * @return - whether or not the node is considered hidden
  */
 // #SPEC_ASSUMPTION (A.2) : definition of 'hidden'
-function isHidden(node: Node, context: Context = getDefaultContext()): boolean {
+function isHidden(node: Node, context: Context): boolean {
   if (!(node instanceof HTMLElement)) {
     return false;
   }
@@ -42,10 +42,7 @@ function isHidden(node: Node, context: Context = getDefaultContext()): boolean {
  */
 function rule2ACondition(node: Node, context: Context): boolean {
   // #SPEC_ASSUMPTION (A.1) : definition of 'directly referenced'
-  return (
-    isHidden(node, context) &&
-    !context.directLabelReference
-  );
+  return isHidden(node, context) && !context.directLabelReference;
 }
 
 /**
@@ -57,7 +54,10 @@ function rule2ACondition(node: Node, context: Context): boolean {
  * null is returned otherwise, indicating that the condition of this rule was
  * not satisfied.
  */
-export function rule2A(node: Node, context: Context = getDefaultContext()): string | null {
+export function rule2A(
+  node: Node,
+  context: Context = getDefaultContext()
+): string | null {
   let result = null;
   if (rule2ACondition(node, context)) {
     result = '';

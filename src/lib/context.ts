@@ -43,7 +43,7 @@ export interface Context {
 export function getDefaultContext(): Context {
   return {
     inherited: {
-      visitedNodes: []
+      visitedNodes: [],
     },
   };
 }

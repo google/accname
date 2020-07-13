@@ -45,7 +45,7 @@ describe('The function for rule 2F', () => {
     );
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
-    context.inherited.partOfName = true;
+    context.directLabelReference = true;
     expect(rule2F(elem!, context)).toBe('Hello world !');
   });
 
@@ -70,11 +70,11 @@ describe('The function for rule 2F', () => {
     );
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
-    context.inherited.partOfName = true;
+    context.directLabelReference = true;
     expect(rule2F(elem!, context)).toBe('Helloworld!');
   });
 
-  it('doesn\'t visit the same node twice during a recursive traversal', () => {
+  it("doesn't visit the same node twice during a recursive traversal", () => {
     render(
       html`
         <div id="foo">
@@ -90,7 +90,7 @@ describe('The function for rule 2F', () => {
     );
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
-    context.inherited.partOfName = true;
+    context.directLabelReference = true;
     expect(rule2F(elem!, context)).toBe('Hello world');
   });
 
@@ -98,12 +98,13 @@ describe('The function for rule 2F', () => {
     render(
       html`
         <div id="foo" aria-labelledby="bar">
-        <div id="bar">
-          Hello
-          <div>
-            world
+          <div id="bar">
+            Hello
             <div>
-              !
+              world
+              <div>
+                !
+              </div>
             </div>
           </div>
         </div>
@@ -112,7 +113,18 @@ describe('The function for rule 2F', () => {
     );
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
-    context.inherited.partOfName = true;
+    context.directLabelReference = true;
     expect(rule2F(elem!, context)).toBe('Hello world !');
+  });
+
+  it('returns null if the conditions for applying rule2F are not satisfied', () => {
+    render(
+      html`
+        <div id="foo""></div>
+      `,
+      container
+    );
+    const elem = document.getElementById('foo');
+    expect(rule2F(elem!)).toBe(null);
   });
 });
