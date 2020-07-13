@@ -67,9 +67,14 @@ export function rule2E(
   if (node instanceof HTMLSelectElement) {
     // #SPEC_ASSUMPTION (E.2) : consider multiple selected options' text
     // alternatives, joining them with a space as in 2B.ii.c
-    return Array.from(node.selectedOptions).map((optionElem) => {
-      return computeTextAlternative(optionElem, {inherited: context.inherited});
-    }).filter(alternativeText => alternativeText !== '').join(' ');
+    return Array.from(node.selectedOptions)
+      .map(optionElem => {
+        return computeTextAlternative(optionElem, {
+          inherited: context.inherited,
+        });
+      })
+      .filter(alternativeText => alternativeText !== '')
+      .join(' ');
   }
 
   if (node instanceof HTMLInputElement && isRangeInput(node)) {

@@ -13,9 +13,11 @@ function isHidden(node: Node, context: Context): boolean {
   }
 
   // #SPEC_ASSUMPTION (A.3) : options shouldn't be hidden
-  if (node instanceof HTMLOptionElement &&
+  if (
+    node instanceof HTMLOptionElement &&
     node.closest('select') !== null &&
-    context.inherited.partOfName) {
+    context.inherited.partOfName
+  ) {
     return false;
   }
 

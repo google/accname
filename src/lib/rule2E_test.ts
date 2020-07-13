@@ -127,9 +127,7 @@ describe('The function for rule 2E', () => {
 
   it('gives aria-valuetext priority over native value for range input', () => {
     render(
-      html`
-        <input id="foo" type="range" value="6" aria-valuetext="5" />
-      `,
+      html` <input id="foo" type="range" value="6" aria-valuetext="5" /> `,
       container
     );
     const elem = document.getElementById('foo');
@@ -140,9 +138,7 @@ describe('The function for rule 2E', () => {
 
   it('gives aria-valuenow priority over native value for range input', () => {
     render(
-      html`
-        <input id="foo" type="range" value="6" aria-valuenow="5" />
-      `,
+      html` <input id="foo" type="range" value="6" aria-valuenow="5" /> `,
       container
     );
     const elem = document.getElementById('foo');
