@@ -67,6 +67,8 @@ export function rule2E(node: Node, context: Context = getDefaultContext()): stri
 
   if (node instanceof HTMLSelectElement) {
     const textAlterantives = [];
+    // #SPEC_ASSUMPTION (E.2) : consider multiple selected options' text
+    // alternatives, joining them with a space as in 2B.ii.c
     for (const optionNode of node.selectedOptions) {
       context.inherited.partOfName = true;
       const textAlterantive = computeTextAlternative(optionNode, {inherited: context.inherited});

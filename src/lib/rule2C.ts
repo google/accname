@@ -17,6 +17,8 @@ export function rule2C(node: Node, context: Context = getDefaultContext()): stri
     return null;
   }
 
+  // #SPEC_ASSUMPTION (C.1) : 'part of name' implies 'traversal
+  // due to recursion'.
   if (context.inherited.partOfName) {
     // 'rule2EResult !== null' indicates that 'node' is an embedded
     // control as defined in step 2E.
