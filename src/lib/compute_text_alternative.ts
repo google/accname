@@ -1,6 +1,8 @@
 import {Context, getDefaultContext} from './context';
 import {rule2A} from './rule2A';
 import {rule2B} from './rule2B';
+import {rule2C} from './rule2C';
+import {rule2E} from './rule2E';
 import {rule2F} from './rule2F';
 import {rule2G} from './rule2G';
 
@@ -22,6 +24,16 @@ export function computeTextAlternative(
   }
 
   result = rule2B(node, context);
+  if (result !== null) {
+    return result;
+  }
+
+  result = rule2C(node, context);
+  if (result !== null) {
+    return result;
+  }
+
+  result = rule2E(node, context);
   if (result !== null) {
     return result;
   }
