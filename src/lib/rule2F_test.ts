@@ -45,7 +45,7 @@ describe('The function for rule 2F', () => {
     );
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
-    context.isLabelReference = true;
+    context.directLabelReference = true;
     expect(rule2F(elem!, context)).toBe('Hello world !');
   });
 
@@ -70,7 +70,7 @@ describe('The function for rule 2F', () => {
     );
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
-    context.isLabelReference = true;
+    context.directLabelReference = true;
     expect(rule2F(elem!, context)).toBe('Helloworld!');
   });
 
@@ -90,7 +90,7 @@ describe('The function for rule 2F', () => {
     );
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
-    context.isLabelReference = true;
+    context.directLabelReference = true;
     expect(rule2F(elem!, context)).toBe('Hello world');
   });
 
@@ -113,7 +113,18 @@ describe('The function for rule 2F', () => {
     );
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
-    context.isLabelReference = true;
+    context.directLabelReference = true;
     expect(rule2F(elem!, context)).toBe('Hello world !');
+  });
+
+  it('returns null if the conditions for applying rule2F are not satisfied', () => {
+    render(
+      html`
+        <div id="foo""></div>
+      `,
+      container
+    );
+    const elem = document.getElementById('foo');
+    expect(rule2F(elem!)).toBe(null);
   });
 });

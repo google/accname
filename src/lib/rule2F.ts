@@ -42,6 +42,7 @@ const NAME_FROM_CONTENT_ELEM_NODE_NAME = [
   'thead',
   'tfoot',
   'summary',
+  'button',
 ];
 
 /**
@@ -148,16 +149,11 @@ function rule2FCondition(elem: HTMLElement, context: Context): boolean {
     return true;
   }
 
-  if (context.wasAriaLabelledbyReferenced) {
+  if (context.directLabelReference) {
     return true;
   }
 
-  if (context.isLabelReference) {
-    context.inherited.isLabelDescendant = true;
-    return true;
-  }
-
-  if (context.inherited.isLabelDescendant) {
+  if (context.inherited.partOfName) {
     return true;
   }
 
@@ -211,6 +207,7 @@ export function rule2F(
   node.childNodes.forEach(childNode => {
     if (!context.inherited.visitedNodes.includes(childNode)) {
       context.inherited.visitedNodes.push(childNode);
+      context.inherited.partOfName = true;
 
       const textAlterantive = computeTextAlternative(childNode, {
         inherited: context.inherited,

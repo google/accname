@@ -19,13 +19,22 @@ module.exports = function (config) {
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
       '**/*.ts': ['karma-typescript'],
+      '**/*[!_test].ts': ['coverage']
     },
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['spec', 'progress', 'karma-typescript'],
+    reporters: ['spec', 'progress', 'karma-typescript', 'coverage'],
 
+    plugins: [
+      'karma-jasmine',
+      'karma-typescript',
+      'karma-coverage',
+      'karma-spec-reporter',
+      'karma-chrome-launcher',
+      'karma-firefox-launcher'
+    ],
     // web server port
     port: 9876,
 
@@ -58,5 +67,14 @@ module.exports = function (config) {
         transforms: [require('karma-typescript-es6-transform')()],
       },
     },
+
+    coverageReporter: {
+      includeAllSources: true,
+      dir: 'coverage/',
+      reporters: [
+          { type: "html", subdir: "html" },
+          { type: 'text-summary' }
+      ]
+    }
   });
 };

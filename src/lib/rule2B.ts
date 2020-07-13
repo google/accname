@@ -39,7 +39,7 @@ export function rule2B(
   }
 
   // #SPEC_ASSUMPTION (B.1) : definition of 'part of an aria-labelledby traversal'
-  if (context.wasAriaLabelledbyReferenced) {
+  if (context.directLabelReference) {
     return null;
   }
 
@@ -50,8 +50,9 @@ export function rule2B(
 
   return labelElems
     .map(labelElem => {
+      context.inherited.partOfName = true;
       return computeTextAlternative(labelElem, {
-        wasAriaLabelledbyReferenced: true,
+        directLabelReference: true,
         inherited: context.inherited,
       });
     })
