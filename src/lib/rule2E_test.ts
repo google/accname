@@ -124,4 +124,30 @@ describe('The function for rule 2E', () => {
     context.inherited.partOfName = true;
     expect(rule2E(elem!, context)).toBe('5');
   });
+
+  it('gives aria-valuetext priority over native value for range input', () => {
+    render(
+      html`
+        <input id="foo" type="range" value="6" aria-valuetext="5" />
+      `,
+      container
+    );
+    const elem = document.getElementById('foo');
+    const context = getDefaultContext();
+    context.inherited.partOfName = true;
+    expect(rule2E(elem!, context)).toBe('5');
+  });
+
+  it('gives aria-valuenow priority over native value for range input', () => {
+    render(
+      html`
+        <input id="foo" type="range" value="6" aria-valuenow="5" />
+      `,
+      container
+    );
+    const elem = document.getElementById('foo');
+    const context = getDefaultContext();
+    context.inherited.partOfName = true;
+    expect(rule2E(elem!, context)).toBe('5');
+  });
 });

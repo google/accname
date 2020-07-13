@@ -21,6 +21,7 @@ describe('The function for rule 2C', () => {
 
   it('returns null if node is not HTMLElement', () => {
     const elem = document.createTextNode('Hello');
+    container.appendChild(elem);
     expect(rule2C(elem)).toBe(null);
   });
 
