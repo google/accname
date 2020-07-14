@@ -43,7 +43,10 @@ describe('The function for rule 2E', () => {
   });
 
   it('returns text content for type=email inputs with list attributes (combobox role)', () => {
-    render(html`<input id="foo" type="email" list="emails" value="hello" />`, container);
+    render(
+      html`<input id="foo" type="email" list="emails" value="hello" />`,
+      container
+    );
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
     context.inherited.partOfName = true;
@@ -85,12 +88,12 @@ describe('The function for rule 2E', () => {
   it('returns text alternative for selected options in explicitly defined listbox', () => {
     render(
       html`
-      <div id="foo" role="listbox">
-        <div aria-selected="true">Green</div>
-        <div>Orange</div>
-        <div>Red</div>
-        <div>Blue</div>
-      </div>
+        <div id="foo" role="listbox">
+          <div aria-selected="true">Green</div>
+          <div>Orange</div>
+          <div>Red</div>
+          <div>Blue</div>
+        </div>
       `,
       container
     );
@@ -103,12 +106,12 @@ describe('The function for rule 2E', () => {
   it('returns text alternative for multiple selected options in explicitly defined listbox', () => {
     render(
       html`
-      <div id="foo" role="listbox">
-        <div aria-selected="true">Green</div>
-        <div aria-selected="true">Orange</div>
-        <div>Red</div>
-        <div>Blue</div>
-      </div>
+        <div id="foo" role="listbox">
+          <div aria-selected="true">Green</div>
+          <div aria-selected="true">Orange</div>
+          <div>Red</div>
+          <div>Blue</div>
+        </div>
       `,
       container
     );
@@ -122,12 +125,12 @@ describe('The function for rule 2E', () => {
   it('returns null if no options are selected in explicitly defined listbox', () => {
     render(
       html`
-      <div id="foo" role="listbox">
-        <div>Green</div>
-        <div>Orange</div>
-        <div>Red</div>
-        <div>Blue</div>
-      </div>
+        <div id="foo" role="listbox">
+          <div>Green</div>
+          <div>Orange</div>
+          <div>Red</div>
+          <div>Blue</div>
+        </div>
       `,
       container
     );
@@ -203,10 +206,7 @@ describe('The function for rule 2E', () => {
   });
 
   it('returns value attribute if input is explicitly defined as range and neither aria-valuenow nor aria-valuetext are present', () => {
-    render(
-      html` <input id="foo" role="spinbutton" value="5" /> `,
-      container
-    );
+    render(html` <input id="foo" role="spinbutton" value="5" /> `, container);
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
     context.inherited.partOfName = true;

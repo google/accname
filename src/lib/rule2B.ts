@@ -1,5 +1,5 @@
 import {computeTextAlternative} from './compute_text_alternative';
-import {Context, getDefaultContext} from './context';
+import {getDefaultContext} from './context';
 
 /**
  * Get any HTMLElement referenced in the aria-labelledby attribute
@@ -32,7 +32,7 @@ function resolveValidAriaLabelledbyIdrefs(elem: HTMLElement): HTMLElement[] {
  */
 export function rule2B(
   node: Node,
-  context: Context = getDefaultContext()
+  context = getDefaultContext()
 ): string | null {
   if (!(node instanceof HTMLElement)) {
     return null;

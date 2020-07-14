@@ -58,7 +58,7 @@ function rule2ACondition(node: Node, context: Context): boolean {
  */
 export function rule2A(
   node: Node,
-  context: Context = getDefaultContext()
+  context = getDefaultContext()
 ): string | null {
   let result = null;
   if (rule2ACondition(node, context)) {

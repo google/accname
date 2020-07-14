@@ -190,7 +190,7 @@ function getCssContent(elem: HTMLElement, pseudoElementName: string): string {
  */
 export function rule2F(
   node: Node,
-  context: Context = getDefaultContext()
+  context = getDefaultContext()
 ): string | null {
   if (!(node instanceof HTMLElement)) {
     return null;

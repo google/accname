@@ -1,4 +1,4 @@
-import {Context, getDefaultContext} from './context';
+import {getDefaultContext} from './context';
 import {rule2E} from './rule2E';
 
 /**
@@ -9,7 +9,7 @@ import {rule2E} from './rule2E';
  */
 export function rule2C(
   node: Node,
-  context: Context = getDefaultContext()
+  context = getDefaultContext()
 ): string | null {
   if (!(node instanceof HTMLElement)) {
     return null;

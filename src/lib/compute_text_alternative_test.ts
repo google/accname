@@ -45,11 +45,11 @@ describe('The computeTextAlternative function', () => {
   it('prefers input value to aria-label for embedded controls', () => {
     render(
       html`
-        <button id="foo">
+        <div id="foo" role="link">
           Say hello
           <input aria-label="100" type="range" value="5" />
           times
-        </button>
+        </div>
       `,
       container
     );

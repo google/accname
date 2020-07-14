@@ -26,10 +26,7 @@ function getValueIfTextbox(node: HTMLElement): string | null {
 
   // <input> with certain type values & no list attribute implies role='textbox'
   const nodeInputType = node.getAttribute('type')?.toLowerCase() ?? '';
-  if (
-    TEXT_INPUT_TYPES.includes(nodeInputType) &&
-    !node.hasAttribute('list')
-  ) {
+  if (TEXT_INPUT_TYPES.includes(nodeInputType) && !node.hasAttribute('list')) {
     return node.value;
   }
 
@@ -46,15 +43,15 @@ function getValueIfTextbox(node: HTMLElement): string | null {
  * combobox or listbox, null otherwise.
  * (null indicates that node is neither combobox nor listbox).
  */
-function getValueIfComboboxOrListbox(node: HTMLElement, context: Context): string | null {
+function getValueIfComboboxOrListbox(
+  node: HTMLElement,
+  context: Context
+): string | null {
   // Combobox role implied by input type and presence of list attribute,
   // chosen option is the input value.
   if (node instanceof HTMLInputElement) {
     const nodeInputType = node.getAttribute('type')?.toLowerCase() ?? '';
-    if (
-      TEXT_INPUT_TYPES.includes(nodeInputType) &&
-      node.hasAttribute('list')
-    ) {
+    if (TEXT_INPUT_TYPES.includes(nodeInputType) && node.hasAttribute('list')) {
       return node.value;
     }
   }
@@ -65,14 +62,20 @@ function getValueIfComboboxOrListbox(node: HTMLElement, context: Context): strin
   if (nodeRole.toLowerCase() === 'listbox') {
     // #SPEC_ASSUMPTION (E.2) : consider multiple selected options' text
     // alternatives, joining them with a space as in 2B.ii.c
-    const selectedOptionsTextAlternative = Array.from(node.childNodes).map(childNode => {
-      if (childNode instanceof HTMLElement &&
+    const selectedOptionsTextAlternative = Array.from(node.childNodes)
+      .map(childNode => {
+        if (
+          childNode instanceof HTMLElement &&
           childNode.getAttribute('aria-selected') === 'true'
         ) {
-          return computeTextAlternative(childNode, {inherited: context.inherited});
+          return computeTextAlternative(childNode, {
+            inherited: context.inherited,
+          });
         }
-      return '';
-    }).filter(alternativeText => alternativeText !== '').join(' ');
+        return '';
+      })
+      .filter(alternativeText => alternativeText !== '')
+      .join(' ');
     if (selectedOptionsTextAlternative) {
       return selectedOptionsTextAlternative;
     }
@@ -84,7 +87,9 @@ function getValueIfComboboxOrListbox(node: HTMLElement, context: Context): strin
     // alternatives, joining them with a space as in 2B.ii.c
     const selectedOptionsTextAlternative = Array.from(node.selectedOptions)
       .map(optionElem => {
-        return computeTextAlternative(optionElem, {inherited: context.inherited});
+        return computeTextAlternative(optionElem, {
+          inherited: context.inherited,
+        });
       })
       .filter(alternativeText => alternativeText !== '')
       .join(' ');
@@ -108,18 +113,16 @@ const RANGE_INPUT_TYPES = ['number', 'range'];
  */
 function getValueIfRange(node: HTMLElement): string | null {
   const nodeRoleAttribute = node.getAttribute('role')?.toLowerCase() ?? '';
-  const isExplicitRange = (
+  const isExplicitRange =
     nodeRoleAttribute === 'spinbutton' ||
     nodeRoleAttribute === 'slider' ||
     nodeRoleAttribute === 'progressbar' ||
-    nodeRoleAttribute === 'scrollbar'
-  );
+    nodeRoleAttribute === 'scrollbar';
 
   const nodeTypeAttribute = node.getAttribute('type')?.toLowerCase() ?? '';
-  const isImplicitRange = (
+  const isImplicitRange =
     RANGE_INPUT_TYPES.includes(nodeTypeAttribute) ||
-    node instanceof HTMLProgressElement
-  );
+    node instanceof HTMLProgressElement;
 
   if (isExplicitRange || isImplicitRange) {
     if (node.hasAttribute('aria-valuetext')) {
@@ -148,7 +151,7 @@ function getValueIfRange(node: HTMLElement): string | null {
  */
 export function rule2E(
   node: Node,
-  context: Context = getDefaultContext()
+  context = getDefaultContext()
 ): string | null {
   if (!(node instanceof HTMLElement)) {
     return null;
