@@ -42,8 +42,8 @@ describe('The function for rule 2E', () => {
     expect(rule2E(elem!, context)).toBe('hello');
   });
 
-  it('returns text content for inputs with list attributes', () => {
-    render(html`<input id="foo" list value="hello" />`, container);
+  it('returns text content for type=email inputs with list attributes (combobox role)', () => {
+    render(html`<input id="foo" type="email" list="emails" value="hello" />`, container);
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
     context.inherited.partOfName = true;
@@ -80,6 +80,61 @@ describe('The function for rule 2E', () => {
     const context = getDefaultContext();
     context.inherited.partOfName = true;
     expect(rule2E(elem!, context)).toBe('Hello world');
+  });
+
+  it('returns text alternative for selected options in explicitly defined listbox', () => {
+    render(
+      html`
+      <div id="foo" role="listbox">
+        <div aria-selected="true">Green</div>
+        <div>Orange</div>
+        <div>Red</div>
+        <div>Blue</div>
+      </div>
+      `,
+      container
+    );
+    const elem = document.getElementById('foo');
+    const context = getDefaultContext();
+    context.inherited.partOfName = true;
+    expect(rule2E(elem!, context)).toBe('Green');
+  });
+
+  it('returns text alternative for multiple selected options in explicitly defined listbox', () => {
+    render(
+      html`
+      <div id="foo" role="listbox">
+        <div aria-selected="true">Green</div>
+        <div aria-selected="true">Orange</div>
+        <div>Red</div>
+        <div>Blue</div>
+      </div>
+      `,
+      container
+    );
+    const elem = document.getElementById('foo');
+    const context = getDefaultContext();
+    context.inherited.partOfName = true;
+    expect(rule2E(elem!, context)).toBe('Green Orange');
+  });
+
+  // Should empty string be returned in this case?
+  it('returns null if no options are selected in explicitly defined listbox', () => {
+    render(
+      html`
+      <div id="foo" role="listbox">
+        <div>Green</div>
+        <div>Orange</div>
+        <div>Red</div>
+        <div>Blue</div>
+      </div>
+      `,
+      container
+    );
+    const elem = document.getElementById('foo');
+    const context = getDefaultContext();
+    context.inherited.partOfName = true;
+    expect(rule2E(elem!, context)).toBe(null);
   });
 
   it('returns aria-valuetext value if present in range input', () => {
@@ -139,6 +194,28 @@ describe('The function for rule 2E', () => {
   it('gives aria-valuenow priority over native value for range input', () => {
     render(
       html` <input id="foo" type="range" value="6" aria-valuenow="5" /> `,
+      container
+    );
+    const elem = document.getElementById('foo');
+    const context = getDefaultContext();
+    context.inherited.partOfName = true;
+    expect(rule2E(elem!, context)).toBe('5');
+  });
+
+  it('returns value attribute if input is explicitly defined as range and neither aria-valuenow nor aria-valuetext are present', () => {
+    render(
+      html` <input id="foo" role="spinbutton" value="5" /> `,
+      container
+    );
+    const elem = document.getElementById('foo');
+    const context = getDefaultContext();
+    context.inherited.partOfName = true;
+    expect(rule2E(elem!, context)).toBe('5');
+  });
+
+  it('returns value attribute of progress element if neither aria-valuenow nor aria-valuetext are present', () => {
+    render(
+      html` <progress id="foo" max="10" value="5"></progress> `,
       container
     );
     const elem = document.getElementById('foo');
