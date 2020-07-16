@@ -89,10 +89,10 @@ describe('The function for rule 2E', () => {
     render(
       html`
         <div id="foo" role="listbox">
-          <div aria-selected="true">Green</div>
-          <div>Orange</div>
-          <div>Red</div>
-          <div>Blue</div>
+          <div role="option" aria-selected="true">Green</div>
+          <div role="option">Orange</div>
+          <div role="option">Red</div>
+          <div role="option">Blue</div>
         </div>
       `,
       container
@@ -107,10 +107,10 @@ describe('The function for rule 2E', () => {
     render(
       html`
         <div id="foo" role="listbox">
-          <div aria-selected="true">Green</div>
-          <div aria-selected="true">Orange</div>
-          <div>Red</div>
-          <div>Blue</div>
+          <div role="option" aria-selected="true">Green</div>
+          <div role="option" aria-selected="true">Orange</div>
+          <div role="option">Red</div>
+          <div role="option">Blue</div>
         </div>
       `,
       container
@@ -126,10 +126,10 @@ describe('The function for rule 2E', () => {
     render(
       html`
         <div id="foo" role="listbox">
-          <div>Green</div>
-          <div>Orange</div>
-          <div>Red</div>
-          <div>Blue</div>
+          <div role="option">Green</div>
+          <div role="option">Orange</div>
+          <div role="option">Red</div>
+          <div role="option">Blue</div>
         </div>
       `,
       container
@@ -222,5 +222,42 @@ describe('The function for rule 2E', () => {
     const context = getDefaultContext();
     context.inherited.partOfName = true;
     expect(rule2E(elem!, context)).toBe('5');
+  });
+
+  it('considers implicit textbox role being explicitly overwritten', () => {
+    render(
+      html` <textarea id="foo" role="spinbutton">Hello world</textarea> `,
+      container
+    );
+    const elem = document.getElementById('foo');
+    const context = getDefaultContext();
+    context.inherited.partOfName = true;
+    expect(rule2E(elem!, context)).toBe(null);
+  });
+
+  it('considers implicit listbox / combobox role being explicitly overwritten', () => {
+    render(
+      html`
+        <select id="foo" role="spinbutton">
+          <option selected>Hello world</option>
+        </select>
+      `,
+      container
+    );
+    const elem = document.getElementById('foo');
+    const context = getDefaultContext();
+    context.inherited.partOfName = true;
+    expect(rule2E(elem!, context)).toBe(null);
+  });
+
+  it('considers implicit range role being explicitly overwritten', () => {
+    render(
+      html` <input id="foo" type="number" role="textbox" value="5" /> `,
+      container
+    );
+    const elem = document.getElementById('foo');
+    const context = getDefaultContext();
+    context.inherited.partOfName = true;
+    expect(rule2E(elem!, context)).toBe(null);
   });
 });

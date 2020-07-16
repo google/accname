@@ -13,20 +13,26 @@ const TEXT_INPUT_TYPES = ['email', 'tel', 'text', 'url', 'search'];
  * (null indicates that node is not a textbox).
  */
 function getValueIfTextbox(node: HTMLElement): string | null {
-  // Explicit role='textbox' (elements not of type <input>) handled by rule2F
+  // Explicit role='textbox' are handled by rule2F.
+  // [This may need to be updated -- see #SPEC_ASSUMPTION (E.4)]
+
+  // Handles the case where node role is explictly overwritten
+  const nodeRole = node.getAttribute('role');
+  if (nodeRole && nodeRole !== 'textbox') {
+    return null;
+  }
 
   // type <textarea> implies role='textbox'
   if (node instanceof HTMLTextAreaElement) {
     return node.value;
   }
 
-  if (!(node instanceof HTMLInputElement)) {
-    return null;
-  }
-
   // <input> with certain type values & no list attribute implies role='textbox'
-  const nodeInputType = node.getAttribute('type')?.toLowerCase() ?? '';
-  if (TEXT_INPUT_TYPES.includes(nodeInputType) && !node.hasAttribute('list')) {
+  if (
+    node instanceof HTMLInputElement &&
+    TEXT_INPUT_TYPES.includes(node.type) &&
+    !node.hasAttribute('list')
+  ) {
     return node.value;
   }
 
@@ -47,45 +53,45 @@ function getValueIfComboboxOrListbox(
   node: HTMLElement,
   context: Context
 ): string | null {
+  // Handles the case where node role is explictly overwritten
+  const nodeRole = node.getAttribute('role');
+  if (
+    nodeRole &&
+    nodeRole.toLowerCase() !== 'listbox' &&
+    nodeRole.toLowerCase() !== 'combobox'
+  ) {
+    return null;
+  }
+
   // Combobox role implied by input type and presence of list attribute,
   // chosen option is the input value.
   if (node instanceof HTMLInputElement) {
-    const nodeInputType = node.getAttribute('type')?.toLowerCase() ?? '';
-    if (TEXT_INPUT_TYPES.includes(nodeInputType) && node.hasAttribute('list')) {
+    if (TEXT_INPUT_TYPES.includes(node.type) && node.hasAttribute('list')) {
       return node.value;
     }
   }
 
+  // Text alternative for elems of role 'listbox' and 'combobox'
+  // consists of the text alternatives for their selected options.
+  let selectedOptions: HTMLElement[] = [];
   // Listbox may be defined explicitly using 'role',
   // and using 'aria-selected' attribute to mark selected options.
-  const nodeRole = node.getAttribute('role') ?? '';
-  if (nodeRole.toLowerCase() === 'listbox') {
-    // #SPEC_ASSUMPTION (E.2) : consider multiple selected options' text
-    // alternatives, joining them with a space as in 2B.ii.c
-    const selectedOptionsTextAlternative = Array.from(node.childNodes)
-      .map(childNode => {
-        if (
-          childNode instanceof HTMLElement &&
-          childNode.getAttribute('aria-selected') === 'true'
-        ) {
-          return computeTextAlternative(childNode, {
-            inherited: context.inherited,
-          });
-        }
-        return '';
-      })
-      .filter(alternativeText => alternativeText !== '')
-      .join(' ');
-    if (selectedOptionsTextAlternative) {
-      return selectedOptionsTextAlternative;
-    }
+  if (nodeRole && nodeRole.toLowerCase() === 'listbox') {
+    selectedOptions = Array.from(
+      node.querySelectorAll('[role="option"][aria-selected="true"]')
+    );
+  }
+  // A <select> element is always implicitly either a listbox or a combobox
+  else if (node instanceof HTMLSelectElement) {
+    selectedOptions = Array.from(node.selectedOptions);
   }
 
-  // A <select> element is always implicitly either a listbox or a combobox
-  if (node instanceof HTMLSelectElement) {
+  // If the current node has any selected options (either by aria-selected
+  // or semantic <option selected>) they will be stored in selectedOptions.
+  if (selectedOptions) {
     // #SPEC_ASSUMPTION (E.2) : consider multiple selected options' text
     // alternatives, joining them with a space as in 2B.ii.c
-    const selectedOptionsTextAlternative = Array.from(node.selectedOptions)
+    return selectedOptions
       .map(optionElem => {
         return computeTextAlternative(optionElem, {
           inherited: context.inherited,
@@ -93,9 +99,6 @@ function getValueIfComboboxOrListbox(
       })
       .filter(alternativeText => alternativeText !== '')
       .join(' ');
-    if (selectedOptionsTextAlternative) {
-      return selectedOptionsTextAlternative;
-    }
   }
 
   return null;
@@ -112,16 +115,21 @@ const RANGE_INPUT_TYPES = ['number', 'range'];
  * null otherwise (indicating that node is not a range).
  */
 function getValueIfRange(node: HTMLElement): string | null {
-  const nodeRoleAttribute = node.getAttribute('role')?.toLowerCase() ?? '';
+  const nodeRoleAttribute = node.getAttribute('role')?.toLowerCase();
   const isExplicitRange =
     nodeRoleAttribute === 'spinbutton' ||
     nodeRoleAttribute === 'slider' ||
     nodeRoleAttribute === 'progressbar' ||
     nodeRoleAttribute === 'scrollbar';
 
-  const nodeTypeAttribute = node.getAttribute('type')?.toLowerCase() ?? '';
+  // Handles the case where node role is explictly overwritten
+  if (nodeRoleAttribute && !isExplicitRange) {
+    return null;
+  }
+
   const isImplicitRange =
-    RANGE_INPUT_TYPES.includes(nodeTypeAttribute) ||
+    (node instanceof HTMLInputElement &&
+      RANGE_INPUT_TYPES.includes(node.type)) ||
     node instanceof HTMLProgressElement;
 
   if (isExplicitRange || isImplicitRange) {
