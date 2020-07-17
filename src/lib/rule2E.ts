@@ -17,7 +17,7 @@ function getValueIfTextbox(node: HTMLElement): string | null {
   // [This may need to be updated -- see #SPEC_ASSUMPTION (E.4)]
 
   // Handles the case where node role is explictly overwritten
-  const nodeRole = node.getAttribute('role');
+  const nodeRole = node.getAttribute('role')?.toLowerCase();
   if (nodeRole && nodeRole !== 'textbox') {
     return null;
   }
@@ -54,12 +54,8 @@ function getValueIfComboboxOrListbox(
   context: Context
 ): string | null {
   // Handles the case where node role is explictly overwritten
-  const nodeRole = node.getAttribute('role');
-  if (
-    nodeRole &&
-    nodeRole.toLowerCase() !== 'listbox' &&
-    nodeRole.toLowerCase() !== 'combobox'
-  ) {
+  const nodeRole = node.getAttribute('role')?.toLowerCase();
+  if (nodeRole && nodeRole !== 'listbox' && nodeRole !== 'combobox') {
     return null;
   }
 
@@ -76,7 +72,7 @@ function getValueIfComboboxOrListbox(
   let selectedOptions: HTMLElement[] = [];
   // Listbox may be defined explicitly using 'role',
   // and using 'aria-selected' attribute to mark selected options.
-  if (nodeRole && nodeRole.toLowerCase() === 'listbox') {
+  if (nodeRole && nodeRole === 'listbox') {
     selectedOptions = Array.from(
       node.querySelectorAll('[role="option"][aria-selected="true"]')
     );
