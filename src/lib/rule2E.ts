@@ -13,8 +13,7 @@ const TEXT_INPUT_TYPES = ['email', 'tel', 'text', 'url', 'search'];
  * (null indicates that node is not a textbox).
  */
 function getValueIfTextbox(node: HTMLElement): string | null {
-  // Explicit role='textbox' are handled by rule2F.
-  // [This may need to be updated -- see #SPEC_ASSUMPTION (E.4)]
+  // #SPEC_ASSUMPTION (E.3) : Explicit role='textbox' are handled by rule2F.
 
   // Handles the case where node role is explictly overwritten
   const nodeRole = node.getAttribute('role');
@@ -163,9 +162,6 @@ export function rule2E(
     return null;
   }
 
-  // #SPEC_ASSUMPTION (E.3) : controls whose text alternative
-  // is their text content are handled by rule2F.
-
   // #SPEC_ASSUMPTION (E.1) : that 'embedded within the label
   // for another widget' is equivalent to 'part of a name computation'
   if (!context.inherited.partOfName) {
@@ -177,8 +173,7 @@ export function rule2E(
     return textboxValue;
   }
 
-  // menu button is handled by 2F (buttons allow name from content)
-  // [See #SPEC_ASSUMPTION (E.3)]
+  // #SPEC_ASSUMPTION (E.4) : menu button is handled by 2F
 
   const comboboxOrListboxValue = getValueIfComboboxOrListbox(node, context);
   if (comboboxOrListboxValue) {
