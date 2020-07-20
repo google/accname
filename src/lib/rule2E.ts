@@ -17,7 +17,7 @@ function getValueIfTextbox(node: HTMLElement): string | null {
   // [This may need to be updated -- see #SPEC_ASSUMPTION (E.4)]
 
   // Handles the case where node role is explictly overwritten
-  const nodeRole = node.getAttribute('role')?.toLowerCase();
+  const nodeRole = node.getAttribute('role');
   if (nodeRole && nodeRole !== 'textbox') {
     return null;
   }
@@ -54,17 +54,19 @@ function getValueIfComboboxOrListbox(
   context: Context
 ): string | null {
   // Handles the case where node role is explictly overwritten
-  const nodeRole = node.getAttribute('role')?.toLowerCase();
+  const nodeRole = node.getAttribute('role');
   if (nodeRole && nodeRole !== 'listbox' && nodeRole !== 'combobox') {
     return null;
   }
 
   // Combobox role implied by input type and presence of list attribute,
   // chosen option is the input value.
-  if (node instanceof HTMLInputElement) {
-    if (TEXT_INPUT_TYPES.includes(node.type) && node.hasAttribute('list')) {
-      return node.value;
-    }
+  if (
+    node instanceof HTMLInputElement &&
+    TEXT_INPUT_TYPES.includes(node.type) &&
+    node.hasAttribute('list')
+  ) {
+    return node.value;
   }
 
   // Text alternative for elems of role 'listbox' and 'combobox'
@@ -84,7 +86,7 @@ function getValueIfComboboxOrListbox(
 
   // If the current node has any selected options (either by aria-selected
   // or semantic <option selected>) they will be stored in selectedOptions.
-  if (selectedOptions) {
+  if (selectedOptions.length > 0) {
     // #SPEC_ASSUMPTION (E.2) : consider multiple selected options' text
     // alternatives, joining them with a space as in 2B.ii.c
     return selectedOptions
@@ -103,6 +105,10 @@ function getValueIfComboboxOrListbox(
 // Input types that imply role 'range'
 const RANGE_INPUT_TYPES = ['number', 'range'];
 
+// Roles for whom 'range' is a superclass.
+// Each of these roles explicitly defines the 'range' role.
+const RANGE_ROLES = ['spinbutton', 'slider', 'progressbar', 'scrollbar'];
+
 /**
  * Determines whether a given node has role 'range' and,
  * if so, gets the text alternative for that node.
@@ -111,12 +117,8 @@ const RANGE_INPUT_TYPES = ['number', 'range'];
  * null otherwise (indicating that node is not a range).
  */
 function getValueIfRange(node: HTMLElement): string | null {
-  const nodeRoleAttribute = node.getAttribute('role')?.toLowerCase();
-  const isExplicitRange =
-    nodeRoleAttribute === 'spinbutton' ||
-    nodeRoleAttribute === 'slider' ||
-    nodeRoleAttribute === 'progressbar' ||
-    nodeRoleAttribute === 'scrollbar';
+  const nodeRoleAttribute = node.getAttribute('role') ?? '';
+  const isExplicitRange = RANGE_ROLES.includes(nodeRoleAttribute);
 
   // Handles the case where node role is explictly overwritten
   if (nodeRoleAttribute && !isExplicitRange) {
@@ -176,6 +178,7 @@ export function rule2E(
   }
 
   // menu button is handled by 2F (buttons allow name from content)
+  // [See #SPEC_ASSUMPTION (E.3)]
 
   const comboboxOrListboxValue = getValueIfComboboxOrListbox(node, context);
   if (comboboxOrListboxValue) {
