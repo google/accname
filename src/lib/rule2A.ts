@@ -7,8 +7,17 @@ import {Context, getDefaultContext} from './context';
  * @return - whether or not the node is considered hidden
  */
 // #SPEC_ASSUMPTION (A.2) : definition of 'hidden'
-function isHidden(node: Node): boolean {
+function isHidden(node: Node, context: Context): boolean {
   if (!(node instanceof HTMLElement)) {
+    return false;
+  }
+
+  // #SPEC_ASSUMPTION (A.3) : options shouldn't be hidden
+  if (
+    node instanceof HTMLOptionElement &&
+    node.closest('select') !== null &&
+    context.inherited.partOfName
+  ) {
     return false;
   }
 
@@ -35,7 +44,7 @@ function isHidden(node: Node): boolean {
  */
 function rule2ACondition(node: Node, context: Context): boolean {
   // #SPEC_ASSUMPTION (A.1) : definition of 'directly referenced'
-  return isHidden(node) && !context.directLabelReference;
+  return isHidden(node, context) && !context.directLabelReference;
 }
 
 /**
@@ -49,7 +58,7 @@ function rule2ACondition(node: Node, context: Context): boolean {
  */
 export function rule2A(
   node: Node,
-  context: Context = getDefaultContext()
+  context = getDefaultContext()
 ): string | null {
   let result = null;
   if (rule2ACondition(node, context)) {

@@ -41,4 +41,19 @@ describe('The computeTextAlternative function', () => {
     const elem = document.getElementById('foo');
     expect(computeTextAlternative(elem!)).toBe('Hello world');
   });
+
+  it('prefers input value to aria-label for embedded controls', () => {
+    render(
+      html`
+        <div id="foo" role="link">
+          Say hello
+          <input aria-label="100" type="range" value="5" />
+          times
+        </div>
+      `,
+      container
+    );
+    const elem = document.getElementById('foo');
+    expect(computeTextAlternative(elem!)).toBe('Say hello 5 times');
+  });
 });
