@@ -1,97 +1,6 @@
 import {Context, getDefaultContext} from './context';
 import {computeTextAlternative} from './compute_text_alternative';
 
-const INPUT_TYPES_WITH_VALUE_AS_ALT_TEXT = ['button', 'submit', 'reset'];
-
-/**
- * Process elem's text alternative if elem is an <input>, assuming
- * that no <label> element references elem.
- * @param elem - element whose text alternative is being processed
- * @return - text alternative of elem if elem is an <input>
- */
-function getUnlabelledInputText(elem: HTMLElement): string | null {
-  if (!(elem instanceof HTMLInputElement)) {
-    return null;
-  }
-
-  // Implementation reflects rules defined in sections 5.1 - 5.3 of html-aam spec:
-  // https://www.w3.org/TR/html-aam-1.0/#accessible-name-and-description-computation
-
-  const inputType = elem.getAttribute('type') ?? '';
-  if (
-    INPUT_TYPES_WITH_VALUE_AS_ALT_TEXT.includes(inputType) &&
-    elem.hasAttribute('value')
-  ) {
-    return elem.value;
-  }
-
-  if (inputType === 'submit' || inputType === 'reset') {
-    return inputType;
-  }
-
-  if (inputType === 'image' && elem.hasAttribute('alt')) {
-    return elem.getAttribute('alt');
-  }
-
-  if (inputType === 'image' && !elem.hasAttribute('title')) {
-    return 'Submit Query';
-  }
-
-  return null;
-}
-
-// Only certain element types are labellable
-// See: https://html.spec.whatwg.org/multipage/forms.html#category-label
-const LABELLABLE_ELEMENT_TYPES = [
-  'BUTTON',
-  'INPUT',
-  'METER',
-  'OUTPUT',
-  'PROGRESS',
-  'SELECT',
-  'TEXTAREA',
-];
-
-/**
- * Gets the text alternative as defined by one or more native <label>s.
- * @param elem - element whose text alternative is being calculated
- * @param context - information relevant to the computation of elem's text alternative
- * @return - the text alternative for elem if elem is legally labelled by a native
- * <label>, null otherwise.
- */
-function getTextIfLabelled(elem: HTMLElement, context: Context): string | null {
-  if (!LABELLABLE_ELEMENT_TYPES.includes(elem.nodeName)) {
-    return null;
-  }
-
-  // Using querySelectorAll to get <label>s in DOM order.
-  const allLabelElems = document.querySelectorAll('label');
-  const labelElems = Array.from(allLabelElems).filter(label => {
-    return (
-      label.htmlFor === elem.id ||
-      // #SPEC_ASSUMPTION (D.2) : Consider the outermost ancestor <label> to
-      // to define the text alternative for elem.
-      (label.contains(elem) && !(label.parentElement?.closest('label') ?? null))
-    );
-  });
-
-  const textAlternative = labelElems
-    .map(labelElem => {
-      return computeTextAlternative(labelElem, {
-        directLabelReference: true,
-        inherited: context.inherited,
-      });
-    })
-    .filter(text => text !== '')
-    .join(' ');
-
-  if (textAlternative !== '') {
-    return textAlternative;
-  }
-
-  return null;
-}
-
 /**
  * Implementation for rule 2D
  * @param node - the node whose text alternative is being computed
@@ -115,17 +24,20 @@ export function rule2D(
 
   // #SPEC_ASSUMPTION (D.1) : html-aam (https://www.w3.org/TR/html-aam-1.0/)
   // specifies all native attributes and elements that define a text alternative.
-
-  const labelText = getTextIfLabelled(node, context);
-  if (labelText) {
-    return labelText;
+  if (LABELLABLE_ELEMENT_TYPES.includes(node.tagName)) {
+    const labelText = getTextIfLabelled(node, context);
+    if (labelText) {
+      return labelText;
+    }
   }
 
   // If input is not <label>led, use native attribute /
   // element information to compute a text alternative
-  const inputTextAlternative = getUnlabelledInputText(node);
-  if (inputTextAlternative) {
-    return inputTextAlternative;
+  if (node instanceof HTMLInputElement) {
+    const inputTextAlternative = getUnlabelledInputText(node);
+    if (inputTextAlternative) {
+      return inputTextAlternative;
+    }
   }
 
   // <caption>s define text alternatives for <table>s
@@ -140,8 +52,8 @@ export function rule2D(
   }
 
   // <figcaption>s define text alternatives for <figure>s
-  // Checking nodeName due to lack of HTMLFigureElement
-  if (node.nodeName.toLowerCase() === 'figure') {
+  // Checking tagName due to lack of HTMLFigureElement
+  if (node.tagName === 'FIGURE') {
     const figcaptionElem = node.querySelector('figcaption');
     if (figcaptionElem) {
       context.inherited.partOfName = true;
@@ -173,4 +85,84 @@ export function rule2D(
   }
 
   return null;
+}
+
+/**
+ * Process elem's text alternative if elem is an <input>, assuming
+ * that no <label> element references elem.
+ * @param elem - element whose text alternative is being processed
+ * @return - text alternative of elem if elem is an <input>
+ */
+function getUnlabelledInputText(elem: HTMLInputElement): string | null {
+  // Implementation reflects rules defined in sections 5.1 - 5.3 of html-aam spec:
+  // https://www.w3.org/TR/html-aam-1.0/#accessible-name-and-description-computation
+
+  const inputType = elem.getAttribute('type') ?? '';
+  if (
+    (inputType === 'button' ||
+      inputType === 'submit' ||
+      inputType === 'reset') &&
+    elem.hasAttribute('value')
+  ) {
+    return elem.value;
+  }
+
+  if (inputType === 'submit' || inputType === 'reset') {
+    // This should be a localised string, but for now we are
+    // just supporting English.
+    return inputType;
+  }
+
+  if (inputType === 'image' && elem.hasAttribute('alt')) {
+    return elem.getAttribute('alt');
+  }
+
+  if (inputType === 'image' && !elem.hasAttribute('title')) {
+    // This should be a localised string, but for now we are
+    // just supporting English.
+    return 'Submit Query';
+  }
+
+  // Title attribute handled by 2I.
+
+  return null;
+}
+
+// Only certain element types are labellable
+// See: https://html.spec.whatwg.org/multipage/forms.html#category-label
+const LABELLABLE_ELEMENT_TYPES = [
+  'BUTTON',
+  'INPUT',
+  'METER',
+  'OUTPUT',
+  'PROGRESS',
+  'SELECT',
+  'TEXTAREA',
+];
+
+/**
+ * Gets the text alternative as defined by one or more native <label>s.
+ * @param elem - element whose text alternative is being calculated
+ * @param context - information relevant to the computation of elem's text alternative
+ * @return - the text alternative for elem if elem is legally labelled by a native
+ * <label>, null otherwise.
+ */
+function getTextIfLabelled(elem: HTMLElement, context: Context): string | null {
+  // Using querySelectorAll to get <label>s in DOM order.
+  const allLabelElems = document.querySelectorAll('label');
+  const labelElems = Array.from(allLabelElems).filter(label => {
+    return label.control === elem;
+  });
+
+  const textAlternative = labelElems
+    .map(labelElem =>
+      computeTextAlternative(labelElem, {
+        directLabelReference: true,
+        inherited: context.inherited,
+      })
+    )
+    .filter(text => text !== '')
+    .join(' ');
+
+  return textAlternative || null;
 }

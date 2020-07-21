@@ -72,46 +72,6 @@ describe('The function for rule 2D', () => {
     expect(rule2D(elem!)).toBe('Hello world');
   });
 
-  it('returns the text alternative of the outermost label ancestor', () => {
-    render(
-      html`
-        <label>
-          Hello
-          <label>
-            world
-            <input id="foo" />
-          </label>
-        </label>
-      `,
-      container
-    );
-    const elem = document.getElementById('foo');
-    expect(rule2D(elem!)).toBe('Hello world');
-  });
-
-  it('considers idref labels before nested labels [absurd example]', () => {
-    render(
-      html`
-        <label for="foo">Hello</label>
-        <label for="foo">world!</label>
-
-        <label>
-          Hi
-          <label>
-            there
-            <div>
-              friend
-              <input id="foo" />
-            </div>
-          </label>
-        </label>
-      `,
-      container
-    );
-    const elem = document.getElementById('foo');
-    expect(rule2D(elem!)).toBe('Hello world! Hi there friend');
-  });
-
   it('processes multiple <label>s in DOM order.', () => {
     render(
       html`
