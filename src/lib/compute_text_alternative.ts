@@ -6,6 +6,7 @@ import {rule2D} from './rule2D';
 import {rule2E} from './rule2E';
 import {rule2F} from './rule2F';
 import {rule2G} from './rule2G';
+import {rule2I} from './rule2I';
 
 /**
  * @param node - The node whose text alternative will be calculated
@@ -50,6 +51,11 @@ export function computeTextAlternative(
   }
 
   result = rule2G(node);
+  if (result !== null) {
+    return result;
+  }
+
+  result = rule2I(node);
   if (result !== null) {
     return result;
   }
