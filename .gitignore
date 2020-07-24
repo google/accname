@@ -1,4 +1,5 @@
 /node_modules/
+/validation/node_modules/
 
 # Compiler output
 /dist/
