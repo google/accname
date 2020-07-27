@@ -1,7 +1,10 @@
-const puppeteer = require('puppeteer');
-const axe = require('axe-core');
-const bgPrototype = require('./source_code/bg_prototype_source.js');
-const ourLib = require('./source_code/our_lib_source.js');
+import {CDPSession} from 'puppeteer';
+import * as puppeteer from 'puppeteer';
+import {Protocol} from 'devtools-protocol';
+
+import {bgPrototypeSource} from './accname_libs_source_code/bg_prototype_source';
+import {ourLibSource} from './accname_libs_source_code/our_lib_source';
+import * as axe from 'axe-core';
 
 const inputHTML = `
   <html>
@@ -19,8 +22,9 @@ const inputHTML = `
 `;
 
 (async () => {
-  const browser = await puppeteer.launch(
-      {args: ['--enable-blink-features=AccessibilityObjectModel']});
+  const browser = await puppeteer.launch({
+    args: ['--enable-blink-features=AccessibilityObjectModel'],
+  });
   const page = await browser.newPage();
   await page.goto('data:text/html,' + inputHTML);
 
@@ -55,23 +59,22 @@ const inputHTML = `
 
 */
 
-
-async function loadAccNameLibraries(client) {
+async function loadAccNameLibraries(client: CDPSession) {
   // Load axe-core
   await client.send('Runtime.evaluate', {expression: axe.source});
   await client.send('Runtime.evaluate', {
     expression:
-        'const _tree = axe.utils.getFlattenedTree(document.body); let axeTargetElem;'
+      'const _tree = axe.utils.getFlattenedTree(document.body); let axeTargetElem;',
   });
   // Load aom wrapper function
   await client.send('Runtime.evaluate', {
     expression:
-        'const getAOMWrapper = async (idref) => { const aomObj = await getComputedAccessibleNode(document.getElementById(idref)); return aomObj.name;}'
+      'const getAOMWrapper = async (idref) => { const aomObj = await getComputedAccessibleNode(document.getElementById(idref)); return aomObj.name;}',
   });
   // Load Bryan Garaventa's Prototype
-  await client.send('Runtime.evaluate', {expression: bgPrototype});
+  await client.send('Runtime.evaluate', {expression: bgPrototypeSource});
   // Load our AccName
-  const x = await client.send('Runtime.evaluate', {expression: ourLib});
+  await client.send('Runtime.evaluate', {expression: ourLibSource});
 }
 
 /**
@@ -80,15 +83,19 @@ async function loadAccNameLibraries(client) {
  * @param {CDPSession} client
  * @param {string} idref
  */
-async function getChromeAccName(client, idref) {
+async function getChromeAccName(
+  client: CDPSession,
+  idref: string
+): Promise<string> {
   const selectedBackendNodeId = await getBackendNodeIdFromIdref(client, idref);
-  const axTree = await client.send(
-      'Accessibility.getPartialAXTree', {backendNodeId: selectedBackendNodeId});
-  return axTree.nodes
-             .filter(
-                 (node) => node.backendDOMNodeId === selectedBackendNodeId)[0]
-             ?.name.value ??
-      '';
+  const axTree = (await client.send('Accessibility.getPartialAXTree', {
+    backendNodeId: selectedBackendNodeId,
+  })) as Protocol.Accessibility.GetPartialAXTreeResponse;
+  return (
+    axTree.nodes.filter(
+      node => node.backendDOMNodeId === selectedBackendNodeId
+    )[0]?.name?.value ?? ''
+  );
 }
 
 /**
@@ -96,15 +103,18 @@ async function getChromeAccName(client, idref) {
  * @param {CDPSession} client
  * @param {string} idref
  */
-async function getAXEAccName(client, idref) {
+async function getAXEAccName(
+  client: CDPSession,
+  idref: string
+): Promise<string> {
   await client.send('Runtime.evaluate', {
-    expression: 'axeTargetElem = axe.utils.querySelectorAll(_tree, \'#' +
-        idref + '\')[0];'
+    expression:
+      "axeTargetElem = axe.utils.querySelectorAll(_tree, '#" + idref + "')[0];",
   });
-  const axeAccNameComputation = await client.send(
-      'Runtime.evaluate',
-      {expression: 'axe.commons.text.accessibleTextVirtual(axeTargetElem);'});
-  return axeAccNameComputation.result.value;
+  const axeAccNameEvaluation = (await client.send('Runtime.evaluate', {
+    expression: 'axe.commons.text.accessibleTextVirtual(axeTargetElem);',
+  })) as Protocol.Runtime.EvaluateResponse;
+  return axeAccNameEvaluation.result.value;
 }
 
 /**
@@ -112,10 +122,14 @@ async function getAXEAccName(client, idref) {
  * @param {CDPSession} client
  * @param {string} idref
  */
-async function getAOMAccName(client, idref) {
-  const aomAccNameComputation = await client.send(
-      'Runtime.evaluate',
-      {expression: 'getAOMWrapper(\'' + idref + '\');', awaitPromise: true});
+async function getAOMAccName(
+  client: CDPSession,
+  idref: string
+): Promise<string> {
+  const aomAccNameComputation = (await client.send('Runtime.evaluate', {
+    expression: "getAOMWrapper('" + idref + "');",
+    awaitPromise: true,
+  })) as Protocol.Runtime.EvaluateResponse;
   return aomAccNameComputation.result.value;
 }
 
@@ -125,10 +139,13 @@ async function getAOMAccName(client, idref) {
  * @param {CDPSession} client
  * @param {string} idref
  */
-async function getBGAccName(client, idref) {
-  const bgAccNameComputation = await client.send('Runtime.evaluate', {
-    expression: 'getAccName(document.getElementById(\'' + idref + '\')).name;'
-  });
+async function getBGAccName(
+  client: CDPSession,
+  idref: string
+): Promise<string> {
+  const bgAccNameComputation = (await client.send('Runtime.evaluate', {
+    expression: "getAccName(document.getElementById('" + idref + "')).name;",
+  })) as Protocol.Runtime.EvaluateResponse;
   return bgAccNameComputation.result.value;
 }
 
@@ -137,12 +154,14 @@ async function getBGAccName(client, idref) {
  * @param {CDPSession} client
  * @param {string} idref
  */
-async function getOurAccName(client, idref) {
-  const ourAccNameComputation = await client.send('Runtime.evaluate', {
+async function getOurAccName(
+  client: CDPSession,
+  idref: string
+): Promise<string> {
+  const ourAccNameComputation = (await client.send('Runtime.evaluate', {
     expression:
-        'OurLib.getAccessibleName(document.getElementById(\'' + idref + '\'));'
-  });
-  // console.log(ourAccNameComputation);
+      "OurLib.getAccessibleName(document.getElementById('" + idref + "'));",
+  })) as Protocol.Runtime.EvaluateResponse;
   return ourAccNameComputation.result.value;
 }
 
@@ -159,11 +178,16 @@ async function getOurAccName(client, idref) {
  * @param {CDPSession} client
  * @param {DOM.backendNodeId} nodeId
  */
-async function getMinimisedHTML(client, idref) {
+async function getMinimisedHTML(
+  client: CDPSession,
+  idref: string
+): Promise<string> {
   const nodeId = await getBackendNodeIdFromIdref(client, idref);
   const allNodesInComputation = await getAllNodesInComputation(client, nodeId);
-  const allRelevantNodes =
-      await removeRedundantNodes(client, allNodesInComputation);
+  const allRelevantNodes = await removeRedundantNodes(
+    client,
+    allNodesInComputation
+  );
   const minimisedHTML = await getHTMLfromNodeIds(client, allRelevantNodes);
   return minimisedHTML;
 }
@@ -176,34 +200,45 @@ async function getMinimisedHTML(client, idref) {
  * @param {CDPSession} client
  * @param {DOM.backendNodeId} nodeId
  */
-async function getAllNodesInComputation(client, nodeId) {
-  const stack = [];
-  const relatedNodeIds = [];
+async function getAllNodesInComputation(
+  client: CDPSession,
+  nodeId: Protocol.DOM.BackendNodeId
+): Promise<Protocol.DOM.BackendNodeId[]> {
+  const stack: Protocol.DOM.BackendNodeId[] = [];
+  const relatedNodeIds: Protocol.DOM.BackendNodeId[] = [];
   stack.push(nodeId);
   // Iterative DFS traverses nodes connected by label references
   while (stack && stack.length > 0) {
     const currentNodeId = stack.pop();
-    relatedNodeIds.push(currentNodeId);
-    const axTree = await client.send(
-        'Accessibility.getPartialAXTree', {backendNodeId: currentNodeId});
+    relatedNodeIds.push(currentNodeId!);
+    const axTree = (await client.send('Accessibility.getPartialAXTree', {
+      backendNodeId: currentNodeId,
+    })) as Protocol.Accessibility.GetPartialAXTreeResponse;
     // Nodes in axTree.nodes are in order of decreasing depth in the DOM.
     // We traverse all nodes descendant of currentNodeId, checking whether
     // each one contains a label reference.
-    for (let axNode of axTree.nodes) {
-      let nextRelatedNodes = [];
+    for (const axNode of axTree.nodes) {
+      let nextRelatedNodes: Protocol.Accessibility.AXRelatedNode[] = [];
+      const sources: Protocol.Accessibility.AXValueSource[] | null =
+        axNode.name?.sources ?? null;
       // Check if axNode is aria-labelledby any other nodes
-      if (axNode.name && axNode.name.sources[0].attributeValue) {
-        nextRelatedNodes = axNode.name.sources[0].attributeValue.relatedNodes;
+      if (
+        sources &&
+        sources.length > 0 &&
+        sources[0].attributeValue?.relatedNodes
+      ) {
+        nextRelatedNodes = sources[0].attributeValue.relatedNodes;
       }
       // Check if axNode is native <label>led by any other nodes
       else if (
-          axNode.name && axNode.name.sources[2] &&
-          axNode.name.sources[2].nativeSourceValue) {
-        nextRelatedNodes =
-            axNode.name.sources[2].nativeSourceValue.relatedNodes;
+        sources &&
+        sources.length > 2 &&
+        sources[2].nativeSourceValue?.relatedNodes
+      ) {
+        nextRelatedNodes = sources[2].nativeSourceValue.relatedNodes;
       }
 
-      for (relatedNode of nextRelatedNodes) {
+      for (const relatedNode of nextRelatedNodes) {
         if (!relatedNodeIds.includes(relatedNode.backendDOMNodeId)) {
           stack.push(relatedNode.backendDOMNodeId);
         }
@@ -226,18 +261,24 @@ async function getAllNodesInComputation(client, nodeId) {
  * @param {CDPSession} client
  * @param {DOM.backendNodeId} relatedNodeIds
  */
-async function removeRedundantNodes(client, relatedNodeIds) {
-  let redundantNodeIds = [];
-  for (let currentBackendNodeId of relatedNodeIds) {
-    const axTree = await client.send(
-        'Accessibility.getPartialAXTree',
-        {backendNodeId: currentBackendNodeId});
-    for (let node of axTree.nodes) {
+async function removeRedundantNodes(
+  client: CDPSession,
+  relatedNodeIds: Protocol.DOM.BackendNodeId[]
+): Promise<Protocol.DOM.BackendNodeId[]> {
+  const redundantNodeIds: Protocol.DOM.BackendNodeId[] = [];
+  for (const currentBackendNodeId of relatedNodeIds) {
+    const axTree = (await client.send('Accessibility.getPartialAXTree', {
+      backendNodeId: currentBackendNodeId,
+    })) as Protocol.Accessibility.GetPartialAXTreeResponse;
+    for (const node of axTree.nodes) {
       // If we reach the current node, we have checked all descendants.
       if (node.backendDOMNodeId === currentBackendNodeId) {
         break;
       }
-      if (relatedNodeIds.includes(node.backendDOMNodeId)) {
+      if (
+        node.backendDOMNodeId &&
+        relatedNodeIds.includes(node.backendDOMNodeId)
+      ) {
         redundantNodeIds.push(node.backendDOMNodeId);
       }
     }
@@ -250,11 +291,15 @@ async function removeRedundantNodes(client, relatedNodeIds) {
  * @param {CDPSession} client
  * @param {DOM.backendNodeId} nodeId
  */
-async function getHTMLfromNodeIds(client, nodeIds) {
+async function getHTMLfromNodeIds(
+  client: CDPSession,
+  nodeIds: Protocol.DOM.BackendNodeId[]
+): Promise<string> {
   let HTMLString = '';
-  for (let nodeId of nodeIds) {
-    const result =
-        await client.send('DOM.getOuterHTML', {backendNodeId: nodeId});
+  for (const nodeId of nodeIds) {
+    const result = (await client.send('DOM.getOuterHTML', {
+      backendNodeId: nodeId,
+    })) as Protocol.DOM.GetOuterHTMLResponse;
     HTMLString += result.outerHTML + '\n';
   }
   return HTMLString;
@@ -265,12 +310,20 @@ async function getHTMLfromNodeIds(client, nodeIds) {
  * @param {CDPSession} client
  * @param {string} idref
  */
-async function getBackendNodeIdFromIdref(client, idref) {
-  const doc = await client.send('DOM.getDocument');
-  const selectedNodeId = await client.send(
-      'DOM.querySelector',
-      {nodeId: doc.root.nodeId, selector: '[id="' + idref + '"]'});
-  const selectedNodeDescription =
-      await client.send('DOM.describeNode', selectedNodeId);
+async function getBackendNodeIdFromIdref(
+  client: CDPSession,
+  idref: string
+): Promise<Protocol.DOM.BackendNodeId> {
+  const doc = (await client.send(
+    'DOM.getDocument'
+  )) as Protocol.DOM.GetDocumentResponse;
+  const selectedNodeId = (await client.send('DOM.querySelector', {
+    nodeId: doc.root.nodeId,
+    selector: '[id="' + idref + '"]',
+  })) as Protocol.DOM.QuerySelectorResponse;
+  const selectedNodeDescription = (await client.send(
+    'DOM.describeNode',
+    selectedNodeId
+  )) as Protocol.DOM.DescribeNodeResponse;
   return selectedNodeDescription.node.backendNodeId;
 }
