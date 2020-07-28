@@ -1,12 +1,15 @@
 import {CDPSession} from 'puppeteer';
 import * as puppeteer from 'puppeteer';
 import {Protocol} from 'devtools-protocol';
+import fetch from 'node-fetch';
 
-import {bgPrototypeSource} from './accname_libs_source_code/bg_prototype_source';
-import {ourLibSource} from './accname_libs_source_code/our_lib_source';
+// TODO: import node package when our lib is ready,
+// export .source as is done in axe.
+import {ourLibSource} from './our_lib_source';
 import * as axe from 'axe-core';
 
-const inputHTML = `
+// TODO: Take user input rather than hard coded
+const INPUT_HTML = `
   <html>
     <head>
       <title>
@@ -14,9 +17,8 @@ const inputHTML = `
       </title>
     </head>
     <body>
-      <div id="bar">world</div>
-      <div id="baz">Hello</div>
-      <div id="foo" aria-labelledby="baz bar"></div>
+      <button id="bar">Hello<div id="baz">world</div></button>
+      <div id="foo" aria-labelledby="bar baz"></div>
     </body>
   </html>
 `;
@@ -26,7 +28,7 @@ const inputHTML = `
     args: ['--enable-blink-features=AccessibilityObjectModel'],
   });
   const page = await browser.newPage();
-  await page.goto('data:text/html,' + inputHTML);
+  await page.goto('data:text/html,' + INPUT_HTML);
 
   const client = await page.target().createCDPSession();
 
@@ -36,7 +38,7 @@ const inputHTML = `
   console.log('Chrome AccName: ', chromeAccName);
 
   const axeAccName = await getAXEAccName(client, 'foo');
-  console.log('aXe AccName: ', axeAccName);
+  console.log('Axe AccName: ', axeAccName);
 
   const aomAccName = await getAOMAccName(client, 'foo');
   console.log('AOM AccName: ', aomAccName);
@@ -72,6 +74,11 @@ async function loadAccNameLibraries(client: CDPSession) {
       'const getAOMWrapper = async (idref) => { const aomObj = await getComputedAccessibleNode(document.getElementById(idref)); return aomObj.name;}',
   });
   // Load Bryan Garaventa's Prototype
+  const bgPrototypeSource = await (async () => {
+    const response = await fetch('https://whatsock.github.io/w3c-alternative-text-computation/Sample%20JavaScript%20Recursion%20Algorithm/recursion.js');
+    const responseBody = await response.text();
+    return responseBody;
+  })();
   await client.send('Runtime.evaluate', {expression: bgPrototypeSource});
   // Load our AccName
   await client.send('Runtime.evaluate', {expression: ourLibSource});
@@ -90,11 +97,10 @@ async function getChromeAccName(
   const selectedBackendNodeId = await getBackendNodeIdFromIdref(client, idref);
   const axTree = (await client.send('Accessibility.getPartialAXTree', {
     backendNodeId: selectedBackendNodeId,
+    fetchRelatives: false
   })) as Protocol.Accessibility.GetPartialAXTreeResponse;
   return (
-    axTree.nodes.filter(
-      node => node.backendDOMNodeId === selectedBackendNodeId
-    )[0]?.name?.value ?? ''
+    axTree.nodes[0]?.name?.value ?? ''
   );
 }
 
@@ -183,13 +189,12 @@ async function getMinimisedHTML(
   idref: string
 ): Promise<string> {
   const nodeId = await getBackendNodeIdFromIdref(client, idref);
-  const allNodesInComputation = await getAllNodesInComputation(client, nodeId);
+  const allNodesInComputation = await getAllNodesUsedByChromeAccName(client, nodeId);
   const allRelevantNodes = await removeRedundantNodes(
     client,
     allNodesInComputation
   );
-  const minimisedHTML = await getHTMLfromNodeIds(client, allRelevantNodes);
-  return minimisedHTML;
+  return await getHTMLfromNodeIds(client, allRelevantNodes);
 }
 
 /**
@@ -200,7 +205,7 @@ async function getMinimisedHTML(
  * @param {CDPSession} client
  * @param {DOM.backendNodeId} nodeId
  */
-async function getAllNodesInComputation(
+async function getAllNodesUsedByChromeAccName(
   client: CDPSession,
   nodeId: Protocol.DOM.BackendNodeId
 ): Promise<Protocol.DOM.BackendNodeId[]> {
@@ -208,7 +213,7 @@ async function getAllNodesInComputation(
   const relatedNodeIds: Protocol.DOM.BackendNodeId[] = [];
   stack.push(nodeId);
   // Iterative DFS traverses nodes connected by label references
-  while (stack && stack.length > 0) {
+  while (stack.length > 0) {
     const currentNodeId = stack.pop();
     relatedNodeIds.push(currentNodeId!);
     const axTree = (await client.send('Accessibility.getPartialAXTree', {
@@ -219,23 +224,19 @@ async function getAllNodesInComputation(
     // each one contains a label reference.
     for (const axNode of axTree.nodes) {
       let nextRelatedNodes: Protocol.Accessibility.AXRelatedNode[] = [];
-      const sources: Protocol.Accessibility.AXValueSource[] | null =
-        axNode.name?.sources ?? null;
-      // Check if axNode is aria-labelledby any other nodes
-      if (
-        sources &&
-        sources.length > 0 &&
-        sources[0].attributeValue?.relatedNodes
-      ) {
-        nextRelatedNodes = sources[0].attributeValue.relatedNodes;
-      }
-      // Check if axNode is native <label>led by any other nodes
-      else if (
-        sources &&
-        sources.length > 2 &&
-        sources[2].nativeSourceValue?.relatedNodes
-      ) {
-        nextRelatedNodes = sources[2].nativeSourceValue.relatedNodes;
+      const sources: Protocol.Accessibility.AXValueSource[] =
+        axNode.name?.sources ?? [];
+
+      for (const source of sources) {
+        if (source.type === 'relatedElement') {
+          // Handles nodes connected by attribute value (aria-labelleby)
+          if (source.attributeValue?.relatedNodes) {
+            nextRelatedNodes = source.attributeValue.relatedNodes;
+          // Handles nodes connected natively (<label>)
+          } else if (source.nativeSourceValue?.relatedNodes) {
+            nextRelatedNodes = source.nativeSourceValue.relatedNodes;
+          }
+        }
       }
 
       for (const relatedNode of nextRelatedNodes) {
@@ -269,8 +270,12 @@ async function removeRedundantNodes(
   for (const currentBackendNodeId of relatedNodeIds) {
     const axTree = (await client.send('Accessibility.getPartialAXTree', {
       backendNodeId: currentBackendNodeId,
+      fetchRelatives: false
     })) as Protocol.Accessibility.GetPartialAXTreeResponse;
+    console.log(axTree.nodes[0].name?.sources);
     for (const node of axTree.nodes) {
+      console.log(node);
+      console.log(node.name?.sources);
       // If we reach the current node, we have checked all descendants.
       if (node.backendDOMNodeId === currentBackendNodeId) {
         break;

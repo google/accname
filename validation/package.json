@@ -1,21 +1,23 @@
 {
-  "name": "puppeteer_env",
-  "version": "1.0.0",
+  "name": "accname-comparison",
+  "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "dist/validate.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Oisín Nolan",
+  "license": "Apache-2.0",
   "devDependencies": {
     "chrome-remote-debug-protocol": "^1.2.20180422",
     "typescript": "^3.9.7"
   },
   "dependencies": {
+    "@types/node-fetch": "^2.5.7",
     "@types/puppeteer": "^3.0.1",
     "axe-core": "^3.5.5",
+    "node-fetch": "^2.6.0",
     "puppeteer": "^5.2.1"
   }
 }
