@@ -22,13 +22,10 @@ const INPUT_HTML = `
       </title>
     </head>
     <body>
-      <button id="bar">Hello<div id="baz">world</div></button>
-      <div aria-labelledby="bar baz"></div>
-      <label for="woop">world</label>
-      <label>
-        Hello
-        <input accnameComparisonTarget id="woop"/>
-      </label>
+      <div id="baz">3</div>
+      <div accnameComparisonTarget aria-labelledby="foo bar baz"></div>
+      <div id="bar">2</div>
+      <div id="foo">1</div>
     </body>
   </html>
 `;
@@ -48,7 +45,7 @@ const INPUT_HTML = `
     page
   );
   if (targetNodeRef) {
-    const accnames = await runComparison(targetNodeRef, page);
+    const accnames = await runComparison(targetNodeRef, page, client);
     console.log('AccName comparison:\n', accnames);
 
     const htmlUsedByChrome = await getHTMLUsedByChrome(
@@ -71,42 +68,44 @@ const INPUT_HTML = `
  */
 async function runComparison(
   nodeRef: NodeRef,
-  page: Page
+  page: Page,
+  client: CDPSession
 ): Promise<{[key: string]: string}> {
   const accnames: {[key: string]: string} = {};
 
   // Chrome accname
-  const axNode = await page.accessibility.snapshot({root: nodeRef.handle});
-  accnames.chrome = axNode.name;
+  const getPartialAXTreeResponse = (await client.send(
+    'Accessibility.getPartialAXTree',
+    {
+      backendNodeId: nodeRef.backendId,
+      fetchRelatives: false,
+    }
+  )) as Protocol.Accessibility.GetPartialAXTreeResponse;
+  const axNode = getPartialAXTreeResponse.nodes[0];
+  accnames.chrome = axNode.name?.value ?? '';
 
   // Axe accname
-  await page.evaluate(
-    "axeTargetElem = axe.utils.querySelectorAll(_tree, '" +
-      nodeRef.selector +
-      "')[0];"
-  );
   const axeName = (await page.evaluate(
-    'axe.commons.text.accessibleTextVirtual(axeTargetElem);'
+    `axeTargetElem = axe.utils.querySelectorAll(_tree, '${nodeRef.selector}')[0];
+    axe.commons.text.accessibleTextVirtual(axeTargetElem);`
   )) as string;
   accnames.axe = axeName;
 
   // AOM accname
   const aomName = (await page.evaluate(
-    "getAOMName('" + nodeRef.selector + "');"
+    `getAOMName('${nodeRef.selector}');`
   )) as string;
   accnames.aom = aomName;
 
   // BG prototype accname
   const bgName = (await page.evaluate(
-    "getAccName(document.querySelector('" + nodeRef.selector + "')).name"
+    `getAccName(document.querySelector('${nodeRef.selector}')).name`
   )) as string;
   accnames.bg = bgName;
 
   // Our accname
   const ourName = (await page.evaluate(
-    "OurLib.getAccessibleName(document.querySelector('" +
-      nodeRef.selector +
-      "'));"
+    `OurLib.getAccessibleName(document.querySelector('${nodeRef.selector}'));`
   )) as string;
   accnames.ourLib = ourName;
 
@@ -160,7 +159,14 @@ async function getHTMLUsedByChrome(
   page: Page
 ): Promise<string> {
   const nodesUsedByChrome = await getNodesUsedByChrome(nodeRef, client, page);
-  const relevantNodes = await removeRedundantNodes(nodesUsedByChrome, page);
+  // Filter any nodes whose HTML would be part of the outerHTML of another node in 'nodesUsedByChrome'.
+  const relevantNodes = await nodesUsedByChrome.filter(
+    async first =>
+      await !nodesUsedByChrome.some(
+        async second =>
+          (await nodeRefContains(second, first, page)) && second !== first
+      )
+  );
   let htmlString = '';
   for (const nodeRef of relevantNodes) {
     htmlString +=
@@ -169,33 +175,16 @@ async function getHTMLUsedByChrome(
   return htmlString;
 }
 
-/**
- * Remove any nodes in nodeRefs that have an ancestor in nodeRefs.
- * @param nodeRefs - Array of nodes from which redundant nodes are being removed
- * @param page - Page containing the nodes in nodeRefs
- */
-async function removeRedundantNodes(
-  nodeRefs: NodeRef[],
+async function nodeRefContains(
+  first: NodeRef,
+  second: NodeRef,
   page: Page
-): Promise<NodeRef[]> {
-  const redundantNodes: NodeRef[] = [];
-  for (const nodeRefA of nodeRefs) {
-    for (const nodeRefB of nodeRefs) {
-      // Any node that has an ancestor in nodeRefs is considered redundant because
-      // outerHTML includes all descendants.
-      const isRedundant = await page.evaluate(
-        (nodeA, nodeB) => nodeA.contains(nodeB),
-        nodeRefA.handle,
-        nodeRefB.handle
-      );
-      // nodeA contains nodeA, so we must ensure that nodeRefA !== nodeRefB or all
-      // nodes will be considered redundant.
-      if (isRedundant && nodeRefA !== nodeRefB) {
-        redundantNodes.push(nodeRefB);
-      }
-    }
-  }
-  return nodeRefs.filter(nodeRef => !redundantNodes.includes(nodeRef));
+): Promise<boolean> {
+  return await page.evaluate(
+    (nodeA, nodeB) => nodeA.contains(nodeB),
+    first.handle,
+    second.handle
+  );
 }
 
 /**
@@ -216,15 +205,23 @@ async function getNodesUsedByChrome(
   stack.push(nodeRef);
   // Iterative DFS traverses nodes connected by label references
   while (stack.length > 0) {
-    const currentNodeRef = stack.pop();
-    nodesUsed.push(currentNodeRef!);
+    const currentNodeRef = stack.pop()!;
+    nodesUsed.push(currentNodeRef);
 
     const axTree = (await client.send('Accessibility.getPartialAXTree', {
-      backendNodeId: currentNodeRef!.backendId,
+      backendNodeId: currentNodeRef.backendId,
     })) as Protocol.Accessibility.GetPartialAXTreeResponse;
 
-    // Check if any AXNodes descandant of currentNodeRef are labelled
-    for (const axNode of axTree.nodes) {
+    // Find the index of the currentNodeRef's corresponding AXNode
+    const indexOfCurrentNode = axTree.nodes.findIndex(
+      axNode => axNode.backendDOMNodeId === currentNodeRef?.backendId
+    );
+
+    // Contains AXNodes descendant of currentNodeRef's corresponding AXNode
+    const descandantNodes = axTree.nodes.slice(0, indexOfCurrentNode + 1);
+
+    // Check if any descendant AXNodes are labelled
+    for (const axNode of descandantNodes) {
       let labelNodes: Protocol.Accessibility.AXRelatedNode[] = [];
       const sources: Protocol.Accessibility.AXValueSource[] =
         axNode.name?.sources ?? [];
@@ -243,23 +240,50 @@ async function getNodesUsedByChrome(
 
       // Repeat the process for all unvisited label nodes.
       for (const labelNode of labelNodes) {
-        const labelNodeRef = await getNodeRefFromBackendId(
-          labelNode.backendDOMNodeId,
-          client,
-          page
-        );
-        if (labelNodeRef && !visitedNodes.includes(labelNodeRef.backendId)) {
-          stack.push(labelNodeRef);
-          visitedNodes.push(labelNodeRef.backendId);
+        if (!visitedNodes.includes(labelNode.backendDOMNodeId)) {
+          const labelNodeRef = await getNodeRefFromBackendId(
+            labelNode.backendDOMNodeId,
+            client,
+            page
+          );
+          if (labelNodeRef) {
+            stack.push(labelNodeRef);
+          }
+          visitedNodes.push(labelNode.backendDOMNodeId);
         }
-      }
-      // Stop iterating when we reach the current node :
-      // we have checked all descendants.
-      if (axNode.backendDOMNodeId === currentNodeRef!.backendId) {
-        break;
       }
     }
   }
+
+  // Sorting the nodes by dom order
+  const n = nodesUsed.length;
+  const nodeOrderMatrix: number[][] = [...Array(n)].map(() => Array(n).fill(0));
+
+  for (const first of nodesUsed) {
+    for (const second of nodesUsed) {
+      const i = nodesUsed.indexOf(first);
+      const j = nodesUsed.indexOf(second);
+      nodeOrderMatrix[i][j] = await page.evaluate(
+        (first, second) => {
+          const relativePosition = first.compareDocumentPosition(second);
+          if (relativePosition & Node.DOCUMENT_POSITION_PRECEDING) {
+            return 1;
+          } else if (relativePosition & Node.DOCUMENT_POSITION_FOLLOWING) {
+            return -1;
+          } else {
+            return 0;
+          }
+        },
+        first.handle,
+        second.handle
+      );
+    }
+  }
+
+  nodesUsed.sort(
+    (first, second) =>
+      nodeOrderMatrix[nodesUsed.indexOf(first)][nodesUsed.indexOf(second)]
+  );
 
   return nodesUsed;
 }
