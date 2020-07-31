@@ -15,18 +15,23 @@ export interface NodeRef {
  * @param client - CDPSession for page.
  * @param page - Page containing the node for whom a NodeRef will be created.
  */
-export async function getNodeRefFromSelector(selector: string, client: CDPSession, page: Page): Promise<NodeRef | null> {
+export async function getNodeRefFromSelector(
+  selector: string,
+  client: CDPSession,
+  page: Page
+): Promise<NodeRef | null> {
+  const getDocumentResponse = (await client.send(
+    'DOM.getDocument'
+  )) as Protocol.DOM.GetDocumentResponse;
 
-  const getDocumentResponse = await client.send('DOM.getDocument') as Protocol.DOM.GetDocumentResponse ;
-
-  const querySelectorResponse = await client.send('DOM.querySelector', {
+  const querySelectorResponse = (await client.send('DOM.querySelector', {
     nodeId: getDocumentResponse.root.nodeId,
-    selector: selector
-  }) as Protocol.DOM.QuerySelectorResponse;
+    selector: selector,
+  })) as Protocol.DOM.QuerySelectorResponse;
 
-  const describeNodeResponse = await client.send('DOM.describeNode', {
-    nodeId: querySelectorResponse.nodeId
-  }) as Protocol.DOM.DescribeNodeResponse;
+  const describeNodeResponse = (await client.send('DOM.describeNode', {
+    nodeId: querySelectorResponse.nodeId,
+  })) as Protocol.DOM.DescribeNodeResponse;
 
   const backendNodeId = describeNodeResponse.node.backendNodeId;
   const nodeHandle = await page.$(selector);
@@ -44,16 +49,19 @@ export async function getNodeRefFromSelector(selector: string, client: CDPSessio
  * @param client - CDPSession for page.
  * @param page - Page in which the node whose nodeRef is being created exists.
  */
-export async function getNodeRefFromBackendId(backendId: Protocol.DOM.BackendNodeId, client: CDPSession, page: Page): Promise<NodeRef | null> {
-
+export async function getNodeRefFromBackendId(
+  backendId: Protocol.DOM.BackendNodeId,
+  client: CDPSession,
+  page: Page
+): Promise<NodeRef | null> {
   // Use Protocol.Runtime.RemoteObject to reliably get Protocol.DOM.NodeId
-  const resolveNodeResponse = await client.send('DOM.resolveNode', {
-    backendNodeId: backendId
-  }) as Protocol.DOM.ResolveNodeResponse;
+  const resolveNodeResponse = (await client.send('DOM.resolveNode', {
+    backendNodeId: backendId,
+  })) as Protocol.DOM.ResolveNodeResponse;
 
-  const requestNodeResponse = await client.send('DOM.requestNode', {
-    objectId: resolveNodeResponse.object.objectId
-  }) as Protocol.DOM.RequestNodeResponse;
+  const requestNodeResponse = (await client.send('DOM.requestNode', {
+    objectId: resolveNodeResponse.object.objectId,
+  })) as Protocol.DOM.RequestNodeResponse;
 
   const markerAttribute = randomString();
 
@@ -61,7 +69,7 @@ export async function getNodeRefFromBackendId(backendId: Protocol.DOM.BackendNod
   await client.send('DOM.setAttributeValue', {
     nodeId: requestNodeResponse.nodeId,
     name: markerAttribute,
-    value: 'true'
+    value: 'true',
   });
 
   // Find the referenced node using that unique attribute, allowing us
@@ -69,7 +77,11 @@ export async function getNodeRefFromBackendId(backendId: Protocol.DOM.BackendNod
   const nodeHandle = await page.$('[' + markerAttribute + ']');
   if (nodeHandle) {
     // Remove the marker attribute.
-    await page.evaluate((elem, markerAttribute) => elem.removeAttribute(markerAttribute), nodeHandle, markerAttribute);
+    await page.evaluate(
+      (elem, markerAttribute) => elem.removeAttribute(markerAttribute),
+      nodeHandle,
+      markerAttribute
+    );
     return {backendId: backendId, handle: nodeHandle};
   }
 
@@ -78,4 +90,4 @@ export async function getNodeRefFromBackendId(backendId: Protocol.DOM.BackendNod
 
 const randomString = () => {
   return 'noderefMarker-' + Math.random().toString(36).substr(2, 5);
-}
+};

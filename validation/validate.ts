@@ -2,7 +2,11 @@ import {CDPSession, Page} from 'puppeteer';
 import * as puppeteer from 'puppeteer';
 import {Protocol} from 'devtools-protocol';
 import fetch from 'node-fetch';
-import {NodeRef, getNodeRefFromSelector, getNodeRefFromBackendId} from './node_ref';
+import {
+  NodeRef,
+  getNodeRefFromSelector,
+  getNodeRefFromBackendId,
+} from './node_ref';
 
 // TODO: import node package when our lib is ready,
 // export .source as is done in axe.
@@ -38,12 +42,20 @@ const INPUT_HTML = `
   const client = await page.target().createCDPSession();
 
   await loadAccNameLibraries(page);
-  const targetNodeRef = await getNodeRefFromSelector('[accnameComparisonTarget]', client, page);
+  const targetNodeRef = await getNodeRefFromSelector(
+    '[accnameComparisonTarget]',
+    client,
+    page
+  );
   if (targetNodeRef) {
     const accnames = await runComparison(targetNodeRef, page);
     console.log('AccName comparison:\n', accnames);
 
-    const htmlUsedByChrome = await getHTMLUsedByChrome(targetNodeRef, client, page);
+    const htmlUsedByChrome = await getHTMLUsedByChrome(
+      targetNodeRef,
+      client,
+      page
+    );
     console.log('\nHTML used by Chrome:\n', htmlUsedByChrome);
   }
 
@@ -57,7 +69,10 @@ const INPUT_HTML = `
  * @return - A mapping from implementation name to the accessible name produced
  * by that implementation.
  */
-async function runComparison(nodeRef: NodeRef, page: Page): Promise<{[key: string]: string}> {
+async function runComparison(
+  nodeRef: NodeRef,
+  page: Page
+): Promise<{[key: string]: string}> {
   const accnames: {[key: string]: string} = {};
 
   // Chrome accname
@@ -65,20 +80,34 @@ async function runComparison(nodeRef: NodeRef, page: Page): Promise<{[key: strin
   accnames.chrome = axNode.name;
 
   // Axe accname
-  await page.evaluate('axeTargetElem = axe.utils.querySelectorAll(_tree, \'' + nodeRef.selector + '\')[0];');
-  const axeName = await page.evaluate('axe.commons.text.accessibleTextVirtual(axeTargetElem);') as string;
+  await page.evaluate(
+    "axeTargetElem = axe.utils.querySelectorAll(_tree, '" +
+      nodeRef.selector +
+      "')[0];"
+  );
+  const axeName = (await page.evaluate(
+    'axe.commons.text.accessibleTextVirtual(axeTargetElem);'
+  )) as string;
   accnames.axe = axeName;
 
   // AOM accname
-  const aomName = await page.evaluate('getAOMName(\'' + nodeRef.selector + '\');') as string;
+  const aomName = (await page.evaluate(
+    "getAOMName('" + nodeRef.selector + "');"
+  )) as string;
   accnames.aom = aomName;
 
   // BG prototype accname
-  const bgName = await page.evaluate('getAccName(document.querySelector(\'' + nodeRef.selector + '\')).name') as string;
+  const bgName = (await page.evaluate(
+    "getAccName(document.querySelector('" + nodeRef.selector + "')).name"
+  )) as string;
   accnames.bg = bgName;
 
   // Our accname
-  const ourName = await page.evaluate('OurLib.getAccessibleName(document.querySelector(\'' + nodeRef.selector + '\'));') as string;
+  const ourName = (await page.evaluate(
+    "OurLib.getAccessibleName(document.querySelector('" +
+      nodeRef.selector +
+      "'));"
+  )) as string;
   accnames.ourLib = ourName;
 
   return accnames;
@@ -91,7 +120,9 @@ async function runComparison(nodeRef: NodeRef, page: Page): Promise<{[key: strin
 async function loadAccNameLibraries(page: Page) {
   // Load axe-core
   await page.evaluate(axe.source);
-  await page.evaluate('const _tree = axe.utils.getFlattenedTree(document.body);');
+  await page.evaluate(
+    'const _tree = axe.utils.getFlattenedTree(document.body);'
+  );
   await page.evaluate('let axeTargetElem');
 
   // Load aom wrapper function
@@ -104,7 +135,9 @@ async function loadAccNameLibraries(page: Page) {
 
   // Load Bryan Garaventa's Prototype from github repo
   const bgPrototypeSource = await (async () => {
-    const response = await fetch('https://whatsock.github.io/w3c-alternative-text-computation/Sample%20JavaScript%20Recursion%20Algorithm/recursion.js');
+    const response = await fetch(
+      'https://whatsock.github.io/w3c-alternative-text-computation/Sample%20JavaScript%20Recursion%20Algorithm/recursion.js'
+    );
     const responseBody = await response.text();
     return responseBody;
   })();
@@ -121,12 +154,17 @@ async function loadAccNameLibraries(page: Page) {
  * @param client - The CDPSession for page.
  * @param page - The page in which to run the accessible name computation.
  */
-async function getHTMLUsedByChrome(nodeRef: NodeRef, client: CDPSession, page: Page): Promise<string> {
+async function getHTMLUsedByChrome(
+  nodeRef: NodeRef,
+  client: CDPSession,
+  page: Page
+): Promise<string> {
   const nodesUsedByChrome = await getNodesUsedByChrome(nodeRef, client, page);
   const relevantNodes = await removeRedundantNodes(nodesUsedByChrome, page);
   let htmlString = '';
   for (const nodeRef of relevantNodes) {
-    htmlString += await page.evaluate(node => node.outerHTML, nodeRef.handle) + '\n';
+    htmlString +=
+      (await page.evaluate(node => node.outerHTML, nodeRef.handle)) + '\n';
   }
   return htmlString;
 }
@@ -136,13 +174,20 @@ async function getHTMLUsedByChrome(nodeRef: NodeRef, client: CDPSession, page: P
  * @param nodeRefs - Array of nodes from which redundant nodes are being removed
  * @param page - Page containing the nodes in nodeRefs
  */
-async function removeRedundantNodes(nodeRefs: NodeRef[], page: Page): Promise<NodeRef[]> {
+async function removeRedundantNodes(
+  nodeRefs: NodeRef[],
+  page: Page
+): Promise<NodeRef[]> {
   const redundantNodes: NodeRef[] = [];
   for (const nodeRefA of nodeRefs) {
     for (const nodeRefB of nodeRefs) {
       // Any node that has an ancestor in nodeRefs is considered redundant because
       // outerHTML includes all descendants.
-      const isRedundant = await page.evaluate((nodeA, nodeB) => nodeA.contains(nodeB), nodeRefA.handle, nodeRefB.handle);
+      const isRedundant = await page.evaluate(
+        (nodeA, nodeB) => nodeA.contains(nodeB),
+        nodeRefA.handle,
+        nodeRefB.handle
+      );
       // nodeA contains nodeA, so we must ensure that nodeRefA !== nodeRefB or all
       // nodes will be considered redundant.
       if (isRedundant && nodeRefA !== nodeRefB) {
@@ -159,7 +204,11 @@ async function removeRedundantNodes(nodeRefs: NodeRef[], page: Page): Promise<No
  * @param client - CDPSession for page.
  * @param page - Page containing nodeRef.
  */
-async function getNodesUsedByChrome(nodeRef: NodeRef, client: CDPSession, page: Page): Promise<NodeRef[]> {
+async function getNodesUsedByChrome(
+  nodeRef: NodeRef,
+  client: CDPSession,
+  page: Page
+): Promise<NodeRef[]> {
   const stack: NodeRef[] = [];
   const nodesUsed: NodeRef[] = [];
   // Track backendIds of visited nodes to avoid infinite cycle.
@@ -185,7 +234,7 @@ async function getNodesUsedByChrome(nodeRef: NodeRef, client: CDPSession, page: 
           // Handles nodes connected by attribute value (aria-labelleby)
           if (source.attributeValue?.relatedNodes) {
             labelNodes = source.attributeValue.relatedNodes;
-          // Handles nodes connected natively (<label>)
+            // Handles nodes connected natively (<label>)
           } else if (source.nativeSourceValue?.relatedNodes) {
             labelNodes = source.nativeSourceValue.relatedNodes;
           }
@@ -194,7 +243,11 @@ async function getNodesUsedByChrome(nodeRef: NodeRef, client: CDPSession, page: 
 
       // Repeat the process for all unvisited label nodes.
       for (const labelNode of labelNodes) {
-        const labelNodeRef = await getNodeRefFromBackendId(labelNode.backendDOMNodeId, client, page);
+        const labelNodeRef = await getNodeRefFromBackendId(
+          labelNode.backendDOMNodeId,
+          client,
+          page
+        );
         if (labelNodeRef && !visitedNodes.includes(labelNodeRef.backendId)) {
           stack.push(labelNodeRef);
           visitedNodes.push(labelNodeRef.backendId);
