@@ -16,14 +16,12 @@ export interface NodeRef {
  * @param selector - Selector uniquely identifying the node to be referenced.
  * @param client - CDPSession for page.
  * @param page - Page containing the node for whom a NodeRef will be created.
- * @return - A NodeRef if one could be created from the provided selector,
- * null otherwise.
  */
 export async function getNodeRefFromSelector(
   selector: string,
   client: CDPSession,
   page: Page
-): Promise<NodeRef | null> {
+): Promise<NodeRef> {
   const getDocumentResponse = (await client.send(
     'DOM.getDocument'
   )) as Protocol.DOM.GetDocumentResponse;
@@ -40,9 +38,13 @@ export async function getNodeRefFromSelector(
   const backendNodeId = describeNodeResponse.node.backendNodeId;
   const nodeHandle = await page.$(selector);
 
-  return nodeHandle
-    ? {selector: selector, handle: nodeHandle, backendId: backendNodeId}
-    : null;
+  if (nodeHandle) {
+    return {selector: selector, handle: nodeHandle, backendId: backendNodeId};
+  }
+
+  throw new Error(
+    `NodeRef could not be created using the selector '${selector}'.`
+  );
 }
 
 /**
@@ -50,14 +52,12 @@ export async function getNodeRefFromSelector(
  * @param backendId - BackendNodeId for the node whose NodeRef is being created.
  * @param client - CDPSession for page.
  * @param page - Page in which the node whose NodeRef is being created exists.
- * @return - A NodeRef if one could be created from the provided BackendNodeId,
- * null otherwise.
  */
 export async function getNodeRefFromBackendId(
   backendId: Protocol.DOM.BackendNodeId,
   client: CDPSession,
   page: Page
-): Promise<NodeRef | null> {
+): Promise<NodeRef> {
   // Use Protocol.Runtime.RemoteObject (returned by DOM.resolveNode)
   // to reliably get Protocol.DOM.NodeId
   const resolveNodeResponse = (await client.send('DOM.resolveNode', {
@@ -90,7 +90,9 @@ export async function getNodeRefFromBackendId(
     return {backendId: backendId, handle: nodeHandle};
   }
 
-  return null;
+  throw new Error(
+    `NodeRef could not be created using DOM.BackendNodeId '${backendId}'.`
+  );
 }
 
 const randomString = () => {

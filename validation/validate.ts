@@ -22,9 +22,8 @@ const INPUT_HTML = `
       </title>
     </head>
     <body>
-      <div id="baz">3</div>
+      <div id="bar">2<div id="baz">3</div></div>
       <div accnameComparisonTarget aria-labelledby="foo bar baz"></div>
-      <div id="bar">2</div>
       <div id="foo">1</div>
     </body>
   </html>
@@ -159,32 +158,30 @@ async function getHTMLUsedByChrome(
   page: Page
 ): Promise<string> {
   const nodesUsedByChrome = await getNodesUsedByChrome(nodeRef, client, page);
-  // Filter any nodes whose HTML would be part of the outerHTML of another node in 'nodesUsedByChrome'.
-  const relevantNodes = await nodesUsedByChrome.filter(
-    async first =>
-      await !nodesUsedByChrome.some(
-        async second =>
-          (await nodeRefContains(second, first, page)) && second !== first
-      )
-  );
-  let htmlString = '';
-  for (const nodeRef of relevantNodes) {
-    htmlString +=
-      (await page.evaluate(node => node.outerHTML, nodeRef.handle)) + '\n';
-  }
-  return htmlString;
-}
 
-async function nodeRefContains(
-  first: NodeRef,
-  second: NodeRef,
-  page: Page
-): Promise<boolean> {
-  return await page.evaluate(
-    (nodeA, nodeB) => nodeA.contains(nodeB),
-    first.handle,
-    second.handle
-  );
+  const nodeHandles = nodesUsedByChrome.map(node => node.handle);
+  // Get the outerHTML of the nodes used by Chrome
+  const htmlString = await page.evaluate((...nodes) => {
+    // Sort nodes by DOM order
+    nodes.sort((first, second) => {
+      const relativePosition = first.compareDocumentPosition(second);
+      if (relativePosition & Node.DOCUMENT_POSITION_PRECEDING) {
+        return 1;
+      } else if (relativePosition & Node.DOCUMENT_POSITION_FOLLOWING) {
+        return -1;
+      } else {
+        return 0;
+      }
+    });
+    // Remove 'redundant' nodes: nodes whose outerHTML is included in that of
+    // an ancestor node.
+    const relevantNodes = nodes.filter(first => {
+      return !nodes.some(second => second.contains(first) && first !== second);
+    });
+    return relevantNodes.map(node => node.outerHTML).join('\n');
+  }, ...nodeHandles);
+
+  return htmlString;
 }
 
 /**
@@ -254,36 +251,6 @@ async function getNodesUsedByChrome(
       }
     }
   }
-
-  // Sorting the nodes by dom order
-  const n = nodesUsed.length;
-  const nodeOrderMatrix: number[][] = [...Array(n)].map(() => Array(n).fill(0));
-
-  for (const first of nodesUsed) {
-    for (const second of nodesUsed) {
-      const i = nodesUsed.indexOf(first);
-      const j = nodesUsed.indexOf(second);
-      nodeOrderMatrix[i][j] = await page.evaluate(
-        (first, second) => {
-          const relativePosition = first.compareDocumentPosition(second);
-          if (relativePosition & Node.DOCUMENT_POSITION_PRECEDING) {
-            return 1;
-          } else if (relativePosition & Node.DOCUMENT_POSITION_FOLLOWING) {
-            return -1;
-          } else {
-            return 0;
-          }
-        },
-        first.handle,
-        second.handle
-      );
-    }
-  }
-
-  nodesUsed.sort(
-    (first, second) =>
-      nodeOrderMatrix[nodesUsed.indexOf(first)][nodesUsed.indexOf(second)]
-  );
 
   return nodesUsed;
 }
