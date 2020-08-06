@@ -165,9 +165,15 @@ async function getHTMLUsedByChrome(
     // Sort nodes by DOM order
     nodes.sort((first, second) => {
       const relativePosition = first.compareDocumentPosition(second);
-      if (relativePosition & Node.DOCUMENT_POSITION_PRECEDING) {
+      if (
+        relativePosition & Node.DOCUMENT_POSITION_PRECEDING ||
+        relativePosition & Node.DOCUMENT_POSITION_CONTAINS
+      ) {
         return 1;
-      } else if (relativePosition & Node.DOCUMENT_POSITION_FOLLOWING) {
+      } else if (
+        relativePosition & Node.DOCUMENT_POSITION_FOLLOWING ||
+        relativePosition & Node.DOCUMENT_POSITION_CONTAINED_BY
+      ) {
         return -1;
       } else {
         return 0;
@@ -175,10 +181,10 @@ async function getHTMLUsedByChrome(
     });
     // Remove 'redundant' nodes: nodes whose outerHTML is included in that of
     // an ancestor node.
-    const relevantNodes = nodes.filter(first => {
-      return !nodes.some(second => second.contains(first) && first !== second);
-    });
-    return relevantNodes.map(node => node.outerHTML).join('\n');
+    return nodes
+      .filter((node, i) => !nodes[i - 1]?.contains(node))
+      .map(node => node.outerHTML)
+      .join('\n');
   }, ...nodeHandles);
 
   return htmlString;
