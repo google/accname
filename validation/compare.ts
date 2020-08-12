@@ -2,12 +2,14 @@ import {CDPSession, Page} from 'puppeteer';
 import puppeteer from 'puppeteer';
 import {Protocol} from 'devtools-protocol';
 import fetch from 'node-fetch';
-import {
-  NodeRef,
-  getNodeRefFromSelector,
-} from './node_ref';
+import {NodeRef, getNodeRefFromSelector} from './node_ref';
 import {getHTMLUsed} from './html_used';
-import {createTestcase, addSnippetCase, CasePreview, addPageSummary} from './output';
+import {
+  createTestcase,
+  addSnippetCase,
+  CasePreview,
+  addPageSummary,
+} from './output';
 
 // TODO: import node package when our lib is ready,
 // export .source as is done in axe.
@@ -75,7 +77,7 @@ export async function runHTMLSnippetComparison(
 export interface PageSummary {
   url: string;
   nodesOnPage: number;
-  stats: { category: Category; count: number; }[];
+  stats: {category: Category; count: number}[];
   cases: CasePreview[];
 }
 
@@ -95,7 +97,9 @@ export async function runURLComparison(url: string): Promise<number> {
 
   const httpResponse = await page.goto(url);
   if (!httpResponse?.ok()) {
-    throw new Error(`URL '${url}' could not be accessed, HTTP status: (${httpResponse?.status}) : ${httpResponse?.statusText}'`);
+    throw new Error(
+      `URL '${url}' could not be accessed, HTTP status: (${httpResponse?.status}) : ${httpResponse?.statusText}'`
+    );
   }
 
   await loadAccNameLibraries(page);
@@ -107,7 +111,7 @@ export async function runURLComparison(url: string): Promise<number> {
 
   const allNodes = await page.$$('body *');
   for (let i = 0; i < allNodes.length; i++) {
-    console.log((i + 1) + '/' + allNodes.length);
+    console.log(i + 1 + '/' + allNodes.length);
     const node = allNodes[i];
 
     await page.evaluate(
@@ -152,7 +156,7 @@ export async function runURLComparison(url: string): Promise<number> {
     url: url,
     nodesOnPage: allNodes.length,
     stats: categoryStats,
-    cases: cases
+    cases: cases,
   };
   const pageSummaryId = addPageSummary(pageSummary);
 

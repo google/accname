@@ -1,9 +1,6 @@
 import {Protocol} from 'devtools-protocol';
-import {
-  NodeRef,
-  getNodeRefFromBackendId,
-} from './node_ref';
-import { CDPSession, Page } from 'puppeteer';
+import {NodeRef, getNodeRefFromBackendId} from './node_ref';
+import {CDPSession, Page} from 'puppeteer';
 
 /**
  * Gets strings containing the HTML markup for the Nodes used to compute
@@ -12,7 +9,11 @@ import { CDPSession, Page } from 'puppeteer';
  * @param client - CDPSession for page
  * @param page - Page containing Node referenced by NodeRef
  */
-export async function getHTMLUsed(nodeRef: NodeRef, client: CDPSession, page: Page): Promise<{[implementation: string]: string}> {
+export async function getHTMLUsed(
+  nodeRef: NodeRef,
+  client: CDPSession,
+  page: Page
+): Promise<{[implementation: string]: string}> {
   const htmlUsedByChrome = await getHTMLUsedByChrome(nodeRef, client, page);
   const htmlUsedByOurAccName = (await page.evaluate(
     "ourLib.getAccessibleName(document.querySelector('" +

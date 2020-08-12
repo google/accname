@@ -17,8 +17,10 @@ export interface CasePreview {
  * a CasePreview for that test-case.
  * @param comparisonResult - The ComparisonResult that will become a test-case
  */
-export function createTestcase(comparisonResult: ComparisonResult): CasePreview {
-  const caseId = fs.readdirSync('./output/case/').length ;
+export function createTestcase(
+  comparisonResult: ComparisonResult
+): CasePreview {
+  const caseId = fs.readdirSync('./output/case/').length;
 
   fs.writeFile(
     `./output/case/case_${caseId}.json`,
@@ -47,7 +49,7 @@ export function createTestcase(comparisonResult: ComparisonResult): CasePreview 
  * Add a snippet CasePreview to preview.json.
  * @param casePreview - The CasePreview to be added to preview.json
  */
-export function addSnippetCase(casePreview: CasePreview) {
+export function addSnippetCase(casePreview: CasePreview): void {
   const preview = getPreviewJson();
   preview.snippets.push(casePreview);
   fs.writeFileSync('./output/preview.json', JSON.stringify(preview));
@@ -76,12 +78,16 @@ export function addPageSummary(pageSummary: PageSummary): number {
   );
 
   // Cut down on url text for easier display (as in Chrome URL bar)
-  const urlPreview =  pageSummary.url.replace(/^(?:https?:\/\/)?(?:www\.)?/i, '');
+  const urlPreview = pageSummary.url.replace(
+    /^(?:https?:\/\/)?(?:www\.)?/i,
+    ''
+  );
 
   const pageSummaryPreview = {
     pageSummaryId: pageSummaryId,
     url: urlPreview,
-    percentDisagreement: (pageSummary.cases.length / pageSummary.nodesOnPage) * 100
+    percentDisagreement:
+      (pageSummary.cases.length / pageSummary.nodesOnPage) * 100,
   };
 
   const preview = getPreviewJson();
