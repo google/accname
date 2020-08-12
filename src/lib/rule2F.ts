@@ -1,5 +1,6 @@
 import {Context, getDefaultContext} from './context';
 import {computeTextAlternative} from './compute_text_alternative';
+import {closest} from './polyfill';
 
 // Explicit roles allowing 'name from content'
 // (https://www.w3.org/TR/wai-aria-1.1/#namefromcontent)
@@ -75,15 +76,15 @@ function getFunctionCalculatingAllowsNameFromContent(
   switch (elemNodeName) {
     case 'th':
       return (elem: HTMLElement) => {
-        return elem.closest('table') !== null;
+        return closest(elem, 'table') !== null;
       };
     case 'td':
       return (elem: HTMLElement) => {
-        return elem.closest('table') !== null;
+        return closest(elem, 'table') !== null;
       };
     case 'option':
       return (elem: HTMLElement) => {
-        return elem.closest('select,datalist') !== null;
+        return closest(elem, 'select,datalist') !== null;
       };
     case 'input':
       return (elem: HTMLElement) => {
@@ -204,7 +205,7 @@ export function rule2F(
   const cssAfterContent = getCssContent(node, ':after');
 
   const textAlterantives: string[] = [];
-  node.childNodes.forEach(childNode => {
+  for (const childNode of node.childNodes) {
     if (!context.inherited.visitedNodes.includes(childNode)) {
       context.inherited.visitedNodes.push(childNode);
       context.inherited.partOfName = true;
@@ -215,7 +216,7 @@ export function rule2F(
 
       textAlterantives.push(textAlterantive);
     }
-  });
+  }
 
   // Consider only non-empty text alternatives to prevent double
   // spacing between text alternatives in accumulatedText.
