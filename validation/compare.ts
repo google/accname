@@ -145,12 +145,10 @@ export async function runURLComparison(url: string): Promise<number> {
   }
 
   // All categories encountered duirng comparison and their associated counts.
-  const categoryStats = Object.entries(categoryCount).map(entry => {
-    return {
-      category: JSON.parse(entry[0]) as Category,
-      count: entry[1],
-    };
-  });
+  const categoryStats = Object.entries(categoryCount).map(entry => ({
+    category: JSON.parse(entry[0]) as Category,
+    count: entry[1],
+  }));
 
   const pageSummary = {
     url: url,
