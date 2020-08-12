@@ -1,4 +1,5 @@
 import {Context, getDefaultContext} from './context';
+import {closest} from './polyfill';
 
 /**
  * Looks at a variety of characteristics (CSS, size on screen, attributes)
@@ -15,7 +16,7 @@ function isHidden(node: Node, context: Context): boolean {
   // #SPEC_ASSUMPTION (A.3) : options shouldn't be hidden
   if (
     node instanceof HTMLOptionElement &&
-    node.closest('select') !== null &&
+    closest(node, 'select') !== null &&
     context.inherited.partOfName
   ) {
     return false;
@@ -27,7 +28,7 @@ function isHidden(node: Node, context: Context): boolean {
     return true;
   }
 
-  const hiddenAncestor = node.closest('[hidden],[aria-hidden="true"]');
+  const hiddenAncestor = closest(node, '[hidden],[aria-hidden="true"]');
   if (hiddenAncestor !== null) {
     return true;
   }
