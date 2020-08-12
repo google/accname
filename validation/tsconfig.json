@@ -19,7 +19,7 @@
     "esModuleInterop": true
   },
   "include": [
-    "validate.ts"
+    "compare.ts"
   ],
   "exclude": [
     "dist",

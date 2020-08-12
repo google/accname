@@ -5,10 +5,9 @@ import fetch from 'node-fetch';
 import {
   NodeRef,
   getNodeRefFromSelector,
-  getNodeRefFromBackendId,
 } from './node_ref';
-import fs from 'fs';
-import child from 'child_process';
+import {getHTMLUsed} from './html_used';
+import {createTestcase, addSnippetCase, CasePreview, addPageSummary} from './output';
 
 // TODO: import node package when our lib is ready,
 // export .source as is done in axe.
@@ -16,8 +15,7 @@ import {ourLibSource} from './our_lib_source';
 import axe from 'axe-core';
 
 // Hard coded initialisation function simulating calls from
-// backend Express server. ./output and ./output/snippets directories
-// must be present to store comparison results.
+// backend Express server.
 (async () => {
   // Compare on URL
   /*
@@ -34,18 +32,6 @@ import axe from 'axe-core';
 })();
 
 /**
- * The return type for runHTMLSnippetComparison.
- *
- * Accnames property always present, caseId property
- * only present if accnames disagree and a testcase
- * has been saved.
- */
-interface HTMLSnippetComparisonResult {
-  accnames: {[key: string]: string};
-  caseId?: string;
-}
-
-/**
  * Compares AccName implementations on a HTML snippet containing a target element
  * identified by the presence of an 'accnameComparisonTarget' attribute.
  * @param HTMLSnippet - The HTML snippet containing the target element.
@@ -55,7 +41,7 @@ interface HTMLSnippetComparisonResult {
  */
 export async function runHTMLSnippetComparison(
   HTMLSnippet: string
-): Promise<HTMLSnippetComparisonResult> {
+): Promise<[{[implementation: string]: string}, number?]> {
   // Load HTML snippet into Puppeteer browser
   const browser = await puppeteer.launch({
     args: ['--enable-blink-features=AccessibilityObjectModel'],
@@ -75,11 +61,22 @@ export async function runHTMLSnippetComparison(
   const comparisonResults = await runComparison(targetNodeRef, page, client);
   await browser.close();
   if (comparisonResults.disagrees) {
-    const caseId = saveTestcase(comparisonResults, 'output/snippet');
-    return {caseId: caseId, accnames: comparisonResults.accnames};
+    const casePreview = createTestcase(comparisonResults);
+    addSnippetCase(casePreview);
+    return [comparisonResults.accnames, casePreview.caseId];
   }
 
-  return {accnames: comparisonResults.accnames};
+  return [comparisonResults.accnames];
+}
+
+/**
+ * A summary of the comparisons performed on a web-page
+ */
+export interface PageSummary {
+  url: string;
+  nodesOnPage: number;
+  stats: { category: Category; count: number; }[];
+  cases: CasePreview[];
 }
 
 /**
@@ -89,7 +86,7 @@ export async function runHTMLSnippetComparison(
  * AccName implementations.
  * @return The name of the directory containing the results of the URL comparison.
  */
-export async function runURLComparison(url: string): Promise<string> {
+export async function runURLComparison(url: string): Promise<number> {
   const browser = await puppeteer.launch({
     args: ['--enable-blink-features=AccessibilityObjectModel'],
   });
@@ -98,23 +95,20 @@ export async function runURLComparison(url: string): Promise<string> {
 
   const httpResponse = await page.goto(url);
   if (!httpResponse?.ok()) {
-    throw new Error(`URL '${url}' could not be accessed.'`);
+    throw new Error(`URL '${url}' could not be accessed, HTTP status: (${httpResponse?.status}) : ${httpResponse?.statusText}'`);
   }
 
   await loadAccNameLibraries(page);
 
-  // Trim URL string to get a concise directory name for this comparison.
-  const dirName = url.replace(/^(?:https?:\/\/)?(?:www\.)?/i, '').split('/')[0];
-  child.exec(`mkdir output/${dirName}`);
-
   // Associates each category encountered with the number
   // of occurrences of that category
-  const categoryCount: {[key: string]: number} = {};
+  const categoryCount: {[categoryHash: string]: number} = {};
+  const cases: CasePreview[] = [];
 
   const allNodes = await page.$$('body *');
-  let i = 0;
-  for (const node of allNodes) {
-    console.log(++i + '/' + allNodes.length);
+  for (let i = 0; i < allNodes.length; i++) {
+    console.log((i + 1) + '/' + allNodes.length);
+    const node = allNodes[i];
 
     await page.evaluate(
       node => node.setAttribute('accnameComparisonTarget', 'true'),
@@ -128,13 +122,14 @@ export async function runURLComparison(url: string): Promise<string> {
     );
 
     const comparisonResults = await runComparison(targetNodeRef, page, client);
-    if (comparisonResults.disagrees && comparisonResults.category) {
+    if (comparisonResults.disagrees) {
       // Count category occurrences, save test case for any new categories.
       const categoryHash = JSON.stringify(comparisonResults.category);
       if (categoryCount[categoryHash]) {
         categoryCount[categoryHash] += 1;
       } else {
-        await saveTestcase(comparisonResults, `output/${dirName}`);
+        const casePreview = createTestcase(comparisonResults);
+        cases.push(casePreview);
         categoryCount[categoryHash] = 1;
       }
     }
@@ -148,32 +143,21 @@ export async function runURLComparison(url: string): Promise<string> {
   // All categories encountered duirng comparison and their associated counts.
   const categoryStats = Object.entries(categoryCount).map(entry => {
     return {
-      category: JSON.parse(entry[0]),
+      category: JSON.parse(entry[0]) as Category,
       count: entry[1],
     };
   });
 
-  const summary = {
+  const pageSummary = {
     url: url,
     nodesOnPage: allNodes.length,
     stats: categoryStats,
+    cases: cases
   };
-
-  // Output summary of URL comparison to file.
-  fs.writeFile(
-    `output/${dirName}/summary.json`,
-    JSON.stringify(summary, null, 2),
-    err => {
-      if (err) {
-        console.log('File output failed:', err);
-      } else {
-        console.log(`Summary for ${dirName} saved to file.`);
-      }
-    }
-  );
+  const pageSummaryId = addPageSummary(pageSummary);
 
   await browser.close();
-  return dirName;
+  return pageSummaryId;
 }
 
 /**
@@ -188,9 +172,9 @@ interface Category {
 /**
  * Results from the comparison of AccName implementations.
  */
-interface ComparisonResult {
+export interface ComparisonResult {
   disagrees: boolean;
-  accnames: {[key: string]: string};
+  accnames: {[implementation: string]: string};
   htmlUsed?: {[key: string]: string};
   category?: Category;
 }
@@ -220,7 +204,7 @@ async function runComparison(
   }
   // An agreement group is a set of implementations that agree
   // on the accessible name for the target DOM Node.
-  const agreementGroups = Object.values(agreementMap).map(group => group);
+  const agreementGroups = Object.values(agreementMap);
 
   // 1 agreement group --> all implementations agree.
   if (agreementGroups.length === 1) {
@@ -243,17 +227,7 @@ async function runComparison(
     category.role = axNode.role;
   }
 
-  // Get HTML used to compute AccNames
-  const htmlUsedByChrome = await getHTMLUsedByChrome(nodeRef, client, page);
-  const htmlUsedByOurAccName = (await page.evaluate(
-    "ourLib.getAccessibleName(document.querySelector('" +
-      nodeRef.selector +
-      "')).visitedHTMLSnippet;"
-  )) as string;
-  const htmlUsed = {
-    chrome: htmlUsedByChrome,
-    ourAccName: htmlUsedByOurAccName,
-  };
+  const htmlUsed = await getHTMLUsed(nodeRef, client, page);
 
   return {
     disagrees: true,
@@ -261,37 +235,6 @@ async function runComparison(
     htmlUsed: htmlUsed,
     category: category,
   };
-}
-
-/**
- * Saves a ComparisonResult to file with a unique identifying case ID.
- * @param comparisonResult - The ComparisonResult to be saved to file.
- * @param outputPath - The path to the directory in which to save the file.
- * @return The caseId for the saved testcase
- */
-function saveTestcase(
-  comparisonResult: ComparisonResult,
-  outputPath: string
-): string {
-  // Random 5 character ID generated
-  const caseId = Math.random().toString(36).substr(2, 5);
-  const outputObj = {
-    caseId: caseId,
-    comparison: comparisonResult,
-  };
-  fs.writeFile(
-    outputPath + '/case_' + caseId + '.json',
-    JSON.stringify(outputObj, null, 2),
-    err => {
-      if (err) {
-        console.log('File output failed:', err);
-        throw new Error(`Error outputting file: ${err}`);
-      } else {
-        console.log('Case saved to file with id ' + caseId);
-      }
-    }
-  );
-  return caseId;
 }
 
 /**
@@ -379,120 +322,4 @@ async function loadAccNameLibraries(page: Page) {
 
   // Load our AccName
   await page.evaluate(ourLibSource);
-}
-
-/**
- * Get a string containing the HTML used by Chrome DevTools to compute the accessible name
- * for nodeRef.
- * @param nodeRef - The node whose accessible name is being computed.
- * @param client - The CDPSession for page.
- * @param page - The page in which to run the accessible name computation.
- */
-async function getHTMLUsedByChrome(
-  nodeRef: NodeRef,
-  client: CDPSession,
-  page: Page
-): Promise<string> {
-  const nodesUsedByChrome = await getNodesUsedByChrome(nodeRef, client, page);
-
-  const nodeHandles = nodesUsedByChrome.map(node => node.handle);
-  // Get the outerHTML of the nodes used by Chrome
-  const htmlString = await page.evaluate((...nodes) => {
-    // Sort nodes by DOM order
-    nodes.sort((first, second) => {
-      const relativePosition = first.compareDocumentPosition(second);
-      if (
-        relativePosition & Node.DOCUMENT_POSITION_PRECEDING ||
-        relativePosition & Node.DOCUMENT_POSITION_CONTAINS
-      ) {
-        return 1;
-      } else if (
-        relativePosition & Node.DOCUMENT_POSITION_FOLLOWING ||
-        relativePosition & Node.DOCUMENT_POSITION_CONTAINED_BY
-      ) {
-        return -1;
-      } else {
-        return 0;
-      }
-    });
-    // Remove 'redundant' nodes: nodes whose outerHTML is included in that of
-    // an ancestor node.
-    return nodes
-      .filter((node, i) => !nodes[i - 1]?.contains(node))
-      .map(node => node.outerHTML)
-      .join('\n');
-  }, ...nodeHandles);
-
-  return htmlString;
-}
-
-/**
- * Gets all nodes used by Chrome to compute the accessible name for nodeRef.
- * @param nodeRef - Node whose accessible name is being computed.
- * @param client - CDPSession for page.
- * @param page - Page containing nodeRef.
- */
-async function getNodesUsedByChrome(
-  nodeRef: NodeRef,
-  client: CDPSession,
-  page: Page
-): Promise<NodeRef[]> {
-  const stack: NodeRef[] = [];
-  const nodesUsed: NodeRef[] = [];
-  // Track backendIds of visited nodes to avoid infinite cycle.
-  const visitedNodes: Protocol.DOM.BackendNodeId[] = [];
-  stack.push(nodeRef);
-  // Iterative DFS traverses nodes connected by label references
-  while (stack.length > 0) {
-    const currentNodeRef = stack.pop()!;
-    nodesUsed.push(currentNodeRef);
-
-    const axTree = (await client.send('Accessibility.getPartialAXTree', {
-      backendNodeId: currentNodeRef.backendId,
-    })) as Protocol.Accessibility.GetPartialAXTreeResponse;
-
-    // Find the index of the currentNodeRef's corresponding AXNode
-    const indexOfCurrentNode = axTree.nodes.findIndex(
-      axNode => axNode.backendDOMNodeId === currentNodeRef?.backendId
-    );
-
-    // Contains AXNodes descendant of currentNodeRef's corresponding AXNode
-    const descandantNodes = axTree.nodes.slice(0, indexOfCurrentNode + 1);
-
-    // Check if any descendant AXNodes are labelled
-    for (const axNode of descandantNodes) {
-      let labelNodes: Protocol.Accessibility.AXRelatedNode[] = [];
-      const sources: Protocol.Accessibility.AXValueSource[] =
-        axNode.name?.sources ?? [];
-
-      for (const source of sources) {
-        if (source.type === 'relatedElement') {
-          // Handles nodes connected by attribute value (aria-labelleby)
-          if (source.attributeValue?.relatedNodes) {
-            labelNodes = source.attributeValue.relatedNodes;
-            // Handles nodes connected natively (<label>)
-          } else if (source.nativeSourceValue?.relatedNodes) {
-            labelNodes = source.nativeSourceValue.relatedNodes;
-          }
-        }
-      }
-
-      // Repeat the process for all unvisited label nodes.
-      for (const labelNode of labelNodes) {
-        if (!visitedNodes.includes(labelNode.backendDOMNodeId)) {
-          const labelNodeRef = await getNodeRefFromBackendId(
-            labelNode.backendDOMNodeId,
-            client,
-            page
-          );
-          if (labelNodeRef) {
-            stack.push(labelNodeRef);
-          }
-          visitedNodes.push(labelNode.backendDOMNodeId);
-        }
-      }
-    }
-  }
-
-  return nodesUsed;
 }
