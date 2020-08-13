@@ -1,0 +1,154 @@
+{
+  "url": "https://keep.google.com/u/0/#home",
+  "nodesOnPage": 141,
+  "stats": [
+    {
+      "category": {
+        "agreement": [
+          [
+            "chrome",
+            "aom",
+            "bg",
+            "ourLib"
+          ],
+          [
+            "axe"
+          ]
+        ]
+      },
+      "count": 22
+    },
+    {
+      "category": {
+        "agreement": [
+          [
+            "chrome",
+            "axe",
+            "bg",
+            "ourLib"
+          ],
+          [
+            "aom"
+          ]
+        ],
+        "rules": [
+          "2A"
+        ]
+      },
+      "count": 1
+    },
+    {
+      "category": {
+        "agreement": [
+          [
+            "chrome",
+            "axe",
+            "aom"
+          ],
+          [
+            "bg"
+          ],
+          [
+            "ourLib"
+          ]
+        ],
+        "rules": [
+          "2G",
+          "2F",
+          "2D"
+        ],
+        "role": "textbox"
+      },
+      "count": 1
+    },
+    {
+      "category": {
+        "agreement": [
+          [
+            "chrome",
+            "axe",
+            "bg",
+            "ourLib"
+          ],
+          [
+            "aom"
+          ]
+        ],
+        "rules": [
+          "2G",
+          "2F"
+        ],
+        "role": "link"
+      },
+      "count": 3
+    },
+    {
+      "category": {
+        "agreement": [
+          [
+            "chrome",
+            "aom",
+            "bg",
+            "ourLib"
+          ],
+          [
+            "axe"
+          ]
+        ],
+        "rules": [
+          "2A"
+        ]
+      },
+      "count": 1
+    },
+    {
+      "category": {
+        "agreement": [
+          [
+            "chrome",
+            "axe",
+            "aom",
+            "bg"
+          ],
+          [
+            "ourLib"
+          ]
+        ],
+        "rules": [
+          "2A"
+        ],
+        "role": "menuitem"
+      },
+      "count": 71
+    }
+  ],
+  "cases": [
+    {
+      "caseId": 5,
+      "numAgreementGroups": 2
+    },
+    {
+      "caseId": 6,
+      "numAgreementGroups": 2
+    },
+    {
+      "caseId": 7,
+      "numAgreementGroups": 3,
+      "role": "textbox"
+    },
+    {
+      "caseId": 8,
+      "numAgreementGroups": 2,
+      "role": "link"
+    },
+    {
+      "caseId": 9,
+      "numAgreementGroups": 2
+    },
+    {
+      "caseId": 10,
+      "numAgreementGroups": 2,
+      "role": "menuitem"
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-import {ComparisonResult, PageSummary} from './compare';
+import {ComparisonResult, UrlSummary} from './compare';
 import fs from 'fs';
 
 /**
@@ -17,22 +17,12 @@ export interface CasePreview {
  * a CasePreview for that test-case.
  * @param comparisonResult - The ComparisonResult that will become a test-case
  */
-export function createTestcase(
-  comparisonResult: ComparisonResult
-): CasePreview {
+export function writeTestcase(comparisonResult: ComparisonResult): CasePreview {
   const caseId = fs.readdirSync('./output/case/').length;
 
-  fs.writeFile(
+  fs.writeFileSync(
     `./output/case/case_${caseId}.json`,
-    JSON.stringify(comparisonResult, null, 2),
-    err => {
-      if (err) {
-        console.log('File output failed:', err);
-        throw new Error(`Error outputting file: ${err}`);
-      } else {
-        console.log('Case saved to file with id ' + caseId);
-      }
-    }
+    JSON.stringify(comparisonResult, null, 2)
   );
 
   const numAgreementGroups = comparisonResult.category!.agreement.length;
@@ -49,59 +39,48 @@ export function createTestcase(
  * Add a snippet CasePreview to preview.json.
  * @param casePreview - The CasePreview to be added to preview.json
  */
-export function addSnippetCase(casePreview: CasePreview): void {
+export function writeSnippetCase(casePreview: CasePreview): void {
   const preview = getPreviewJson();
   preview.snippets.push(casePreview);
   fs.writeFileSync('./output/preview.json', JSON.stringify(preview));
 }
 
 /**
- * Save a given PageSummary to file, create a preview for that
- * PageSummary, add that preview to preview.json.
- * @param pageSummary - the PageSummary to be saved to file and
+ * Save a given UrlSummary to file, create a preview for that
+ * UrlSummary, add that preview to preview.json.
+ * @param urlSummary - the UrlSummary to be saved to file and
  * added to preview.json.
  */
-export function addPageSummary(pageSummary: PageSummary): number {
-  const pageSummaryId = fs.readdirSync('./output/summary/').length;
+export function writeUrlSummary(urlSummary: UrlSummary): number {
+  const urlSummaryId = fs.readdirSync('./output/url_summary/').length;
 
-  fs.writeFile(
-    `./output/summary/summary_${pageSummaryId}.json`,
-    JSON.stringify(pageSummary, null, 2),
-    err => {
-      if (err) {
-        console.log('File output failed:', err);
-        throw new Error(`Error outputting file: ${err}`);
-      } else {
-        console.log('Summary saved to file with id ' + pageSummaryId);
-      }
-    }
+  fs.writeFileSync(
+    `./output/url_summary/summary_${urlSummaryId}.json`,
+    JSON.stringify(urlSummary, null, 2)
   );
 
   // Cut down on url text for easier display (as in Chrome URL bar)
-  const urlPreview = pageSummary.url.replace(
-    /^(?:https?:\/\/)?(?:www\.)?/i,
-    ''
-  );
+  const urlPreview = urlSummary.url.replace(/^(?:https?:\/\/)?(?:www\.)?/i, '');
 
-  const pageSummaryPreview = {
-    pageSummaryId: pageSummaryId,
+  const urlSummaryPreview = {
+    urlSummaryId: urlSummaryId,
     url: urlPreview,
     percentDisagreement:
-      (pageSummary.cases.length / pageSummary.nodesOnPage) * 100,
+      (urlSummary.cases.length / urlSummary.nodesOnPage) * 100,
   };
 
   const preview = getPreviewJson();
-  preview.pageSummaries.push(pageSummaryPreview);
+  preview.pageSummaries.push(urlSummaryPreview);
   fs.writeFileSync('./output/preview.json', JSON.stringify(preview, null, 2));
 
-  return pageSummaryId;
+  return urlSummaryId;
 }
 
 /**
- * A preview for some PageSummary
+ * A preview for some UrlSummary
  */
-interface PageSummaryPreview {
-  pageSummaryId: number;
+interface UrlSummaryPreview {
+  urlSummaryId: number;
   url: string;
   percentDisagreement: number;
 }
@@ -111,7 +90,7 @@ interface PageSummaryPreview {
  */
 interface Preview {
   snippets: CasePreview[];
-  pageSummaries: PageSummaryPreview[];
+  pageSummaries: UrlSummaryPreview[];
 }
 
 /**

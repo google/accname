@@ -5,10 +5,10 @@ import fetch from 'node-fetch';
 import {NodeRef, getNodeRefFromSelector} from './node_ref';
 import {getHTMLUsed} from './html_used';
 import {
-  createTestcase,
-  addSnippetCase,
+  writeTestcase,
+  writeSnippetCase,
   CasePreview,
-  addPageSummary,
+  writeUrlSummary,
 } from './output';
 
 // TODO: import node package when our lib is ready,
@@ -63,8 +63,8 @@ export async function runHTMLSnippetComparison(
   const comparisonResults = await runComparison(targetNodeRef, page, client);
   await browser.close();
   if (comparisonResults.disagrees) {
-    const casePreview = createTestcase(comparisonResults);
-    addSnippetCase(casePreview);
+    const casePreview = writeTestcase(comparisonResults);
+    writeSnippetCase(casePreview);
     return [comparisonResults.accnames, casePreview.caseId];
   }
 
@@ -74,7 +74,7 @@ export async function runHTMLSnippetComparison(
 /**
  * A summary of the comparisons performed on a web-page
  */
-export interface PageSummary {
+export interface UrlSummary {
   url: string;
   nodesOnPage: number;
   stats: {category: Category; count: number}[];
@@ -132,7 +132,7 @@ export async function runURLComparison(url: string): Promise<number> {
       if (categoryCount[categoryHash]) {
         categoryCount[categoryHash] += 1;
       } else {
-        const casePreview = createTestcase(comparisonResults);
+        const casePreview = writeTestcase(comparisonResults);
         cases.push(casePreview);
         categoryCount[categoryHash] = 1;
       }
@@ -156,7 +156,7 @@ export async function runURLComparison(url: string): Promise<number> {
     stats: categoryStats,
     cases: cases,
   };
-  const pageSummaryId = addPageSummary(pageSummary);
+  const pageSummaryId = writeUrlSummary(pageSummary);
 
   await browser.close();
   return pageSummaryId;
