@@ -66,4 +66,21 @@ describe('The computeTextAlternative function', () => {
       rulesApplied: new Set<Rule>(['2G', '2F']),
     });
   });
+
+  it('returns correct nodesUsed and rulesApplied sets for aria-labelledby references', () => {
+    render(
+      html`
+        <div id="foo" aria-labelledby="bar">Hi</div>
+        <div id="bar">Hello world</div>
+      `,
+      container
+    );
+    const elem1 = document.getElementById('foo')!;
+    const elem2 = document.getElementById('bar')!;
+    expect(computeTextAlternative(elem1)).toEqual({
+      name: 'Hello world',
+      nodesUsed: new Set<Node>([elem1, elem2, elem2.childNodes[0]]),
+      rulesApplied: new Set<Rule>(['2B', '2F', '2G']),
+    });
+  });
 });

@@ -13,97 +13,54 @@ import {rule2I} from './rule2I';
  */
 export type Rule = '2A' | '2B' | '2C' | '2D' | '2E' | '2F' | '2G' | '2I';
 
+const ruleToImpl: {
+  [rule in Rule]: (node: Node, context: Context) => string | null;
+} = {
+  '2A': rule2A,
+  '2B': rule2B,
+  '2C': rule2C,
+  '2D': rule2D,
+  '2E': rule2E,
+  '2F': rule2F,
+  '2G': rule2G,
+  '2I': rule2I,
+};
+
+/**
+ * Provides details about the computation of some accessible name, such as
+ * the Nodes used and rules applied during computation.
+ */
+export interface ComputationDetails {
+  name: string;
+  nodesUsed: Set<Node>;
+  rulesApplied: Set<Rule>;
+}
+
 /**
  * @param node - The node whose text alternative will be calculated
  * @param  context - Additional information relevant to the text alternative
- *     computation for node. Optional paramater is 'getDefaultContext' by default.
+ * computation for node. Optional paramater is 'getDefaultContext' by default.
  * @return - The text alternative for node
  */
 export function computeTextAlternative(
   node: Node,
   context: Context = getDefaultContext()
-): {name: string; nodesUsed: Set<Node>; rulesApplied: Set<Rule>} {
+): ComputationDetails {
   context.inherited.nodesUsed.add(node);
-  let result: string | null = null;
 
-  result = rule2A(node, context);
-  if (result !== null) {
-    context.inherited.rulesApplied.add('2A');
-    return {
-      name: result,
-      nodesUsed: context.inherited.nodesUsed,
-      rulesApplied: context.inherited.rulesApplied,
-    };
-  }
-
-  result = rule2B(node, context);
-  if (result !== null) {
-    context.inherited.rulesApplied.add('2B');
-    return {
-      name: result,
-      nodesUsed: context.inherited.nodesUsed,
-      rulesApplied: context.inherited.rulesApplied,
-    };
-  }
-
-  result = rule2C(node, context);
-  if (result !== null) {
-    context.inherited.rulesApplied.add('2C');
-    return {
-      name: result,
-      nodesUsed: context.inherited.nodesUsed,
-      rulesApplied: context.inherited.rulesApplied,
-    };
-  }
-
-  result = rule2D(node, context);
-  if (result !== null) {
-    context.inherited.rulesApplied.add('2D');
-    return {
-      name: result,
-      nodesUsed: context.inherited.nodesUsed,
-      rulesApplied: context.inherited.rulesApplied,
-    };
-  }
-
-  result = rule2E(node, context);
-  if (result !== null) {
-    context.inherited.rulesApplied.add('2E');
-    return {
-      name: result,
-      nodesUsed: context.inherited.nodesUsed,
-      rulesApplied: context.inherited.rulesApplied,
-    };
-  }
-
-  result = rule2F(node, context);
-  if (result !== null) {
-    context.inherited.rulesApplied.add('2F');
-    return {
-      name: result,
-      nodesUsed: context.inherited.nodesUsed,
-      rulesApplied: context.inherited.rulesApplied,
-    };
-  }
-
-  result = rule2G(node);
-  if (result !== null) {
-    context.inherited.rulesApplied.add('2G');
-    return {
-      name: result,
-      nodesUsed: context.inherited.nodesUsed,
-      rulesApplied: context.inherited.rulesApplied,
-    };
-  }
-
-  result = rule2I(node);
-  if (result !== null) {
-    context.inherited.rulesApplied.add('2I');
-    return {
-      name: result,
-      nodesUsed: context.inherited.nodesUsed,
-      rulesApplied: context.inherited.rulesApplied,
-    };
+  // Try each rule sequentially on the target Node.
+  for (const [rule, impl] of Object.entries(ruleToImpl)) {
+    const result = impl(node, context);
+    // A rule has been applied if its implementation has
+    // returned a string.
+    if (result !== null) {
+      context.inherited.rulesApplied.add(<Rule>rule);
+      return {
+        name: result,
+        nodesUsed: context.inherited.nodesUsed,
+        rulesApplied: context.inherited.rulesApplied,
+      };
+    }
   }
 
   return {
