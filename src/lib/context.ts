@@ -1,3 +1,5 @@
+import {Rule} from './compute_text_alternative';
+
 /**
  * This interface will be used to pass additional information
  * about the element whose name is being computed.
@@ -29,11 +31,24 @@ export interface Context {
     // may be considered equivalent.
     partOfName?: boolean;
     /**
-     * visitedNodes stores any nodes visited by rule 2F to
-     * ensure that any node is visited at most once. This
+     * visitedNodes stores any nodes visited recursively by rule 2F
+     * to ensure that any node is visited at most once. This
      * prevents infinite cycles during node traversal.
      */
     visitedNodes: Node[];
+
+    // TODO: Look into merging 'nodesUsed' and 'visitedNodes'
+
+    /**
+     * nodesUsed stores any Nodes used during the name computation
+     * algorithm, including the original target node.
+     */
+    nodesUsed: Set<Node>;
+    /**
+     * rulesApplied stores all Rules that were applied during the
+     * name computation algorithm.
+     */
+    rulesApplied: Set<Rule>;
   };
 }
 
@@ -44,6 +59,8 @@ export function getDefaultContext(): Context {
   return {
     inherited: {
       visitedNodes: [],
+      nodesUsed: new Set<Node>(),
+      rulesApplied: new Set<Rule>(),
     },
   };
 }

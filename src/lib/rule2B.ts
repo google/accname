@@ -54,7 +54,7 @@ export function rule2B(
       return computeTextAlternative(labelElem, {
         directLabelReference: true,
         inherited: context.inherited,
-      });
+      }).name;
     })
     .join(' ')
     .trim();

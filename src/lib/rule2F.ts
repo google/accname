@@ -212,7 +212,7 @@ export function rule2F(
 
       const textAlterantive = computeTextAlternative(childNode, {
         inherited: context.inherited,
-      });
+      }).name;
 
       textAlterantives.push(textAlterantive);
     }

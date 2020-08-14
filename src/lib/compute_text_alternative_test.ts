@@ -1,5 +1,5 @@
 import {html, render} from 'lit-html';
-import {computeTextAlternative} from './compute_text_alternative';
+import {computeTextAlternative, Rule} from './compute_text_alternative';
 
 describe('The computeTextAlternative function', () => {
   let container: HTMLElement;
@@ -25,7 +25,7 @@ describe('The computeTextAlternative function', () => {
       container
     );
     const elem = document.getElementById('foo');
-    expect(computeTextAlternative(elem!)).toBe('Hello world');
+    expect(computeTextAlternative(elem!).name).toBe('Hello world');
   });
 
   it("uses aria-labelledby references when computing 'name from content' nodes", () => {
@@ -39,7 +39,7 @@ describe('The computeTextAlternative function', () => {
       container
     );
     const elem = document.getElementById('foo');
-    expect(computeTextAlternative(elem!)).toBe('Hello world');
+    expect(computeTextAlternative(elem!).name).toBe('Hello world');
   });
 
   it('prefers input value to aria-label for embedded controls', () => {
@@ -54,6 +54,16 @@ describe('The computeTextAlternative function', () => {
       container
     );
     const elem = document.getElementById('foo');
-    expect(computeTextAlternative(elem!)).toBe('Say hello 5 times');
+    expect(computeTextAlternative(elem!).name).toBe('Say hello 5 times');
+  });
+
+  it('returns correct nodesUsed and rulesApplied sets for simple button input', () => {
+    render(html` <button id="foo">Hello world</button> `, container);
+    const elem = document.getElementById('foo')!;
+    expect(computeTextAlternative(elem)).toEqual({
+      name: 'Hello world',
+      nodesUsed: new Set<Node>([elem, elem.childNodes[0]]),
+      rulesApplied: new Set<Rule>(['2G', '2F']),
+    });
   });
 });

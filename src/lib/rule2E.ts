@@ -92,7 +92,7 @@ function getValueIfComboboxOrListbox(
       .map(optionElem => {
         return computeTextAlternative(optionElem, {
           inherited: context.inherited,
-        });
+        }).name;
       })
       .filter(alternativeText => alternativeText !== '')
       .join(' ');

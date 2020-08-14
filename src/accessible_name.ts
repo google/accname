@@ -1,11 +1,19 @@
-import {computeTextAlternative} from './lib/compute_text_alternative';
+import {computeTextAlternative, Rule} from './lib/compute_text_alternative';
 
 /**
- * Main exported function for the library. Initialises traversal with an empty
- * context.
- * @param elem - The element whose accessible name will be calculated
- * @return - The accessible name for elem
+ * Compute the accessible name for a given HTMLElement.
+ * @param elem - The HTMLElement whose accessible name will be calculated.
  */
 export function getAccessibleName(elem: HTMLElement): string {
+  return computeTextAlternative(elem).name;
+}
+
+/**
+ * Get details surrounding the computation of the accessible name for a given HTMLElement
+ * @param elem - The HTMLElement whose accessible name will be calculated.
+ */
+export function getNameComputationDetails(
+  elem: HTMLElement
+): {name: string; nodesUsed: Set<Node>; rulesApplied: Set<Rule>} {
   return computeTextAlternative(elem);
 }
