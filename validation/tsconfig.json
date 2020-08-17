@@ -15,10 +15,11 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
-    "lib": ["es6", "dom"]
+    "lib": ["es6", "dom"],
+    "esModuleInterop": true
   },
   "include": [
-    "validate.ts"
+    "compare.ts"
   ],
   "exclude": [
     "dist",
