@@ -62,7 +62,7 @@ describe('The function for rule 2C', () => {
   });
 
   it('returns aria-label value for elements that are not controls, even if they are part of a name', () => {
-    render(html` <div id="foo" aria-label="hello there" /> `, container);
+    render(html`<div id="foo" aria-label="hello there"></div>`, container);
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
     context.inherited.partOfName = true;

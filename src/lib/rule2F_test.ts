@@ -118,12 +118,7 @@ describe('The function for rule 2F', () => {
   });
 
   it('returns null if the conditions for applying rule2F are not satisfied', () => {
-    render(
-      html`
-        <div id="foo""></div>
-      `,
-      container
-    );
+    render(html` <div id="foo"></div> `, container);
     const elem = document.getElementById('foo');
     expect(rule2F(elem!)).toBe(null);
   });
