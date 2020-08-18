@@ -2,12 +2,12 @@
   "compileOnSave": true,
   "compilerOptions": {
     "target": "es6",
-    "module": "es6",
+    "module": "commonjs",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
     "inlineSources": true,
-    "outDir": "dist",
+    "outDir": "test_dist",
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -23,8 +23,7 @@
   ],
   "exclude": [
     "dist",
-    "node_modules",
-    "src/lib/*_test.ts"
+    "node_modules"
   ],
   "types": [
     "@types/jasmine",
