@@ -25,9 +25,9 @@ jobs:
       with:
         node-version: 13
 
-    # Ensures dist/ is empty before building
-    - name: Remove contents of dist/
-      run: rm dist/* -r
+    # Create an empty dist/ folder to build into
+    - name: Create empty dist/
+      run: mkdir dist
     
     # Builds the project in its current state so that the bundle
     # contains up-to-date code
@@ -42,6 +42,10 @@ jobs:
     # may be used to access our exported functions.
     - name: Generate bundle
       run: rollup dist/accessible_name.js --file bundle.js --format iife --name \"accname\"
+
+    # Remove dist/ and contents
+    - name: Remove dist/
+      run: rm dist/* -r
 
     # Add, commit & push the newly-generated bundle.js
     - name: Commit & push bundle
