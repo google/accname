@@ -53,6 +53,12 @@ jobs:
     # Remove dist/ and contents
     - name: Remove dist/
       run: rm dist/* -r
+    
+    # Get the name of the current branch
+    - name: Extract branch name
+      shell: bash
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      id: extract_branch
 
     # Add, commit & push the newly-generated bundle.js
     - name: Commit & push bundle
@@ -65,5 +71,5 @@ jobs:
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: OisinNolan-patch-1
+        branch: ${{ steps.extract_branch.outputs.branch }}
             
