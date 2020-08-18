@@ -10,10 +10,6 @@ import {
   CasePreview,
   writeUrlSummary,
 } from './output';
-
-// TODO: import node package when our lib is ready,
-// export .source as is done in axe.
-import {ourLibSource} from './our_lib_source';
 import axe from 'axe-core';
 
 // Hard coded initialisation function simulating calls from
@@ -27,7 +23,10 @@ import axe from 'axe-core';
   */
   // Compare on snippet
   /*
-  const USER_INPUT_HTML_SNIPPET = `<div accnamecomparisontarget>Hello world</div>`;
+  const USER_INPUT_HTML_SNIPPET = `
+    <div accnamecomparisontarget aria-labelledby="foo">Hello world</div>
+    <div id="foo">Hi planet</div>
+  `;
   const result = await runHTMLSnippetComparison(USER_INPUT_HTML_SNIPPET);
   console.log(result);
   */
@@ -209,6 +208,7 @@ async function runComparison(
   const agreementGroups = Object.values(agreementMap);
 
   // 1 agreement group --> all implementations agree.
+
   if (agreementGroups.length === 1) {
     return {disagrees: false, accnames: accnames};
   }
@@ -216,10 +216,12 @@ async function runComparison(
   const category: Category = {agreement: agreementGroups};
 
   const rulesApplied = (await page.evaluate(
-    "ourLib.getAccessibleName(document.querySelector('" +
-      nodeRef.selector +
-      "')).rulesApplied;"
+    `
+    let ruleSet = accname.getNameComputationDetails(document.querySelector('${nodeRef.selector}')).rulesApplied;
+    Array.from(ruleSet);
+    `
   )) as string[];
+
   if (rulesApplied.length > 0) {
     category.rules = rulesApplied;
   }
@@ -284,10 +286,10 @@ async function getAccNames(
   accnames.bg = bgName ?? '';
 
   // Our accname
-  const ourName = (await page.evaluate(
-    `ourLib.getAccessibleName(document.querySelector('${nodeRef.selector}')).name;`
+  const accnameName = (await page.evaluate(
+    `accname.getAccessibleName(document.querySelector('${nodeRef.selector}'));`
   )) as string;
-  accnames.ourLib = ourName ?? '';
+  accnames.accname = accnameName ?? '';
 
   return accnames;
 }
@@ -322,6 +324,13 @@ async function loadAccNameLibraries(page: Page) {
   })();
   await page.evaluate(bgPrototypeSource);
 
-  // Load our AccName
-  await page.evaluate(ourLibSource);
+  // Load AccName
+  const accnameSource = await (async () => {
+    const response = await fetch(
+      'https://raw.githubusercontent.com/googleinterns/accessible-name/bundle/bundle.js'
+    );
+    const responseBody = await response.text();
+    return responseBody;
+  })();
+  await page.evaluate(accnameSource);
 }

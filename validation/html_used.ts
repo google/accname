@@ -1,6 +1,6 @@
 import {Protocol} from 'devtools-protocol';
 import {NodeRef, getNodeRefFromBackendId} from './node_ref';
-import {CDPSession, Page} from 'puppeteer';
+import {CDPSession, Page, ElementHandle} from 'puppeteer';
 
 /**
  * Gets strings containing the HTML markup for the Nodes used to compute
@@ -14,30 +14,36 @@ export async function getHTMLUsed(
   client: CDPSession,
   page: Page
 ): Promise<{[implementation: string]: string}> {
-  const htmlUsedByChrome = await getHTMLUsedByChrome(nodeRef, client, page);
-  const htmlUsedByOurAccName = (await page.evaluate(
-    "ourLib.getAccessibleName(document.querySelector('" +
-      nodeRef.selector +
-      "')).visitedHTMLSnippet;"
-  )) as string;
-  return {chrome: htmlUsedByChrome, accname: htmlUsedByOurAccName};
+  const nodesUsedByChrome = await getNodesUsedByChrome(nodeRef, client, page);
+  const chromeHandles = nodesUsedByChrome.map(node => node.handle);
+  const htmlUsedByChrome = await getHTMLFromHandles(chromeHandles, page);
+
+  // Initialise nodeArray and get its length
+  const accnameNodeArrayLength = await page.evaluate(`
+    const nodeSet = accname.getNameComputationDetails(document.querySelector('${nodeRef.selector}')).nodesUsed;
+    const nodeArray = Array.from(nodeSet);
+    nodeArray.length;`
+  );
+  // Make an array containing an ElementHandle for each Node in nodeArray
+  const accnameHandles = await Promise.all([...Array(accnameNodeArrayLength).keys()].map((i) => 
+    page.evaluateHandle(`nodeArray[${i}]`)
+  )) as ElementHandle<Element>[];
+  const htmlUsedByAccname = await getHTMLFromHandles(accnameHandles, page);
+
+  return {chrome: htmlUsedByChrome, accname: htmlUsedByAccname};
 }
 
 /**
- * Get a string containing the HTML used by Chrome DevTools to compute the accessible name
- * for nodeRef.
- * @param nodeRef - The node whose accessible name is being computed.
- * @param client - The CDPSession for page.
- * @param page - The page in which to run the accessible name computation.
+ * Calculate the HTML snippet containing the elements referenced
+ * by a given array of ElementHandles.
+ * @param handles - The ElementHandles for whom a HTML snippet is being computed
+ * @param page - The page containing the ElementHandles.
  */
-async function getHTMLUsedByChrome(
-  nodeRef: NodeRef,
-  client: CDPSession,
+async function getHTMLFromHandles(
+  handles: ElementHandle<Element>[],
   page: Page
 ): Promise<string> {
-  const nodesUsedByChrome = await getNodesUsedByChrome(nodeRef, client, page);
-
-  const nodeHandles = nodesUsedByChrome.map(node => node.handle);
+  
   // Get the outerHTML of the nodes used by Chrome
   const htmlString = await page.evaluate((...nodes) => {
     // Sort nodes by DOM order
@@ -63,7 +69,7 @@ async function getHTMLUsedByChrome(
       .filter((node, i) => !nodes[i - 1]?.contains(node))
       .map(node => node.outerHTML)
       .join('\n');
-  }, ...nodeHandles);
+  }, ...handles);
 
   return htmlString;
 }
