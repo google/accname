@@ -61,7 +61,7 @@ jobs:
         git add bundle.js
         git commit -m "Added auto-generated bundle"
     - name: Push changes
-      uses: ad-m/github-push-action@OisinNolan-patch-1
+      uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
             
