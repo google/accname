@@ -59,6 +59,8 @@ jobs:
       run: |
         git config --global user.name 'Oisín Nolan'
         git config --global user.email '34962541+OisinNolan@users.noreply.github.com'
+        git push origin --delete bundle
+        git checkout -b bundle
         git add bundle.js
         git commit -m "Added auto-generated bundle"
     - name: Push changes
