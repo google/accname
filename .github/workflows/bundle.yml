@@ -52,6 +52,7 @@ jobs:
 
     # Remove dist/ and contents
     - name: Remove dist/
+      run: rm dist/* -r
 
     # Add, commit & push the newly-generated bundle.js
     - name: Commit & push bundle
