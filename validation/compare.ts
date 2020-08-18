@@ -23,10 +23,7 @@ import axe from 'axe-core';
   */
   // Compare on snippet
   /*
-  const USER_INPUT_HTML_SNIPPET = `
-    <div accnamecomparisontarget aria-labelledby="foo">Hello world</div>
-    <div id="foo">Hi planet</div>
-  `;
+  const USER_INPUT_HTML_SNIPPET = `<div accnamecomparisontarget>Hello world</div>`;
   const result = await runHTMLSnippetComparison(USER_INPUT_HTML_SNIPPET);
   console.log(result);
   */
@@ -208,20 +205,15 @@ async function runComparison(
   const agreementGroups = Object.values(agreementMap);
 
   // 1 agreement group --> all implementations agree.
-
   if (agreementGroups.length === 1) {
     return {disagrees: false, accnames: accnames};
   }
 
   const category: Category = {agreement: agreementGroups};
 
-  const rulesApplied = (await page.evaluate(
-    `
+  const rulesApplied = (await page.evaluate(`
     let ruleSet = accname.getNameComputationDetails(document.querySelector('${nodeRef.selector}')).rulesApplied;
-    Array.from(ruleSet);
-    `
-  )) as string[];
-
+    Array.from(ruleSet);`)) as string[];
   if (rulesApplied.length > 0) {
     category.rules = rulesApplied;
   }

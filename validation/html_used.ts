@@ -22,11 +22,12 @@ export async function getHTMLUsed(
   const accnameNodeArrayLength = await page.evaluate(`
     const nodeSet = accname.getNameComputationDetails(document.querySelector('${nodeRef.selector}')).nodesUsed;
     const nodeArray = Array.from(nodeSet);
-    nodeArray.length;`
-  );
+    nodeArray.length;`);
   // Make an array containing an ElementHandle for each Node in nodeArray
-  const accnameHandles = await Promise.all([...Array(accnameNodeArrayLength).keys()].map((i) => 
-    page.evaluateHandle(`nodeArray[${i}]`)
+  const accnameHandles = (await Promise.all(
+    [...Array(accnameNodeArrayLength).keys()].map(i =>
+      page.evaluateHandle(`nodeArray[${i}]`)
+    )
   )) as ElementHandle<Element>[];
   const htmlUsedByAccname = await getHTMLFromHandles(accnameHandles, page);
 
@@ -43,7 +44,6 @@ async function getHTMLFromHandles(
   handles: ElementHandle<Element>[],
   page: Page
 ): Promise<string> {
-  
   // Get the outerHTML of the nodes used by Chrome
   const htmlString = await page.evaluate((...nodes) => {
     // Sort nodes by DOM order
