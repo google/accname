@@ -62,7 +62,7 @@ jobs:
         git add bundle.js
         git stash
         git checkout bundle
-        rm bundle.js
+        rm ./* -r
         git add .
         git commit -m "Removed old bundle.js"
         git stash apply 0
