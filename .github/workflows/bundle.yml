@@ -54,7 +54,7 @@ jobs:
     - name: Remove dist/
       run: rm dist/* -r
 
-    # Add, commit & push the newly-generated bundle.js
+    # Add, commit & push the newly-generated bundle.js e
     - name: Commit & push bundle
       run: |
         git config --global user.name 'Oisín Nolan'
