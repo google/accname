@@ -47,7 +47,7 @@ export function rule2D(
       context.inherited.partOfName = true;
       return computeTextAlternative(captionElem, {
         inherited: context.inherited,
-      });
+      }).name;
     }
   }
 
@@ -59,7 +59,7 @@ export function rule2D(
       context.inherited.partOfName = true;
       return computeTextAlternative(figcaptionElem, {
         inherited: context.inherited,
-      });
+      }).name;
     }
   }
 
@@ -70,7 +70,7 @@ export function rule2D(
       context.inherited.partOfName = true;
       return computeTextAlternative(legendElem, {
         inherited: context.inherited,
-      });
+      }).name;
     }
   }
 
@@ -155,11 +155,12 @@ function getTextIfLabelled(elem: HTMLElement, context: Context): string | null {
   });
 
   const textAlternative = labelElems
-    .map(labelElem =>
-      computeTextAlternative(labelElem, {
-        directLabelReference: true,
-        inherited: context.inherited,
-      })
+    .map(
+      labelElem =>
+        computeTextAlternative(labelElem, {
+          directLabelReference: true,
+          inherited: context.inherited,
+        }).name
     )
     .filter(text => text !== '')
     .join(' ');
