@@ -59,9 +59,14 @@ jobs:
       run: |
         git config --global user.name 'Oisín Nolan'
         git config --global user.email '34962541+OisinNolan@users.noreply.github.com'
-        git checkout bundle
         git add bundle.js
-        git commit -m "Added auto-generated bundle"
+        git stash
+        git checkout bundle
+        rm bundle.js
+        git add .
+        git commit -m "Removed old bundle.js"
+        git stash apply 0
+        git commit -m "Added new auto-generated bundle.js"
     - name: Push changes
       uses: ad-m/github-push-action@master
       with:
