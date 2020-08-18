@@ -24,10 +24,14 @@ jobs:
     - uses: actions/setup-node@v1
       with:
         node-version: 13
-
+        
+    # Install node modules
+    - name: Install node modules
+      run: npm install
+    
     # Create an empty dist/ folder to build into
     - name: Create empty dist/
-      run: mkdir dist
+      run: mkdir -p dist
     
     # Builds the project in its current state so that the bundle
     # contains up-to-date code
