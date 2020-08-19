@@ -11,9 +11,6 @@ import {
   writeUrlSummary,
 } from './output';
 
-// TODO: import node package when our lib is ready,
-// export .source as is done in axe.
-import {ourLibSource} from './our_lib_source';
 import axe from 'axe-core';
 
 // Hard coded initialisation function simulating calls from
@@ -216,9 +213,8 @@ async function runComparison(
   const category: Category = {agreement: agreementGroups};
 
   const rulesApplied = (await page.evaluate(
-    "ourLib.getAccessibleName(document.querySelector('" +
-      nodeRef.selector +
-      "')).rulesApplied;"
+    `const ruleSet = accname.getNameComputationDetails(document.querySelector('${nodeRef.selector}')).rulesApplied;
+    Array.from(ruleSet)`
   )) as string[];
   if (rulesApplied.length > 0) {
     category.rules = rulesApplied;
@@ -251,7 +247,9 @@ async function getAccNames(
   page: Page,
   client: CDPSession
 ): Promise<{[key: string]: string}> {
-  const accnames: {[key: string]: string} = {};
+  // Maps an implementation to the accessible name output by
+  // that implementation
+  const implToName: {[key: string]: string} = {};
 
   // Chrome accname
   const getPartialAXTreeResponse = (await client.send(
@@ -262,34 +260,34 @@ async function getAccNames(
     }
   )) as Protocol.Accessibility.GetPartialAXTreeResponse;
   const axNode = getPartialAXTreeResponse.nodes[0];
-  accnames.chrome = axNode.name?.value ?? '';
+  implToName.chrome = axNode.name?.value ?? '';
 
   // Axe accname
   const axeName = (await page.evaluate(
     `axeTargetElem = axe.utils.querySelectorAll(_tree, '${nodeRef.selector}')[0];
     axe.commons.text.accessibleTextVirtual(axeTargetElem);`
   )) as string;
-  accnames.axe = axeName ?? '';
+  implToName.axe = axeName ?? '';
 
   // AOM accname
   const aomName = (await page.evaluate(
     `getAOMName('${nodeRef.selector}');`
   )) as string;
-  accnames.aom = aomName ?? '';
+  implToName.aom = aomName ?? '';
 
   // BG prototype accname
   const bgName = (await page.evaluate(
     `getAccName(document.querySelector('${nodeRef.selector}')).name`
   )) as string;
-  accnames.bg = bgName ?? '';
+  implToName.bg = bgName ?? '';
 
   // Our accname
-  const ourName = (await page.evaluate(
-    `ourLib.getAccessibleName(document.querySelector('${nodeRef.selector}')).name;`
+  const accnameName = (await page.evaluate(
+    `accname.getAccessibleName(document.querySelector('${nodeRef.selector}'));`
   )) as string;
-  accnames.ourLib = ourName ?? '';
+  implToName.accname = accnameName ?? '';
 
-  return accnames;
+  return implToName;
 }
 
 /**
@@ -322,6 +320,13 @@ async function loadAccNameLibraries(page: Page) {
   })();
   await page.evaluate(bgPrototypeSource);
 
-  // Load our AccName
-  await page.evaluate(ourLibSource);
+  // Load AccName from github repo
+  const accnameSource = await (async () => {
+    const response = await fetch(
+      'https://raw.githubusercontent.com/googleinterns/accessible-name/master/bundle.js'
+    );
+    const responseBody = await response.text();
+    return responseBody;
+  })();
+  await page.evaluate(accnameSource);
 }
