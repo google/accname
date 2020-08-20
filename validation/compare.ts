@@ -174,7 +174,7 @@ interface Category {
 export interface ComparisonResult {
   disagrees: boolean;
   accnames: {[implementation: string]: string};
-  htmlUsed?: {[key: string]: string};
+  htmlUsed?: {[implementation: string]: string};
   category?: Category;
 }
 
@@ -194,7 +194,7 @@ async function runComparison(
 
   // Map each accessible name to the set of implementations that
   // produced that accessible name.
-  const agreementMap: {[key: string]: string[]} = {};
+  const agreementMap: {[implementation: string]: string[]} = {};
   for (const [impl, name] of Object.entries(accnames)) {
     if (!agreementMap[name]) {
       agreementMap[name] = [];
@@ -246,10 +246,10 @@ async function getAccNames(
   nodeRef: NodeRef,
   page: Page,
   client: CDPSession
-): Promise<{[key: string]: string}> {
+): Promise<{[implementation: string]: string}> {
   // Maps an implementation to the accessible name output by
   // that implementation
-  const implToName: {[key: string]: string} = {};
+  const implToName: {[implementation: string]: string} = {};
 
   // Chrome accname
   const getPartialAXTreeResponse = (await client.send(
