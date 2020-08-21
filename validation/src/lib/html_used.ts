@@ -79,7 +79,7 @@ async function getNodesUsedByChrome(
 ): Promise<JSHandle<Element[]>> {
   const stack: NodeRef[] = [];
   // Create a JSHandle containing an empty array
-  const nodesUsedHandle = await page.evaluateHandle(`[]`);
+  const nodesUsedHandle = await page.evaluateHandle('[]');
 
   // Track backendIds of visited nodes to avoid infinite cycle.
   const visitedNodes: Protocol.DOM.BackendNodeId[] = [];
