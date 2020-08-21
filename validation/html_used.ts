@@ -1,6 +1,6 @@
 import {Protocol} from 'devtools-protocol';
 import {NodeRef, getNodeRefFromBackendId} from './node_ref';
-import {CDPSession, Page} from 'puppeteer';
+import {CDPSession, Page, JSHandle} from 'puppeteer';
 
 /**
  * Gets strings containing the HTML markup for the Nodes used to compute
@@ -14,32 +14,30 @@ export async function getHTMLUsed(
   client: CDPSession,
   page: Page
 ): Promise<{[implementation: string]: string}> {
-  const htmlUsedByChrome = await getHTMLUsedByChrome(nodeRef, client, page);
-  const htmlUsedByOurAccName = (await page.evaluate(
-    "ourLib.getAccessibleName(document.querySelector('" +
-      nodeRef.selector +
-      "')).visitedHTMLSnippet;"
-  )) as string;
-  return {chrome: htmlUsedByChrome, accname: htmlUsedByOurAccName};
+  const chromeHandles = await getNodesUsedByChrome(nodeRef, client, page);
+  const htmlUsedByChrome = await getHTMLFromHandles(chromeHandles, page);
+
+  const accnameHandles = (await page.evaluateHandle(`
+    const nodeSet = accname.getNameComputationDetails(document.querySelector('${nodeRef.selector}')).nodesUsed;
+    Array.from(nodeSet);
+  `)) as JSHandle<Element[]>;
+  const htmlUsedByAccname = await getHTMLFromHandles(accnameHandles, page);
+
+  return {chrome: htmlUsedByChrome, accname: htmlUsedByAccname};
 }
 
 /**
- * Get a string containing the HTML used by Chrome DevTools to compute the accessible name
- * for nodeRef.
- * @param nodeRef - The node whose accessible name is being computed.
- * @param client - The CDPSession for page.
- * @param page - The page in which to run the accessible name computation.
+ * Calculate the HTML snippet containing the array of elements referenced
+ * by a given JSHandle.
+ * @param handles - The ElementHandles for whom a HTML snippet is being computed
+ * @param page - The page containing the ElementHandles.
  */
-async function getHTMLUsedByChrome(
-  nodeRef: NodeRef,
-  client: CDPSession,
+async function getHTMLFromHandles(
+  handles: JSHandle<Element[]>,
   page: Page
 ): Promise<string> {
-  const nodesUsedByChrome = await getNodesUsedByChrome(nodeRef, client, page);
-
-  const nodeHandles = nodesUsedByChrome.map(node => node.handle);
   // Get the outerHTML of the nodes used by Chrome
-  const htmlString = await page.evaluate((...nodes) => {
+  const htmlString = await page.evaluate((nodes: Element[]) => {
     // Sort nodes by DOM order
     nodes.sort((first, second) => {
       const relativePosition = first.compareDocumentPosition(second);
@@ -63,13 +61,14 @@ async function getHTMLUsedByChrome(
       .filter((node, i) => !nodes[i - 1]?.contains(node))
       .map(node => node.outerHTML)
       .join('\n');
-  }, ...nodeHandles);
+  }, handles);
 
   return htmlString;
 }
 
 /**
- * Gets all nodes used by Chrome to compute the accessible name for nodeRef.
+ * Gets a JSHandle containing the array of nodes used by Chrome
+ * to compute the accessible name for nodeRef.
  * @param nodeRef - Node whose accessible name is being computed.
  * @param client - CDPSession for page.
  * @param page - Page containing nodeRef.
@@ -78,16 +77,26 @@ async function getNodesUsedByChrome(
   nodeRef: NodeRef,
   client: CDPSession,
   page: Page
-): Promise<NodeRef[]> {
+): Promise<JSHandle<Element[]>> {
   const stack: NodeRef[] = [];
-  const nodesUsed: NodeRef[] = [];
+  // Create an array to contain the Nodes used and store it
+  // in a JSHandle for reference later.
+  await page.evaluate('const nodesUsed = [];');
+  const nodesUsedHandle = await page.evaluateHandle('nodesUsed');
+
   // Track backendIds of visited nodes to avoid infinite cycle.
   const visitedNodes: Protocol.DOM.BackendNodeId[] = [];
   stack.push(nodeRef);
+
   // Iterative DFS traverses nodes connected by label references
   while (stack.length > 0) {
     const currentNodeRef = stack.pop()!;
-    nodesUsed.push(currentNodeRef);
+    // Add current Node to nodesUsed array
+    await page.evaluate(
+      (node, nodesUsed) => nodesUsed.push(node),
+      currentNodeRef.handle,
+      nodesUsedHandle
+    );
 
     const axTree = (await client.send('Accessibility.getPartialAXTree', {
       backendNodeId: currentNodeRef.backendId,
@@ -136,5 +145,5 @@ async function getNodesUsedByChrome(
     }
   }
 
-  return nodesUsed;
+  return await page.evaluateHandle('nodesUsed');
 }
