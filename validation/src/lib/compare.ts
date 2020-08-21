@@ -213,8 +213,7 @@ async function runComparison(
   const category: Category = {agreement: agreementGroups};
 
   const rulesApplied = (await page.evaluate(
-    `const ruleSet = accname.getNameComputationDetails(document.querySelector('${nodeRef.selector}')).rulesApplied;
-    Array.from(ruleSet)`
+    `Array.from(accname.getNameComputationDetails(document.querySelector('${nodeRef.selector}')).rulesApplied);`
   )) as string[];
   if (rulesApplied.length > 0) {
     category.rules = rulesApplied;
