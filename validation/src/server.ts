@@ -27,35 +27,41 @@ app.get('/api/preview', (_req, res) => {
     } else if (data) {
       res.status(200).json(JSON.parse(data.toString()));
     } else {
-      res.status(404).json({'message': 'Preview could not be found.'});
+      res.status(404).json({message: 'Preview could not be found.'});
     }
   });
 });
 
 app.get('/api/summary/:id', (req, res) => {
   const summaryId = req.params.id;
-  fs.readFile(path.join(__dirname, `lib/output/url_summary/summary_${summaryId}.json`), (err, data) => {
-    if (err) {
-      res.status(400).json(err);
-    } else if (data) {
-      res.status(200).json(JSON.parse(data.toString()));
-    } else {
-      res.status(404).json({'message': 'Summary could not be found.'});
+  fs.readFile(
+    path.join(__dirname, `lib/output/url_summary/summary_${summaryId}.json`),
+    (err, data) => {
+      if (err) {
+        res.status(400).json(err);
+      } else if (data) {
+        res.status(200).json(JSON.parse(data.toString()));
+      } else {
+        res.status(404).json({message: 'Summary could not be found.'});
+      }
     }
-  });
+  );
 });
 
 app.get('/api/case/:id', (req, res) => {
   const caseId = req.params.id;
-  fs.readFile(path.join(__dirname, `lib/output/case/case_${caseId}.json`), (err, data) => {
-    if (err) {
-      res.status(400).json(err);
-    } else if (data) {
-      res.status(200).json(JSON.parse(data.toString()));
-    } else {
-      res.status(404).json({'message': 'Case could not be found.'});
+  fs.readFile(
+    path.join(__dirname, `lib/output/case/case_${caseId}.json`),
+    (err, data) => {
+      if (err) {
+        res.status(400).json(err);
+      } else if (data) {
+        res.status(200).json(JSON.parse(data.toString()));
+      } else {
+        res.status(404).json({message: 'Case could not be found.'});
+      }
     }
-  });
+  );
 });
 
 app.post('/api/runSnippetComparison', async (req, res) => {
@@ -77,6 +83,5 @@ app.post('/api/runURLComparison', async (req, res) => {
     res.status(400).json(err);
   }
 });
-
 
 app.listen(3000, () => console.log('App listening on port 3000'));

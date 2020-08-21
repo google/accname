@@ -60,7 +60,7 @@
   "dependencies": {},
   "husky": {
     "hooks": {
-      "pre-commit": "npm run fix src/*.ts src/lib/*.ts validation/*.ts",
+      "pre-commit": "npm run fix src/*.ts src/lib/*.ts validation/src/*.ts validation/src/lib/*.ts validation/src/public/scripts/*.ts",
       "pre-push": "npm run build && rollup dist/accessible_name.js --file bundle.js --format iife --name \"accname\" && git add bundle.js && git commit --amend --no-edit"
     }
   }
