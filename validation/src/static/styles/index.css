@@ -1,4 +1,334 @@
 body {
-  background: blue;
+  font-family: "Roboto Mono";
+  display: flex;
+  justify-content: center;
+  background: #F4e5D4;
+}
+
+.content {
+  width: 60%;
+}
+
+.titleContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.title {
+  font-size: 40pt;
+  font-weight: bold;
+  color: #4A70D0;
+  text-align: center;
+}
+
+.introTextContainer {
+  width: 100%;
+  margin-top: 30px;
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+.introText {
+  font-size: 16pt;
+  word-spacing: 5px;
+  color: #4A70D0;
+}
+
+button {
+  border: none;
+  background: #C9805C;
+  border-radius: 5px;
+  padding: 5px;
+  padding-left: 12px;
+  padding-right: 12px;
   color: white;
+  font-size: 16pt;
+  font-family: 'Roboto Mono';
+}
+
+button:hover {
+  cursor: pointer;
+  background: #8d593f;
+}
+
+.chooseComparisonBtn {
+  padding: 10px;
+  padding-left: 25px;
+  padding-right: 25px;
+}
+
+.runComparisonInputSection {
+  display: flex;
+  flex-direction: column;
+  padding: 30px;
+}
+
+.heading {
+  font-size: 14pt;
+  color: #C9805C;
+  font-weight: bold;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.bluetext {
+  font-size: 12pt;
+  color: #4A70D0;
+}
+
+.redtext {
+  font-size: 12pt;
+  color: #d04a4a;
+}
+
+.instructionTextContainer {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.runComparisonBtnContainer {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  display: flex;
+}
+
+.runComparisonBtn {
+  margin-left: auto;
+}
+
+.comparisonSection {
+  margin-bottom: 20px;
+}
+
+#snippetInput {
+  width: 100%;
+}
+
+.tableHeaderRow {
+  background: #C9805C;
+  color: white;
+}
+
+table {
+  background: white;
+  border-collapse: collapse;
+  border: 1px solid black;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid black;
+  padding: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.implTitle {
+  background: #C9805C;
+  color: white;
+  font-weight: bold;
+}
+
+#snippetHistoryContainer {
+  margin-top: 10px;
+  border: 1px solid black;
+  display: flex;
+  flex-direction: column;
+  padding: 5px;
+}
+
+#snippetHistoryContainer > a {
+  border: 1px solid black;
+  margin: 5px;
+}
+
+.linkBtn {
+  border: none;
+  background: #C9805C;
+  border-radius: 5px;
+  padding: 4px;
+  padding-left: 8px;
+  padding-right: 8px;
+  color: white;
+  text-decoration: none;
+}
+
+.linkBtn:hover {
+  background: #8d593f;
+}
+
+.comparisonResultText {
+  padding-top: 10px;
+}
+
+.hidden {
+  display: none;
+}
+
+.visible {
+  display: block;
+}
+
+.urlComparisonContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.urlInput {
+  font-size: 12pt;
+  padding: 10px;
+  font-family: 'Roboto Mono';
+  border: none;
+  border-radius: 5px;
+}
+
+#previewSection {
+  background: white;
+  display: flex;
+  flex-direction: column;
+  border-radius: 5px;
+}
+
+.previewHeader {
+  display: flex;
+  justify-content: center;
+  background: #C9805C;
+  color: white;
+  font-size: 14pt;
+  font-weight: bold;
+  padding: 10px;
+  border-radius: 5px 5px 0px 0px;
+}
+
+.previewBody {
+  display: flex;
+}
+
+.comparisonType {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+}
+
+.comparisonTitle {
+  font-size: 12pt;
+  font-weight: bold;
+  color: #4A70D0;
+  padding: 10px;
+}
+
+.previewCardContainer {
+  display: flex;
+  flex-direction: column;
+  padding-left: 10px;
+  padding-right: 10px;
+  overflow: scroll;
+}
+
+.previewCard {
+  display: flex;
+  background: #C9805C;
+  color: white;
+  font-size: 12pt;
+  font-weight: bold;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  padding: 10px;
+}
+
+.previewCard > span {
+  margin-left: auto;
+}
+
+.previewCard:hover {
+  background: #8d593f;
+  cursor: pointer;
+}
+
+.invisibleLink {
+  text-decoration: none;
+}
+
+/* CSS for Loading Spinner from https://projects.lukehaas.me/css-loaders/ */
+.loader {
+  color: #4A70D0;
+  font-size: 60px;
+  text-indent: -9999em;
+  overflow: hidden;
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  margin: 72px auto;
+  position: relative;
+  -webkit-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-animation: load6 1.7s infinite ease, round 1.7s infinite ease;
+  animation: load6 1.7s infinite ease, round 1.7s infinite ease;
+}
+@-webkit-keyframes load6 {
+  0% {
+    box-shadow: 0 -0.83em 0 -0.4em, 0 -0.83em 0 -0.42em, 0 -0.83em 0 -0.44em, 0 -0.83em 0 -0.46em, 0 -0.83em 0 -0.477em;
+  }
+  5%,
+  95% {
+    box-shadow: 0 -0.83em 0 -0.4em, 0 -0.83em 0 -0.42em, 0 -0.83em 0 -0.44em, 0 -0.83em 0 -0.46em, 0 -0.83em 0 -0.477em;
+  }
+  10%,
+  59% {
+    box-shadow: 0 -0.83em 0 -0.4em, -0.087em -0.825em 0 -0.42em, -0.173em -0.812em 0 -0.44em, -0.256em -0.789em 0 -0.46em, -0.297em -0.775em 0 -0.477em;
+  }
+  20% {
+    box-shadow: 0 -0.83em 0 -0.4em, -0.338em -0.758em 0 -0.42em, -0.555em -0.617em 0 -0.44em, -0.671em -0.488em 0 -0.46em, -0.749em -0.34em 0 -0.477em;
+  }
+  38% {
+    box-shadow: 0 -0.83em 0 -0.4em, -0.377em -0.74em 0 -0.42em, -0.645em -0.522em 0 -0.44em, -0.775em -0.297em 0 -0.46em, -0.82em -0.09em 0 -0.477em;
+  }
+  100% {
+    box-shadow: 0 -0.83em 0 -0.4em, 0 -0.83em 0 -0.42em, 0 -0.83em 0 -0.44em, 0 -0.83em 0 -0.46em, 0 -0.83em 0 -0.477em;
+  }
+}
+@keyframes load6 {
+  0% {
+    box-shadow: 0 -0.83em 0 -0.4em, 0 -0.83em 0 -0.42em, 0 -0.83em 0 -0.44em, 0 -0.83em 0 -0.46em, 0 -0.83em 0 -0.477em;
+  }
+  5%,
+  95% {
+    box-shadow: 0 -0.83em 0 -0.4em, 0 -0.83em 0 -0.42em, 0 -0.83em 0 -0.44em, 0 -0.83em 0 -0.46em, 0 -0.83em 0 -0.477em;
+  }
+  10%,
+  59% {
+    box-shadow: 0 -0.83em 0 -0.4em, -0.087em -0.825em 0 -0.42em, -0.173em -0.812em 0 -0.44em, -0.256em -0.789em 0 -0.46em, -0.297em -0.775em 0 -0.477em;
+  }
+  20% {
+    box-shadow: 0 -0.83em 0 -0.4em, -0.338em -0.758em 0 -0.42em, -0.555em -0.617em 0 -0.44em, -0.671em -0.488em 0 -0.46em, -0.749em -0.34em 0 -0.477em;
+  }
+  38% {
+    box-shadow: 0 -0.83em 0 -0.4em, -0.377em -0.74em 0 -0.42em, -0.645em -0.522em 0 -0.44em, -0.775em -0.297em 0 -0.46em, -0.82em -0.09em 0 -0.477em;
+  }
+  100% {
+    box-shadow: 0 -0.83em 0 -0.4em, 0 -0.83em 0 -0.42em, 0 -0.83em 0 -0.44em, 0 -0.83em 0 -0.46em, 0 -0.83em 0 -0.477em;
+  }
+}
+@-webkit-keyframes round {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+@keyframes round {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
 }

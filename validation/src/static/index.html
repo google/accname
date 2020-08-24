@@ -1,9 +1,100 @@
-<html>
+<!doctype html>
+<html lang="en">
   <head>
-    <link rel="stylesheet" href="/static/styles/index.css"/>
+    <meta charset="utf-8">
+    <title>AccName Comparison</title>
+    <!-- External dependencies -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.29.0/codemirror.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.29.0/codemirror.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.29.0/mode/xml/xml.js"></script>
+    <!-- Local dependencies -->
+    <link rel="stylesheet" href="/static/styles/index.css">
     <script src="/static/scripts/index.js"></script>
   </head>
   <body>
-    <h1>Hello world!</h1>
+    <div class="content">
+      <!-- Title -->
+      <div class="titleContainer">
+        <div class="title">AccName Comparison</div>
+      </div>
+      <div class="introTextContainer">
+        <div class="introText">
+          Run comparison on <button class="chooseComparisonBtn" onclick="toggleComparisonSectionVisibility('snippetComparison', this);">HTML Snippet</button>
+          or <button class="chooseComparisonBtn" onclick="toggleComparisonSectionVisibility('urlComparison', this);">Web-Page</button>
+        </div>
+      </div>
+      <!-- Snippet comparison -->
+      <span id="snippetComparison" class="hidden comparisonSection">
+        <div id="runComparisonInputSection">
+          <div class="instructionTextContainer">
+            <div class="heading">Enter HTML Snippet</div>
+            <div class="bluetext">Mark target element with an 'accnameComparisonTarget' attribute</div>
+          </div>
+          <textarea id="snippetInput"></textarea>
+          <div class="runComparisonBtnContainer">
+            <button class="runComparisonBtn" onclick="getSnippetComparison();">Run Comparison</button>
+          </div>
+        </div>
+        
+        <div id="comparisonResultsContainer">
+          <table id="resultsTable" class="hidden">
+            <colgroup>
+              <col span="1" style="width: 20%;">
+              <col span="1" style="width: 80%;">
+            </colgroup>
+            <tr>
+              <td class="implTitle">Chrome</td>
+              <td id="chromeAccName"></td>
+            <tr>
+            </tr>
+              <td class="implTitle">Axe</td>
+              <td id="axeAccName"></td>
+            <tr>
+            </tr>
+              <td class="implTitle">AOM</td>
+              <td id="aomAccName"></td>
+            <tr>
+            </tr>
+              <td class="implTitle">BG</td>
+              <td id="bgAccName"></td>
+            <tr>
+            </tr>
+              <td class="implTitle">AccName</td>
+              <td id="ourAccName"></td>
+            </tr>
+          </table>
+          <div id="snippetResults"></div>
+        </div>
+      </span>
+      <!-- URL comparison -->
+      <span id="urlComparison" class="hidden comparisonSection">
+        <div class="urlComparisonContainer">
+          <div class="heading">Enter Web-Page URL</div>
+          <input id="urlInput" class="urlInput" type="url" placeholder="http://www.example.com/"/>
+          <div class="runComparisonBtnContainer">
+            <button class="runComparisonBtn" onclick="getURLComparison();">Run Comparison</button>
+          </div>
+          <div id="urlResults">
+          </div>
+        </div>
+      </span>
+      <!-- Comparison history -->
+      <div id="previewSection">
+        <div class="previewHeader">Comparison History</div>
+        <div class="previewBody">
+          <div class="comparisonType">
+            <div class="comparisonTitle">HTML Snippets</div>
+            <div id="snippetPreviews" class="previewCardContainer">
+            </div>
+          </div>
+          <div class="comparisonType">
+            <div class="comparisonTitle">Web-Pages</div>
+            <div id="summaryPreviews" class="previewCardContainer">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
