@@ -18,8 +18,7 @@ export async function getHTMLUsed(
   const htmlUsedByChrome = await getHTMLFromHandles(chromeHandles, page);
 
   const accnameHandles = (await page.evaluateHandle(`
-    const nodeSet = accname.getNameComputationDetails(document.querySelector('${nodeRef.selector}')).nodesUsed;
-    Array.from(nodeSet);
+    Array.from(accname.getNameComputationDetails(document.querySelector('${nodeRef.selector}')).nodesUsed);
   `)) as JSHandle<Element[]>;
   const htmlUsedByAccname = await getHTMLFromHandles(accnameHandles, page);
 
@@ -79,10 +78,8 @@ async function getNodesUsedByChrome(
   page: Page
 ): Promise<JSHandle<Element[]>> {
   const stack: NodeRef[] = [];
-  // Create an array to contain the Nodes used and store it
-  // in a JSHandle for reference later.
-  await page.evaluate('const nodesUsed = [];');
-  const nodesUsedHandle = await page.evaluateHandle('nodesUsed');
+  // Create a JSHandle containing an empty array
+  const nodesUsedHandle = await page.evaluateHandle('[]');
 
   // Track backendIds of visited nodes to avoid infinite cycle.
   const visitedNodes: Protocol.DOM.BackendNodeId[] = [];
@@ -145,5 +142,5 @@ async function getNodesUsedByChrome(
     }
   }
 
-  return await page.evaluateHandle('nodesUsed');
+  return nodesUsedHandle;
 }

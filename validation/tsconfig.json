@@ -19,13 +19,11 @@
     "esModuleInterop": true
   },
   "include": [
-    "compare.ts"
+    "src/**/*"
   ],
   "exclude": [
     "dist",
-    "node_modules",
-    "output",
-    "accname_libs_source_code"
+    "node_modules"
   ],
   "types": [
     "@types/puppeteer",
