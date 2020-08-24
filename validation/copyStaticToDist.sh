@@ -1,4 +1,3 @@
-# Copies files from src/public/ and src/lib/output/ to dist/
-cp -R ./src/public/*.html ./dist/public
-cp -R ./src/public/styles ./dist/public
-cp -R ./src/lib/output ./dist/lib
+# Copies files from src/static/ to dist/
+cp -R ./src/static/*.html ./dist/static
+cp -R ./src/static/styles ./dist/static

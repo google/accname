@@ -19,10 +19,11 @@ export interface CasePreview {
  * @param comparisonResult - The ComparisonResult that will become a test-case
  */
 export function writeTestcase(comparisonResult: ComparisonResult): CasePreview {
-  const caseId = fs.readdirSync(path.join(__dirname, 'output/case/')).length;
+  const caseId = fs.readdirSync(path.join(__dirname, '../../output/case/'))
+    .length;
 
   fs.writeFileSync(
-    path.join(__dirname, `output/case/case_${caseId}.json`),
+    path.join(__dirname, `../../output/case/case_${caseId}.json`),
     JSON.stringify(comparisonResult, null, 2)
   );
 
@@ -44,7 +45,7 @@ export function writeSnippetCase(casePreview: CasePreview): void {
   const preview = getPreviewJson();
   preview.snippets.push(casePreview);
   fs.writeFileSync(
-    path.join(__dirname, 'output/preview.json'),
+    path.join(__dirname, '../../output/preview.json'),
     JSON.stringify(preview, null, 2)
   );
 }
@@ -57,11 +58,14 @@ export function writeSnippetCase(casePreview: CasePreview): void {
  */
 export function writeUrlSummary(urlSummary: UrlSummary): number {
   const urlSummaryId = fs.readdirSync(
-    path.join(__dirname, 'output/url_summary/')
+    path.join(__dirname, '../../output/url_summary/')
   ).length;
 
   fs.writeFileSync(
-    path.join(__dirname, `output/url_summary/summary_${urlSummaryId}.json`),
+    path.join(
+      __dirname,
+      `../../output/url_summary/summary_${urlSummaryId}.json`
+    ),
     JSON.stringify(urlSummary, null, 2)
   );
 
@@ -78,7 +82,7 @@ export function writeUrlSummary(urlSummary: UrlSummary): number {
   const preview = getPreviewJson();
   preview.pageSummaries.push(urlSummaryPreview);
   fs.writeFileSync(
-    path.join(__dirname, 'output/preview.json'),
+    path.join(__dirname, '../../output/preview.json'),
     JSON.stringify(preview, null, 2)
   );
 
@@ -112,7 +116,7 @@ interface Preview {
 function getPreviewJson(): Preview {
   try {
     const previewRaw = fs.readFileSync(
-      path.join(__dirname, 'output/preview.json')
+      path.join(__dirname, '../../output/preview.json')
     );
     return JSON.parse(previewRaw.toString());
   } catch (err) {

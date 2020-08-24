@@ -4,8 +4,8 @@ import fs from 'fs';
 import {runHTMLSnippetComparison, runURLComparison} from './lib/compare';
 
 const app = express();
-// Set static folder as src/public
-app.use('/static', express.static(path.join(__dirname, 'public')));
+// Set static folder as src/static
+app.use('/static', express.static(path.join(__dirname, 'static')));
 app.use(express.json());
 
 /**
@@ -13,7 +13,7 @@ app.use(express.json());
  */
 
 app.get('/', (_req, res) => {
-  res.sendFile(path.join(__dirname, 'public/index.html'));
+  res.sendFile(path.join(__dirname, 'static/index.html'));
 });
 
 /**
@@ -21,7 +21,7 @@ app.get('/', (_req, res) => {
  */
 
 app.get('/api/preview', (_req, res) => {
-  fs.readFile(path.join(__dirname, 'lib/output/preview.json'), (err, data) => {
+  fs.readFile(path.join(__dirname, '../output/preview.json'), (err, data) => {
     if (err) {
       res.status(400).json(err);
     } else if (data) {
@@ -35,7 +35,7 @@ app.get('/api/preview', (_req, res) => {
 app.get('/api/summary/:id', (req, res) => {
   const summaryId = req.params.id;
   fs.readFile(
-    path.join(__dirname, `lib/output/url_summary/summary_${summaryId}.json`),
+    path.join(__dirname, `../output/url_summary/summary_${summaryId}.json`),
     (err, data) => {
       if (err) {
         res.status(400).json(err);
@@ -51,7 +51,7 @@ app.get('/api/summary/:id', (req, res) => {
 app.get('/api/case/:id', (req, res) => {
   const caseId = req.params.id;
   fs.readFile(
-    path.join(__dirname, `lib/output/case/case_${caseId}.json`),
+    path.join(__dirname, `../output/case/case_${caseId}.json`),
     (err, data) => {
       if (err) {
         res.status(400).json(err);
