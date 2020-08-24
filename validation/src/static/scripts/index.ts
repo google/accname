@@ -114,7 +114,7 @@ const getURLComparison = async () => {
 };
 
 /**
- * Displays the contents on preview.json in the 'Comparison History' section.
+ * Displays the contents of preview.json in the 'Comparison History' section.
  * @param preview - the Preview to be displayed under 'Comparison History'
  */
 function displayPreview(preview: Preview) {
@@ -140,7 +140,7 @@ function displayPreview(preview: Preview) {
 }
 
 /**
- * Toggles the visibility of a given comparison section. (Snippet / web-page)
+ * Toggles the visibility of a given comparison section.
  * @param idref - An idref for the comparison section whose visibility should change.
  * @param targetButton - The button that toggles the visibility of the section with id of idref.
  */
