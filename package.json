@@ -34,7 +34,7 @@
     "!/src/lib/*_test.ts"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && cd validation && npm run build",
     "test": "karma start",
     "test-headless": "karma start --single-run --browsers ChromeHeadless,FirefoxHeadless",
     "check": "npx gts check src/**/*.ts validation/src/**/*.ts",
