@@ -11,3 +11,6 @@ jobs:
           node-version: 13
       - run: npm install
       - run: npm run check
+      - run: cd validation
+      - run: npm install
+      - run: npm run check
