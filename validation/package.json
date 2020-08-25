@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc && sh copyStaticToDist.sh",
-    "check": "npx gts check src/*.ts src/**/*.ts"
+    "check": "npx gts check src/*.ts src/**/*.ts",
+    "serve": "npm run build && node dist/server.js"
   },
   "author": "Oisín Nolan",
   "license": "Apache-2.0",

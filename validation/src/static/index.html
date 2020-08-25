@@ -10,34 +10,35 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.29.0/mode/xml/xml.js"></script>
     <!-- Local dependencies -->
     <link rel="stylesheet" href="/static/styles/index.css">
+    <link rel="stylesheet" href="/static/styles/spinner.css">
     <script src="/static/scripts/index.js"></script>
   </head>
   <body>
     <div class="content">
       <!-- Title -->
-      <div class="titleContainer">
-        <div class="title">AccName Comparison</div>
-      </div>
-      <div class="introTextContainer">
-        <div class="introText">
+      <header class="titleContainer">
+        <h1 class="title">AccName Comparison</h1>
+      </header>
+      <section class="introTextContainer">
+        <h2 class="introText">
           Run comparison on <button class="chooseComparisonBtn" onclick="toggleComparisonSectionVisibility('snippetComparison', this);">HTML Snippet</button>
           or <button class="chooseComparisonBtn" onclick="toggleComparisonSectionVisibility('urlComparison', this);">Web-Page</button>
-        </div>
-      </div>
+        </h2>
+      </section>
       <!-- Snippet comparison -->
-      <span id="snippetComparison" class="hidden comparisonSection">
+      <section id="snippetComparison" class="hidden comparisonSection">
         <div id="runComparisonInputSection">
-          <div class="instructionTextContainer">
-            <div class="heading">Enter HTML Snippet</div>
-            <div class="bluetext">Mark target element with an 'accnameComparisonTarget' attribute</div>
-          </div>
+          <heading class="instructionTextContainer">
+            <h3 class="heading">Enter HTML Snippet</h3>
+            <h4 class="bluetext" style="margin-bottom: 10px;">Mark target element with an 'ac' attribute</h4>
+          </heading>
           <textarea id="snippetInput"></textarea>
           <div class="runComparisonBtnContainer">
             <button class="runComparisonBtn" onclick="getSnippetComparison();">Run Comparison</button>
           </div>
         </div>
         
-        <div id="comparisonResultsContainer">
+        <section id="comparisonResultsContainer" aria-label="Comparison results">
           <table id="resultsTable" class="hidden">
             <colgroup>
               <col span="1" style="width: 20%;">
@@ -65,12 +66,12 @@
             </tr>
           </table>
           <div id="snippetResults"></div>
-        </div>
-      </span>
+        </section>
+      </section>
       <!-- URL comparison -->
-      <span id="urlComparison" class="hidden comparisonSection">
+      <section id="urlComparison" class="hidden comparisonSection">
         <div class="urlComparisonContainer">
-          <div class="heading">Enter Web-Page URL</div>
+          <h3 class="heading">Enter Web-Page URL</h3>
           <input id="urlInput" class="urlInput" type="url" placeholder="http://www.example.com/"/>
           <div class="runComparisonBtnContainer">
             <button class="runComparisonBtn" onclick="getURLComparison();">Run Comparison</button>
@@ -78,23 +79,25 @@
           <div id="urlResults">
           </div>
         </div>
-      </span>
+      </section>
       <!-- Comparison history -->
-      <div id="previewSection">
-        <div class="previewHeader">Comparison History</div>
+      <section id="previewSection">
+        <h2 class="previewHeader">Comparison History</h2>
         <div class="previewBody">
-          <div class="comparisonType">
-            <div class="comparisonTitle">HTML Snippets</div>
+          <section class="comparisonType">
+            <h3 class="comparisonTitle">HTML Snippets</h3>
+            <h4 class="comparisonKey">Case ID<span>(target Element role)</span></h4>
             <div id="snippetPreviews" class="previewCardContainer">
             </div>
-          </div>
-          <div class="comparisonType">
-            <div class="comparisonTitle">Web-Pages</div>
+          </section>
+          <section class="comparisonType">
+            <h3 class="comparisonTitle">Web-Pages</h3>
+            <h4 class="comparisonKey">Target URL<span>disagreement%</span></h4>
             <div id="summaryPreviews" class="previewCardContainer">
             </div>
-          </div>
+          </section>
         </div>
-      </div>
+      </section>
     </div>
   </body>
 </html>

@@ -46,11 +46,7 @@ export async function runHTMLSnippetComparison(
 
   await loadAccNameLibraries(page);
 
-  const targetNodeRef = await getNodeRefFromSelector(
-    '[accnameComparisonTarget]',
-    client,
-    page
-  );
+  const targetNodeRef = await getNodeRefFromSelector('[ac]', client, page);
 
   const comparisonResults = await runComparison(targetNodeRef, page, client);
   await browser.close();

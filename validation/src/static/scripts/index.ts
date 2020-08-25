@@ -1,27 +1,28 @@
 // Helper function for shorter 'document.getElementById(id)'
 const getElem = (id: string) => document.getElementById(id);
 
+const noElemError = new Error(
+  'An Element essential for UI functionality could not be found.'
+);
+
 let editor: CodeMirror.EditorFromTextArea;
 
 window.onload = async () => {
   // input textarea must be visible to set CodeMirror text editor up.
   const snippetComparison = getElem('snippetComparison');
-  if (!snippetComparison) return;
+  if (!snippetComparison) throw noElemError;
   snippetComparison.classList.add('visible');
 
   const snippetInput = getElem('snippetInput') as HTMLTextAreaElement;
-  if (!snippetInput) return;
+  if (!snippetInput) throw noElemError;
   editor = CodeMirror.fromTextArea(snippetInput, {
     lineNumbers: true,
     lineWrapping: true,
-    mode: 'xml',
+    mode: 'text/html',
   });
   snippetComparison.classList.remove('visible');
 
-  // Get 'Preview' to display under 'Comparison History'
-  const rawResponse = await fetch('http://localhost:3000/api/preview');
-  const preview = (await rawResponse.json()) as Preview;
-  displayPreview(preview);
+  await displayPreview();
 };
 
 /**
@@ -31,10 +32,15 @@ window.onload = async () => {
 const getSnippetComparison = async () => {
   const resultsTable = getElem('resultsTable');
   const resultsContainer = getElem('snippetResults');
-  if (!resultsTable || !resultsContainer || !editor) return;
+  if (!resultsTable || !resultsContainer || !editor) throw noElemError;
 
   resultsTable.classList.add('hidden');
   resultsContainer.innerHTML = '';
+
+  // Adds an animated CSS Loading Spinner
+  const spinner = document.createElement('div');
+  spinner.classList.add('loader');
+  resultsContainer.append(spinner);
 
   const rawResponse = await fetch(
     'http://localhost:3000/api/runSnippetComparison',
@@ -48,6 +54,8 @@ const getSnippetComparison = async () => {
     }
   );
 
+  // Remove spinner once we get a response
+  spinner.remove();
   // Display results in table if response is OK
   if (rawResponse.status === 200) {
     const comparisonResults = await rawResponse.json();
@@ -68,7 +76,8 @@ const getSnippetComparison = async () => {
         <div class="bluetext comparisonResultText">A test-case was generated as a result of this comparison - <a class="linkBtn" href="/case/${caseId}">View Test-case ${caseId}</a></div>
       `;
     }
-  } else if (rawResponse.status === 400) {
+    await displayPreview();
+  } else {
     const error = await rawResponse.json();
     resultsContainer.innerHTML = `<div class="redtext comparisonResultText">Error: ${error.message}</div>`;
   }
@@ -81,7 +90,7 @@ const getSnippetComparison = async () => {
 const getURLComparison = async () => {
   const urlInput = getElem('urlInput') as HTMLInputElement;
   const urlResults = getElem('urlResults');
-  if (!urlInput || !urlResults) return;
+  if (!urlInput || !urlResults) throw noElemError;
   urlResults.innerHTML = '';
 
   // Adds an animated CSS Loading Spinner
@@ -107,7 +116,8 @@ const getURLComparison = async () => {
   if (rawResponse.status === 200) {
     const summaryId = await rawResponse.json();
     urlResults.innerHTML = `<div class="bluetext comparisonResultText">View the comparison results for ${url} - <a class="linkBtn" href="/summary/${summaryId}">Summary ${summaryId}</a></div>`;
-  } else if (rawResponse.status === 400) {
+    await displayPreview();
+  } else {
     const error = await rawResponse.json();
     urlResults.innerHTML = `<div class="redtext comparisonResultText">Error: ${error.message}</div>`;
   }
@@ -117,25 +127,36 @@ const getURLComparison = async () => {
  * Displays the contents of preview.json in the 'Comparison History' section.
  * @param preview - the Preview to be displayed under 'Comparison History'
  */
-function displayPreview(preview: Preview) {
+async function displayPreview() {
+  // Get 'Preview' to display under 'Comparison History'
+  const rawResponse = await fetch('http://localhost:3000/api/preview');
+  const preview = (await rawResponse.json()) as Preview;
+
   const snippetContainer = getElem('snippetPreviews');
   const summaryContainer = getElem('summaryPreviews');
-  if (!snippetContainer || !summaryContainer) return;
+  if (!snippetContainer || !summaryContainer) throw noElemError;
+
+  // Empty preview containers to prevent duplicate cards
+  snippetContainer.innerHTML = '';
+  summaryContainer.innerHTML = '';
 
   for (const snippet of preview.snippets) {
-    snippetContainer.innerHTML += `<a href="/case/${
-      snippet.caseId
-    }" class="invisibleLink"><div class="previewCard">Case ${
-      snippet.caseId
-    } <span>${snippet.role ? `(${snippet.role})` : ''}</span></div></a>`;
+    // Sort the snippet cases from recent -> old
+    snippetContainer.innerHTML =
+      `<a href="/case/${
+        snippet.caseId
+      }" class="invisibleLink"><div class="previewCard">Case ${
+        snippet.caseId
+      } <span>${snippet.role ? `(${snippet.role})` : ''}</span></div></a>` +
+      snippetContainer.innerHTML;
   }
 
   for (const summary of preview.pageSummaries) {
-    summaryContainer.innerHTML += `<a href="/summary/${
-      summary.urlSummaryId
-    }" class="invisibleLink"><div class="previewCard">${
-      summary.url
-    } <span>${Math.round(summary.percentDisagreement)}%</span></div></a>`;
+    const disagreement = Math.round(summary.percentDisagreement);
+    // Sort the summaries from recent -> old
+    summaryContainer.innerHTML =
+      `<a href="/summary/${summary.urlSummaryId}" class="invisibleLink"><div class="previewCard">${summary.url} <span>${disagreement}%</span></div></a>` +
+      summaryContainer.innerHTML;
   }
 }
 
@@ -149,7 +170,7 @@ function toggleComparisonSectionVisibility(
   targetButton: HTMLButtonElement
 ) {
   const targetSection = getElem(idref);
-  if (!targetSection) return;
+  if (!targetSection) throw noElemError;
   const targetWasVisible = targetSection.classList.contains('visible');
   // Make all other comparison sections invisible.
   document.querySelectorAll('.comparisonSection').forEach(section => {

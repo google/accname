@@ -9,8 +9,11 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 13
-      - run: npm install
-      - run: npm run build
-      - run: cd validation
-      - run: npm install
-      - run: npm run build
+      - name: Build accname
+        run: npm install
+        run: npm run build
+
+      - name: Build validation
+        run: npm install
+        run: npm run build
+        working-directory: ./validation
