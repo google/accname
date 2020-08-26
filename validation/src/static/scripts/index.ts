@@ -197,3 +197,34 @@ function toggleComparisonSectionVisibility(
     targetButton.style.background = '#C9805C';
   }
 }
+
+/**
+ * A preview for some UrlSummary
+ */
+interface UrlSummaryPreview {
+  urlSummaryId: number;
+  url: string;
+  percentDisagreement: number;
+}
+
+// TODO: import these interfaces from src/lib/schema.ts
+// This would require transpiling static/scripts/*.ts as es6 modules
+// and importing them with type="module" to the .html files.
+/**
+ * An interface to represent preview.json
+ */
+interface Preview {
+  snippets: CasePreview[];
+  pageSummaries: UrlSummaryPreview[];
+}
+
+/**
+ * A preview for some test-case
+ */
+interface CasePreview {
+  caseId: number;
+  // Less agreement groups --> more agreement amongst implementations.
+  // This property can be used to colour-code cases.
+  numAgreementGroups: number;
+  role?: string;
+}

@@ -1,7 +1,7 @@
 /**
  * A preview for some UrlSummary
  */
-declare interface UrlSummaryPreview {
+export interface UrlSummaryPreview {
   urlSummaryId: number;
   url: string;
   percentDisagreement: number;
@@ -10,7 +10,7 @@ declare interface UrlSummaryPreview {
 /**
  * An interface to represent preview.json
  */
-declare interface Preview {
+export interface Preview {
   snippets: CasePreview[];
   pageSummaries: UrlSummaryPreview[];
 }
@@ -18,7 +18,7 @@ declare interface Preview {
 /**
  * A preview for some test-case
  */
-declare interface CasePreview {
+export interface CasePreview {
   caseId: number;
   // Less agreement groups --> more agreement amongst implementations.
   // This property can be used to colour-code cases.
@@ -29,7 +29,7 @@ declare interface CasePreview {
 /**
  * A summary of the comparisons performed on a web-page
  */
-declare interface UrlSummary {
+export interface UrlSummary {
   url: string;
   nodesOnPage: number;
   stats: {category: Category; count: number}[];
@@ -39,7 +39,7 @@ declare interface UrlSummary {
 /**
  * Properties used to group similar comparison results.
  */
-declare interface Category {
+export interface Category {
   agreement: string[][];
   rules?: string[];
   role?: string;
@@ -48,7 +48,7 @@ declare interface Category {
 /**
  * Results from the comparison of AccName implementations.
  */
-declare interface ComparisonResult {
+export interface ComparisonResult {
   disagrees: boolean;
   accnames: {[implementation: string]: string};
   htmlUsed?: {[implementation: string]: string};
