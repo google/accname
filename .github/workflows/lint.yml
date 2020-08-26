@@ -9,5 +9,13 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 13
-      - run: npm install
-      - run: npm run check
+      - name: Lint accname
+        run: |
+          npm install
+          npm run check
+
+      - name: Lint validation
+        run: |
+          npm install
+          npm run check
+        working-directory: ./validation

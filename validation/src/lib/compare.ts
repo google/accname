@@ -4,12 +4,7 @@ import {Protocol} from 'devtools-protocol';
 import fetch from 'node-fetch';
 import {NodeRef, getNodeRefFromSelector} from './node_ref';
 import {getHTMLUsed} from './html_used';
-import {
-  writeTestcase,
-  writeSnippetCase,
-  CasePreview,
-  writeUrlSummary,
-} from './output';
+import {writeTestcase, writeSnippetCase, writeUrlSummary} from './output';
 
 import axe from 'axe-core';
 
@@ -51,11 +46,7 @@ export async function runHTMLSnippetComparison(
 
   await loadAccNameLibraries(page);
 
-  const targetNodeRef = await getNodeRefFromSelector(
-    '[accnameComparisonTarget]',
-    client,
-    page
-  );
+  const targetNodeRef = await getNodeRefFromSelector('[ac]', client, page);
 
   const comparisonResults = await runComparison(targetNodeRef, page, client);
   await browser.close();
@@ -66,16 +57,6 @@ export async function runHTMLSnippetComparison(
   }
 
   return [comparisonResults.accnames];
-}
-
-/**
- * A summary of the comparisons performed on a web-page
- */
-export interface UrlSummary {
-  url: string;
-  nodesOnPage: number;
-  stats: {category: Category; count: number}[];
-  cases: CasePreview[];
 }
 
 /**
@@ -147,7 +128,7 @@ export async function runURLComparison(url: string): Promise<number> {
     count: entry[1],
   }));
 
-  const pageSummary = {
+  const pageSummary: UrlSummary = {
     url: url,
     nodesOnPage: allNodes.length,
     stats: categoryStats,
@@ -157,25 +138,6 @@ export async function runURLComparison(url: string): Promise<number> {
 
   await browser.close();
   return pageSummaryId;
-}
-
-/**
- * Properties used to group similar comparison results.
- */
-interface Category {
-  agreement: string[][];
-  rules?: string[];
-  role?: string;
-}
-
-/**
- * Results from the comparison of AccName implementations.
- */
-export interface ComparisonResult {
-  disagrees: boolean;
-  accnames: {[implementation: string]: string};
-  htmlUsed?: {[implementation: string]: string};
-  category?: Category;
 }
 
 /**

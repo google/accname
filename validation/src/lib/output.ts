@@ -1,17 +1,5 @@
-import {ComparisonResult, UrlSummary} from './compare';
 import fs from 'fs';
 import path from 'path';
-
-/**
- * A preview for some test-case
- */
-export interface CasePreview {
-  caseId: number;
-  // Less agreement groups --> more agreement amongst implementations.
-  // This property can be used to colour-code cases.
-  numAgreementGroups: number;
-  role?: string;
-}
 
 /**
  * Creates a new test-case from a ComparisonResult and returns
@@ -72,11 +60,16 @@ export function writeUrlSummary(urlSummary: UrlSummary): number {
   // Cut down on url text for easier display (as in Chrome URL bar)
   const urlPreview = urlSummary.url.replace(/^(?:https?:\/\/)?(?:www\.)?/i, '');
 
+  // The total disagreements is the sum of occurrences of each category of disagreement
+  const totalDisagreements = urlSummary.stats.reduce(
+    (sum, stat) => sum + stat.count,
+    0
+  );
+
   const urlSummaryPreview = {
     urlSummaryId: urlSummaryId,
     url: urlPreview,
-    percentDisagreement:
-      (urlSummary.cases.length / urlSummary.nodesOnPage) * 100,
+    percentDisagreement: (totalDisagreements / urlSummary.nodesOnPage) * 100,
   };
 
   const preview = getPreviewJson();
@@ -87,23 +80,6 @@ export function writeUrlSummary(urlSummary: UrlSummary): number {
   );
 
   return urlSummaryId;
-}
-
-/**
- * A preview for some UrlSummary
- */
-interface UrlSummaryPreview {
-  urlSummaryId: number;
-  url: string;
-  percentDisagreement: number;
-}
-
-/**
- * An interface to represent preview.json
- */
-interface Preview {
-  snippets: CasePreview[];
-  pageSummaries: UrlSummaryPreview[];
 }
 
 /**

@@ -5,18 +5,22 @@
   "main": "dist/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc && sh copyStaticToDist.sh"
+    "build": "tsc && sh copyStaticToDist.sh",
+    "check": "npx gts check src/*.ts src/**/*.ts",
+    "serve": "npm run build && node dist/server.js"
   },
   "author": "Oisín Nolan",
   "license": "Apache-2.0",
   "devDependencies": {
-    "chrome-remote-debug-protocol": "^1.2.20180422",
-    "typescript": "^3.9.7"
-  },
-  "dependencies": {
+    "@types/codemirror": "0.0.97",
     "@types/express": "^4.17.7",
     "@types/node-fetch": "^2.5.7",
     "@types/puppeteer": "^3.0.1",
+    "chrome-remote-debug-protocol": "^1.2.20180422",
+    "gts": "^2.0.2",
+    "typescript": "^3.9.7"
+  },
+  "dependencies": {
     "axe-core": "^3.5.5",
     "express": "^4.17.1",
     "node-fetch": "^2.6.0",

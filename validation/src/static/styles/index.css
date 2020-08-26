@@ -1,4 +1,273 @@
 body {
-  background: blue;
+  font-family: "Roboto Mono";
+  display: flex;
+  justify-content: center;
+  background: #F4e5D4;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: normal;
+  margin: 0;
+}
+
+.content {
+  width: 60%;
+}
+
+.titleContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.title {
+  font-size: 40pt;
+  font-weight: bold;
+  color: #4A70D0;
+  text-align: center;
+}
+
+.introTextContainer {
+  width: 100%;
+  margin-top: 30px;
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+.introText {
+  font-size: 16pt;
+  word-spacing: 5px;
+  color: #4A70D0;
+}
+
+button {
+  border: none;
+  background: #C9805C;
+  border-radius: 5px;
+  padding: 5px;
+  padding-left: 12px;
+  padding-right: 12px;
   color: white;
+  font-size: 16pt;
+  font-family: 'Roboto Mono';
+}
+
+button:hover {
+  cursor: pointer;
+  background: #8d593f;
+}
+
+.chooseComparisonBtn {
+  padding: 10px;
+  padding-left: 25px;
+  padding-right: 25px;
+}
+
+.runComparisonInputSection {
+  display: flex;
+  flex-direction: column;
+  padding: 30px;
+}
+
+.heading {
+  font-size: 14pt;
+  color: #C9805C;
+  font-weight: bold;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.bluetext {
+  font-size: 12pt;
+  color: #4A70D0;
+}
+
+.redtext {
+  font-size: 12pt;
+  color: #d04a4a;
+}
+
+.instructionTextContainer {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.runComparisonBtnContainer {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  display: flex;
+}
+
+.runComparisonBtn {
+  margin-left: auto;
+}
+
+.comparisonSection {
+  margin-bottom: 20px;
+}
+
+#snippetInput {
+  width: 100%;
+}
+
+.tableHeaderRow {
+  background: #C9805C;
+  color: white;
+}
+
+table {
+  background: white;
+  border-collapse: collapse;
+  border: 1px solid black;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid black;
+  padding: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.implTitle {
+  background: #C9805C;
+  color: white;
+  font-weight: bold;
+}
+
+#snippetHistoryContainer {
+  margin-top: 10px;
+  border: 1px solid black;
+  display: flex;
+  flex-direction: column;
+  padding: 5px;
+}
+
+#snippetHistoryContainer > a {
+  border: 1px solid black;
+  margin: 5px;
+}
+
+.linkBtn {
+  border: none;
+  background: #C9805C;
+  border-radius: 5px;
+  padding: 4px;
+  padding-left: 8px;
+  padding-right: 8px;
+  color: white;
+  text-decoration: none;
+}
+
+.linkBtn:hover {
+  background: #8d593f;
+}
+
+.comparisonResultText {
+  padding-top: 10px;
+}
+
+.hidden {
+  display: none;
+}
+
+.visible {
+  display: block;
+}
+
+.urlComparisonContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.urlInput {
+  font-size: 12pt;
+  padding: 10px;
+  font-family: 'Roboto Mono';
+  border: none;
+  border-radius: 5px;
+}
+
+#previewSection {
+  background: white;
+  display: flex;
+  flex-direction: column;
+  border-radius: 5px;
+}
+
+.previewHeader {
+  display: flex;
+  justify-content: center;
+  background: #C9805C;
+  color: white;
+  font-weight: bold;
+  font-size: 18pt;
+  padding: 10px;
+  border-radius: 5px 5px 0px 0px;
+}
+
+.previewBody {
+  display: flex;
+}
+
+.comparisonType {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+}
+
+.comparisonTitle {
+  font-size: 16pt;
+  font-weight: bold;
+  color: #4A70D0;
+  padding: 10px;
+  padding-bottom: 5px;
+}
+
+.comparisonKey {
+  display: flex;
+  color: #777167;
+  font-size: 12pt;
+  font-weight: bold;
+  padding: 15px;
+  padding-bottom: 8px;
+  padding-top: 0;
+}
+
+.comparisonKey > span {
+  margin-left: auto;
+}
+
+.previewCardContainer {
+  display: flex;
+  flex-direction: column;
+  padding-left: 10px;
+  padding-right: 10px;
+  overflow-y: scroll;
+  max-height: 50vh;
+}
+
+.previewCard {
+  display: flex;
+  background: #C9805C;
+  color: white;
+  font-size: 12pt;
+  font-weight: bold;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  padding: 10px;
+}
+
+.previewCard > span {
+  margin-left: auto;
+}
+
+.previewCard:hover {
+  background: #8d593f;
+  cursor: pointer;
+}
+
+.invisibleLink {
+  text-decoration: none;
 }
