@@ -4,7 +4,8 @@ import path from 'path';
 /**
  * Creates a new test-case from a ComparisonResult and returns
  * a CasePreview for that test-case.
- * @param comparisonResult - The ComparisonResult that will become a test-case
+ * @param comparisonResult - The ComparisonResult that will become a test-case.
+ * @param context - Information relevant to the origin of this testcase (input snippet / target url).
  */
 export function writeTestcase(
   comparisonResult: ComparisonResult,
