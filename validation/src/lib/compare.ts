@@ -7,7 +7,6 @@ import {getHTMLUsed} from './html_used';
 import {writeTestcase, writeSnippetCase, writeUrlSummary} from './output';
 
 import axe from 'axe-core';
-import {Category, ComparisonResult, CasePreview} from './schema';
 
 // Hard coded initialisation function simulating calls from
 // backend Express server.
@@ -129,7 +128,7 @@ export async function runURLComparison(url: string): Promise<number> {
     count: entry[1],
   }));
 
-  const pageSummary = {
+  const pageSummary: UrlSummary = {
     url: url,
     nodesOnPage: allNodes.length,
     stats: categoryStats,

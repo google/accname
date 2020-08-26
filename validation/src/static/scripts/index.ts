@@ -1,20 +1,24 @@
 // Helper function for shorter 'document.getElementById(id)'
 const getElem = (id: string) => document.getElementById(id);
 
-const noElemError = new Error(
-  'An Element essential for UI functionality could not be found.'
-);
+class ElemNotFound extends Error {
+  constructor() {
+    super(
+      'An Element essential to the UI for this app could not be found in the document.'
+    );
+  }
+}
 
 let editor: CodeMirror.EditorFromTextArea;
 
 window.onload = async () => {
   // input textarea must be visible to set CodeMirror text editor up.
   const snippetComparison = getElem('snippetComparison');
-  if (!snippetComparison) throw noElemError;
+  if (!snippetComparison) throw new ElemNotFound();
   snippetComparison.classList.add('visible');
 
   const snippetInput = getElem('snippetInput') as HTMLTextAreaElement;
-  if (!snippetInput) throw noElemError;
+  if (!snippetInput) throw new ElemNotFound();
   editor = CodeMirror.fromTextArea(snippetInput, {
     lineNumbers: true,
     lineWrapping: true,
@@ -22,7 +26,11 @@ window.onload = async () => {
   });
   snippetComparison.classList.remove('visible');
 
-  await displayPreview();
+  try {
+    await displayPreview();
+  } catch (error) {
+    console.log('No Comparisons have been made yet');
+  }
 };
 
 /**
@@ -32,7 +40,7 @@ window.onload = async () => {
 const getSnippetComparison = async () => {
   const resultsTable = getElem('resultsTable');
   const resultsContainer = getElem('snippetResults');
-  if (!resultsTable || !resultsContainer || !editor) throw noElemError;
+  if (!resultsTable || !resultsContainer || !editor) throw new ElemNotFound();
 
   resultsTable.classList.add('hidden');
   resultsContainer.innerHTML = '';
@@ -90,7 +98,7 @@ const getSnippetComparison = async () => {
 const getURLComparison = async () => {
   const urlInput = getElem('urlInput') as HTMLInputElement;
   const urlResults = getElem('urlResults');
-  if (!urlInput || !urlResults) throw noElemError;
+  if (!urlInput || !urlResults) throw new ElemNotFound();
   urlResults.innerHTML = '';
 
   // Adds an animated CSS Loading Spinner
@@ -134,7 +142,7 @@ async function displayPreview() {
 
   const snippetContainer = getElem('snippetPreviews');
   const summaryContainer = getElem('summaryPreviews');
-  if (!snippetContainer || !summaryContainer) throw noElemError;
+  if (!snippetContainer || !summaryContainer) throw new ElemNotFound();
 
   // Empty preview containers to prevent duplicate cards
   snippetContainer.innerHTML = '';
@@ -170,7 +178,7 @@ function toggleComparisonSectionVisibility(
   targetButton: HTMLButtonElement
 ) {
   const targetSection = getElem(idref);
-  if (!targetSection) throw noElemError;
+  if (!targetSection) throw new ElemNotFound();
   const targetWasVisible = targetSection.classList.contains('visible');
   // Make all other comparison sections invisible.
   document.querySelectorAll('.comparisonSection').forEach(section => {
@@ -196,35 +204,4 @@ function toggleComparisonSectionVisibility(
   } else {
     targetButton.style.background = '#C9805C';
   }
-}
-
-/**
- * A preview for some UrlSummary
- */
-interface UrlSummaryPreview {
-  urlSummaryId: number;
-  url: string;
-  percentDisagreement: number;
-}
-
-// TODO: import these interfaces from src/lib/schema.ts
-// This would require transpiling static/scripts/*.ts as es6 modules
-// and importing them with type="module" to the .html files.
-/**
- * An interface to represent preview.json
- */
-interface Preview {
-  snippets: CasePreview[];
-  pageSummaries: UrlSummaryPreview[];
-}
-
-/**
- * A preview for some test-case
- */
-interface CasePreview {
-  caseId: number;
-  // Less agreement groups --> more agreement amongst implementations.
-  // This property can be used to colour-code cases.
-  numAgreementGroups: number;
-  role?: string;
 }

@@ -40,9 +40,15 @@ async function getHTMLFromHandles(
     // Sort nodes by DOM order
     nodes.sort((first, second) => {
       const relativePosition = first.compareDocumentPosition(second);
-      if (relativePosition & 2 || relativePosition & 8) {
+      if (
+        relativePosition & Node.DOCUMENT_POSITION_PRECEDING ||
+        relativePosition & Node.DOCUMENT_POSITION_CONTAINS
+      ) {
         return 1;
-      } else if (relativePosition & 4 || relativePosition & 16) {
+      } else if (
+        relativePosition & Node.DOCUMENT_POSITION_FOLLOWING ||
+        relativePosition & Node.DOCUMENT_POSITION_CONTAINED_BY
+      ) {
         return -1;
       } else {
         return 0;

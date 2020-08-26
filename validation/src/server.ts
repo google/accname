@@ -70,6 +70,7 @@ app.post('/api/runSnippetComparison', async (req, res) => {
     const result = await runHTMLSnippetComparison(inputSnippet);
     res.status(200).json(result);
   } catch (err) {
+    console.log('An Error occurred while running a SNIPPET COMPARISON:', err);
     res.status(400).json(err);
   }
 });
@@ -80,6 +81,7 @@ app.post('/api/runURLComparison', async (req, res) => {
     const result = await runURLComparison(inputURL);
     res.status(200).json(result);
   } catch (err) {
+    console.log('An Error occurred while running a URL COMPARISON:', err);
     res.status(400).json(err);
   }
 });
