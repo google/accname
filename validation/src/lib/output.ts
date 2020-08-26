@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { CasePreview, UrlSummary, Preview, ComparisonResult } from './schema';
+import {CasePreview, UrlSummary, Preview, ComparisonResult} from './schema';
 
 /**
  * Creates a new test-case from a ComparisonResult and returns
