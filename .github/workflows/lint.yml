@@ -10,10 +10,12 @@ jobs:
         with:
           node-version: 13
       - name: Lint accname
-        run: npm install
-        run: npm run check
+        run: |
+          npm install
+          npm run check
 
       - name: Lint validation
-        run: npm install
-        run: npm run check
+        run: |
+          npm install
+          npm run check
         working-directory: ./validation
