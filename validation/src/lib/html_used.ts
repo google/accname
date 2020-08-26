@@ -39,15 +39,20 @@ async function getHTMLFromHandles(
   const htmlString = await page.evaluate((nodes: Element[]) => {
     // Sort nodes by DOM order
     nodes.sort((first, second) => {
+      // (See https://developer.mozilla.org/en-US/docs/Web/API/Node/compareDocumentPosition)
+      const DOCUMENT_POSITION_PRECEDING = 2;
+      const DOCUMENT_POSITION_FOLLOWING = 4;
+      const DOCUMENT_POSITION_CONTAINS = 8;
+      const DOCUMENT_POSITION_CONTAINED_BY = 16;
       const relativePosition = first.compareDocumentPosition(second);
       if (
-        relativePosition & Node.DOCUMENT_POSITION_PRECEDING ||
-        relativePosition & Node.DOCUMENT_POSITION_CONTAINS
+        relativePosition & DOCUMENT_POSITION_PRECEDING ||
+        relativePosition & DOCUMENT_POSITION_CONTAINS
       ) {
         return 1;
       } else if (
-        relativePosition & Node.DOCUMENT_POSITION_FOLLOWING ||
-        relativePosition & Node.DOCUMENT_POSITION_CONTAINED_BY
+        relativePosition & DOCUMENT_POSITION_FOLLOWING ||
+        relativePosition & DOCUMENT_POSITION_CONTAINED_BY
       ) {
         return -1;
       } else {
