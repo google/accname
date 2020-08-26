@@ -31,7 +31,7 @@ declare interface Category {
   role?: string;
 }
 
-interface ComparisonResult {
+declare interface ComparisonResult {
   disagrees: boolean;
   accnames: {[implementation: string]: string};
   htmlUsed?: {[key: string]: string};

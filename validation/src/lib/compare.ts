@@ -51,7 +51,9 @@ export async function runHTMLSnippetComparison(
   const comparisonResults = await runComparison(targetNodeRef, page, client);
   await browser.close();
   if (comparisonResults.disagrees) {
-    const casePreview = writeTestcase(comparisonResults);
+    const casePreview = writeTestcase(comparisonResults, {
+      inputSnippet: HTMLSnippet,
+    });
     writeSnippetCase(casePreview);
     return [comparisonResults.accnames, casePreview.caseId];
   }
@@ -110,7 +112,7 @@ export async function runURLComparison(url: string): Promise<number> {
       if (categoryCount[categoryHash]) {
         categoryCount[categoryHash] += 1;
       } else {
-        const casePreview = writeTestcase(comparisonResults);
+        const casePreview = writeTestcase(comparisonResults, {url: url});
         cases.push(casePreview);
         categoryCount[categoryHash] = 1;
       }

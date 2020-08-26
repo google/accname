@@ -1,11 +1,13 @@
 import express from 'express';
 import path from 'path';
 import fs from 'fs';
+import favicon from 'serve-favicon';
 import {runHTMLSnippetComparison, runURLComparison} from './lib/compare';
 
 const app = express();
 // Set static folder as src/static
 app.use('/static', express.static(path.join(__dirname, 'static')));
+app.use(favicon(path.join(__dirname, 'static/favicon.ico')));
 app.use(express.json());
 
 /**
@@ -14,6 +16,10 @@ app.use(express.json());
 
 app.get('/', (_req, res) => {
   res.sendFile(path.join(__dirname, 'static/index.html'));
+});
+
+app.get('/case/:id', (_req, res) => {
+  res.sendFile(path.join(__dirname, 'static/case.html'));
 });
 
 /**

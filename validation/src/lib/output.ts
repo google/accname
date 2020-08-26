@@ -6,13 +6,16 @@ import path from 'path';
  * a CasePreview for that test-case.
  * @param comparisonResult - The ComparisonResult that will become a test-case
  */
-export function writeTestcase(comparisonResult: ComparisonResult): CasePreview {
+export function writeTestcase(
+  comparisonResult: ComparisonResult,
+  context: {[format: string]: string}
+): CasePreview {
   const caseId = fs.readdirSync(path.join(__dirname, '../../output/case/'))
     .length;
 
   fs.writeFileSync(
     path.join(__dirname, `../../output/case/case_${caseId}.json`),
-    JSON.stringify(comparisonResult, null, 2)
+    JSON.stringify({result: comparisonResult, context}, null, 2)
   );
 
   const numAgreementGroups = comparisonResult.category!.agreement.length;
