@@ -53,8 +53,7 @@
   const inputSnippet = res.context.inputSnippet ?? null;
   if (inputSnippet) {
     contextHeading.innerText = 'Input HTML Snippet';
-    const formattedInputHTML = inputSnippet.replace(/</g, '&lt;');
-    inputCode.innerHTML = formattedInputHTML;
+    inputCode.innerHTML = inputSnippet.replace(/</g, '&lt;');;
   }
 
   const targetUrl = res.context.url ?? null;
