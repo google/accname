@@ -22,6 +22,10 @@ app.get('/case/:id', (_req, res) => {
   res.sendFile(path.join(__dirname, 'static/case.html'));
 });
 
+app.get('/summary/:id', (_req, res) => {
+  res.sendFile(path.join(__dirname, 'static/summary.html'));
+});
+
 /**
  * Comparison API endpoints
  */

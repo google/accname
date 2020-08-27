@@ -30,11 +30,17 @@ declare interface Preview {
 declare interface UrlSummary {
   url: string;
   nodesOnPage: number;
-  stats: {
-    category: Category;
-    count: number;
-  }[];
-  cases: CasePreview[];
+  stats: CategoryStat[];
+}
+
+/**
+ * The number of times a category has occured on a given web-page
+ * and the caseId of a test-case representing this category.
+ */
+declare interface CategoryStat {
+  category: Category;
+  count: number;
+  caseId: number;
 }
 
 /**
