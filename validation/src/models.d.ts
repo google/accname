@@ -34,8 +34,8 @@ declare interface UrlSummary {
 }
 
 /**
- * The number of times a category has occured on a given web-page
- * and the caseId of a test-case representing this category.
+ * The number of times a Category has occured on a given web-page
+ * and the caseId of a test-case representing this Category.
  */
 declare interface CategoryStat {
   category: Category;
