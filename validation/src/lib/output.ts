@@ -4,15 +4,19 @@ import path from 'path';
 /**
  * Creates a new test-case from a ComparisonResult and returns
  * a CasePreview for that test-case.
- * @param comparisonResult - The ComparisonResult that will become a test-case
+ * @param comparisonResult - The ComparisonResult that will become a test-case.
+ * @param context - Information relevant to the origin of this testcase (input snippet / target url).
  */
-export function writeTestcase(comparisonResult: ComparisonResult): CasePreview {
+export function writeTestcase(
+  comparisonResult: ComparisonResult,
+  context: {[format: string]: string}
+): CasePreview {
   const caseId = fs.readdirSync(path.join(__dirname, '../../output/case/'))
     .length;
 
   fs.writeFileSync(
     path.join(__dirname, `../../output/case/case_${caseId}.json`),
-    JSON.stringify(comparisonResult, null, 2)
+    JSON.stringify({result: comparisonResult, context}, null, 2)
   );
 
   const numAgreementGroups = comparisonResult.category!.agreement.length;

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>AccName Comparison</title>
+    <!-- External dependencies -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono">
+    <!-- Local dependencies -->
+    <link rel="stylesheet" href="/static/styles/index.css">
+    <link rel="stylesheet" href="/static/styles/case.css">
+    <script src="/static/scripts/util.js"></script>
+    <script src="/static/scripts/case.js"></script>
+    <!-- Prism.js -->
+    <link href="/static/styles/prism.css" rel="stylesheet" />
+    <script src="/static/scripts/lib/prism.js"></script>
+  </head>
+  <body>
+    <div class="content">
+      <heading class="titleContainer">
+        <h1 class="title">Test-case <span id="caseId"></span></h1>
+      </heading>
+      <section class="section">
+        <table id="resultsTable">
+          <colgroup>
+            <col span="1" style="width: 20%;">
+            <col span="1" style="width: 80%;">
+          </colgroup>
+          <tr class="tableHeaderRow">
+            <th>Implementation</th>
+            <th>Accessible Name</th>
+          </tr>
+          <tr>
+            <td>Chrome</td>
+            <td id="chromeAccName"></td>
+          <tr>
+          </tr>
+            <td>Axe</td>
+            <td id="axeAccName"></td>
+          <tr>
+          </tr>
+            <td>AOM</td>
+            <td id="aomAccName"></td>
+          <tr>
+          </tr>
+            <td>BG</td>
+            <td id="bgAccName"></td>
+          <tr>
+          </tr>
+            <td>AccName</td>
+            <td id="ourAccName"></td>
+          </tr>
+        </table>
+        <section class="section">
+          <h2 class="heading">Category</h2>
+          <div id="categoryTextContainer" class="bluetext"></div>
+        </section>
+        <section class="section">
+          <h2 class="heading">HTML Used by Chrome</h2>
+          <pre id="chromeCodePre"><code class="language-markup" id="chromeHTML"></code></pre>
+        </section>
+        <section class="section">
+          <h2 class="heading">HTML Used by AccName</h2>
+          <pre id="accnameCodePre"><code class="language-markup" id="accnameHTML"></code></pre>
+        </section>
+        <section class="section">
+          <h2 id="contextHeading" class="heading">Input HTML snippet</h2>
+          <pre id="inputCodePre"><code class="language-markup" id="inputHTML"></code></pre>
+        </section>
+      </section>
+    </div>
+  </body>
+</html>

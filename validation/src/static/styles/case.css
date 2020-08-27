@@ -1,0 +1,25 @@
+.section {
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+#categoryTextContainer {
+  background: white;
+  border-radius: 5px;
+  padding: 20px;
+}
+
+#chromeCodePre {
+  background: white;
+  border-radius: 5px;
+}
+
+#accnameCodePre {
+  background: white;
+  border-radius: 5px;
+}
+
+#inputCodePre {
+  background: white;
+  border-radius: 5px;
+}
