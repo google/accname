@@ -41,11 +41,9 @@
   }
 
   // Format for prism.js syntax highlighting
-  const formattedChromeHtml = testcase.htmlUsed.chrome.replace(/</g, '&lt;');
-  chromeCode.innerHTML = formattedChromeHtml;
+  chromeCode.innerHTML = testcase.htmlUsed.chrome.replace(/</g, '&lt;');
 
-  const formattedAccnameHtml = testcase.htmlUsed.accname.replace(/</g, '&lt;');
-  accnameCode.innerHTML = formattedAccnameHtml;
+  accnameCode.innerHTML = testcase.htmlUsed.accname.replace(/</g, '&lt;');
 
   const contextHeading = getElem('contextHeading');
   if (!contextHeading) throw new ElemNotFound();
