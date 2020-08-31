@@ -14,13 +14,12 @@
   if (!urlContainer || !numNodesContainer || !categoryTable)
     throw new ElemNotFound();
 
-  urlContainer.innerText = summary.url;
+  urlContainer.innerHTML = `<a href="${summary.url}">${summary.url}</a>`;
   numNodesContainer.innerText = summary.nodesOnPage.toString();
 
-  const stats = summary.stats.sort(compareStats);
+  const stats = summary.stats.sort((a, b) => b.count - a.count);
 
-  for (let i = 0; i < stats.length; ++i) {
-    const stat = stats[i];
+  for (const stat of stats) {
     const categoryString = getFormattedCategoryHTML(stat.category);
 
     // Add a row of generated HTML to the category table.
@@ -28,7 +27,17 @@
       <tr>
         <td>${categoryString}</td>
         <td style="text-align:center;">${stat.count}</td>
-        <td><a href="/case/${stat.caseId}" class="invisibleLink" aria-label="View case ${stat.caseId}"><div class="previewCard" style="margin:0;">Case ${stat.caseId} <span style="margin-left:auto;">🡆</span></div></a></td>
+        <td>
+          <a href="/case/${stat.caseId}" target="_blank" rel="noopener noreferrer" class="invisibleLink" aria-label="View case ${stat.caseId}">
+            <div class="previewCard" style="margin:0;">
+              Case ${stat.caseId}
+              <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" style="margin-left:auto;">
+                <path d="M0 0h24v24H0z" fill="none"/>
+                <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" fill="white"/>
+              </svg>
+            </div>
+          </a>
+        </td>
       </tr>
     `;
   }
@@ -53,17 +62,4 @@ function getFormattedCategoryHTML(category: Category): string {
       '<strong>Rules:</strong> ' + JSON.stringify(category.rules) + '<br/>';
   }
   return categoryString;
-}
-
-/**
- * Compare two category stats in terms of their count properties
- */
-function compareStats(a: CategoryStat, b: CategoryStat): number {
-  if (a.count < b.count) {
-    return 1;
-  }
-  if (a.count > b.count) {
-    return -1;
-  }
-  return 0;
 }
