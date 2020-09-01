@@ -658,10 +658,10 @@ var accname = (function (exports) {
         const accumulatedText = textAlterantives
             .filter(textAlterantive => textAlterantive !== '')
             .join(' ');
-        const result = (cssBeforeContent + accumulatedText + cssAfterContent).trim();
         // #SPEC_ASSUMPTION (F.2) : that CSS generated content should be
         // concatenated to accumulatedText
-        return result === '' ? null : result;
+        const result = (cssBeforeContent + accumulatedText + cssAfterContent).trim();
+        return result || null;
     }
 
     /**
