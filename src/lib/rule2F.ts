@@ -226,7 +226,9 @@ export function rule2F(
     .filter(textAlterantive => textAlterantive !== '')
     .join(' ');
 
+  const result = (cssBeforeContent + accumulatedText + cssAfterContent).trim();
+
   // #SPEC_ASSUMPTION (F.2) : that CSS generated content should be
   // concatenated to accumulatedText
-  return (cssBeforeContent + accumulatedText + cssAfterContent).trim();
+  return result === '' ? null : result;
 }
