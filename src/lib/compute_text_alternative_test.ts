@@ -83,4 +83,26 @@ describe('The computeTextAlternative function', () => {
       rulesApplied: new Set<Rule>(['2B', '2F', '2G']),
     });
   });
+
+  it('check title attribute for name when subtree is empty', () => {
+    render(
+      html` <input type="checkbox" title="Hello world" id="foo" /> `,
+      container
+    );
+    const elem = document.getElementById('foo')!;
+    expect(computeTextAlternative(elem).name).toEqual('Hello world');
+  });
+
+  it('check title attribute for name when subtree is hidden', () => {
+    render(
+      html`
+        <button title="Hello world" id="foo">
+          <div aria-hidden="true">Invisible text</div>
+        </button>
+      `,
+      container
+    );
+    const elem = document.getElementById('foo')!;
+    expect(computeTextAlternative(elem).name).toEqual('Hello world');
+  });
 });

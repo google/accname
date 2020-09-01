@@ -228,5 +228,7 @@ export function rule2F(
 
   // #SPEC_ASSUMPTION (F.2) : that CSS generated content should be
   // concatenated to accumulatedText
-  return (cssBeforeContent + accumulatedText + cssAfterContent).trim();
+  const result = (cssBeforeContent + accumulatedText + cssAfterContent).trim();
+
+  return result || null;
 }
