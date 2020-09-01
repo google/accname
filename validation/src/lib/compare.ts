@@ -8,23 +8,6 @@ import {writeTestcase, writeSnippetCase, writeUrlSummary} from './output';
 
 import axe from 'axe-core';
 
-// Hard coded initialisation function simulating calls from
-// backend Express server.
-(async () => {
-  // Compare on URL
-  /*
-  const USER_INPUT_URL =
-    'https://keep.google.com/u/0/#home';
-  await runURLComparison(USER_INPUT_URL);
-  */
-  // Compare on snippet
-  /*
-  const USER_INPUT_HTML_SNIPPET = `<div accnamecomparisontarget>Hello world</div>`;
-  const result = await runHTMLSnippetComparison(USER_INPUT_HTML_SNIPPET);
-  console.log(result);
-  */
-})();
-
 /**
  * Compares AccName implementations on a HTML snippet containing a target element
  * identified by the presence of an 'accnameComparisonTarget' attribute.
@@ -87,7 +70,7 @@ export async function runURLComparison(url: string): Promise<number> {
   // Associates each category encountered with the number
   // of occurrences of that category
   const categoryCount: {[categoryHash: string]: number} = {};
-  const cases: CasePreview[] = [];
+  const cases: number[] = [];
 
   const allNodes = await page.$$('body *');
   for (let i = 0; i < allNodes.length; i++) {
@@ -113,7 +96,7 @@ export async function runURLComparison(url: string): Promise<number> {
         categoryCount[categoryHash] += 1;
       } else {
         const casePreview = writeTestcase(comparisonResults, {url: url});
-        cases.push(casePreview);
+        cases.push(casePreview.caseId);
         categoryCount[categoryHash] = 1;
       }
     }
@@ -125,16 +108,16 @@ export async function runURLComparison(url: string): Promise<number> {
   }
 
   // All categories encountered duirng comparison and their associated counts.
-  const categoryStats = Object.entries(categoryCount).map(entry => ({
+  const categoryStats = Object.entries(categoryCount).map((entry, i) => ({
     category: JSON.parse(entry[0]) as Category,
     count: entry[1],
+    caseId: cases[i],
   }));
 
   const pageSummary: UrlSummary = {
     url: url,
     nodesOnPage: allNodes.length,
     stats: categoryStats,
-    cases: cases,
   };
   const pageSummaryId = writeUrlSummary(pageSummary);
 
