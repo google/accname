@@ -14,7 +14,7 @@
   if (!urlContainer || !numNodesContainer || !categoryTable)
     throw new ElemNotFound();
 
-  urlContainer.innerHTML = `<a href="${summary.url}">${summary.url}</a>`;
+  urlContainer.innerHTML = `<a href="${summary.url}" target="_blank">${summary.url}</a>`;
   numNodesContainer.innerText = summary.nodesOnPage.toString();
 
   const stats = summary.stats.sort((a, b) => b.count - a.count);
