@@ -172,13 +172,11 @@ function rule2FCondition(elem: HTMLElement, context: Context): boolean {
 function getCssContent(elem: HTMLElement, pseudoElementName: string): string {
   const cssContent: string = window.getComputedStyle(elem, pseudoElementName)
     .content;
-  if (cssContent === 'none') {
-    return '';
-  } else {
-    // slicing off unnecessary double quotes (")
-    // from either end of the string.
+  // <string> CSS content identified by surrounding double-quotes
+  if (cssContent[0] === '"' && cssContent[cssContent.length - 1] === '"') {
     return cssContent.slice(1, -1);
   }
+  return '';
 }
 
 /**

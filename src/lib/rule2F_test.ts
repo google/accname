@@ -74,6 +74,26 @@ describe('The function for rule 2F', () => {
     expect(rule2F(elem!, context)).toBe('Helloworld!');
   });
 
+  it("doesn't include non-textual CSS content", () => {
+    render(
+      html`
+        <style>
+          #foo:before {
+            url("a/url/to/some/image");
+          }
+        </style>
+        <div id="foo">
+          Hello world
+        </div>
+      `,
+      container
+    );
+    const elem = document.getElementById('foo');
+    const context = getDefaultContext();
+    context.directLabelReference = true;
+    expect(rule2F(elem!, context)).toBe('Hello world');
+  });
+
   it("doesn't visit the same node twice during a recursive traversal", () => {
     render(
       html`
