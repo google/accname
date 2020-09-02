@@ -190,7 +190,7 @@ var accname = (function (exports) {
         // chosen option is the input value.
         if (node instanceof HTMLInputElement &&
             TEXT_INPUT_TYPES.includes(node.type) &&
-            node.hasAttribute('list')) {
+            (node.hasAttribute('list') || nodeRole === 'combobox')) {
             return node.value;
         }
         // Text alternative for elems of role 'listbox' and 'combobox'

@@ -53,6 +53,17 @@ describe('The function for rule 2E', () => {
     expect(rule2E(elem!, context)).toBe('hello');
   });
 
+  it('returns text content for inputs explicitly defined as comboboxes', () => {
+    render(
+      html`<input id="foo" type="text" role="combobox" value="hello" />`,
+      container
+    );
+    const elem = document.getElementById('foo');
+    const context = getDefaultContext();
+    context.inherited.partOfName = true;
+    expect(rule2E(elem!, context)).toBe('hello');
+  });
+
   it('returns text alternative of selected option in select element', () => {
     render(
       html`

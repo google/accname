@@ -63,7 +63,7 @@ function getValueIfComboboxOrListbox(
   if (
     node instanceof HTMLInputElement &&
     TEXT_INPUT_TYPES.includes(node.type) &&
-    node.hasAttribute('list')
+    (node.hasAttribute('list') || nodeRole === 'combobox')
   ) {
     return node.value;
   }
