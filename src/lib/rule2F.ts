@@ -204,11 +204,21 @@ export function rule2F(
     return null;
   }
 
-  const cssBeforeContent = getCssContent(node, ':before');
-  const cssAfterContent = getCssContent(node, ':after');
+  const a11yChildNodes = Array.from(node.childNodes);
+
+  // Include any aria-owned Nodes in the list of 'child nodes'
+  const ariaOwnedNodeIds = node.getAttribute('aria-owns');
+  if (ariaOwnedNodeIds) {
+    for (const idref of ariaOwnedNodeIds.split(' ')) {
+      const referencedNode = document.getElementById(idref);
+      if (referencedNode) {
+        a11yChildNodes.push(referencedNode);
+      }
+    }
+  }
 
   const textAlterantives: string[] = [];
-  for (const childNode of node.childNodes) {
+  for (const childNode of a11yChildNodes) {
     if (!context.inherited.visitedNodes.includes(childNode)) {
       context.inherited.visitedNodes.push(childNode);
       context.inherited.partOfName = true;
@@ -228,6 +238,9 @@ export function rule2F(
   const accumulatedText = textAlterantives
     .filter(textAlterantive => textAlterantive !== '')
     .join(' ');
+
+  const cssBeforeContent = getCssContent(node, ':before');
+  const cssAfterContent = getCssContent(node, ':after');
 
   // #SPEC_ASSUMPTION (F.2) : that CSS generated content should be
   // concatenated to accumulatedText

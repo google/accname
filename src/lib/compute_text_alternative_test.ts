@@ -105,4 +105,56 @@ describe('The computeTextAlternative function', () => {
     const elem = document.getElementById('foo')!;
     expect(computeTextAlternative(elem).name).toEqual('Hello world');
   });
+
+  // http://wpt.live/accname/name_file-label-owned-combobox-manual.html
+  it('includes aria-owned nodes in the subtree of the current node', () => {
+    render(
+      html`
+        <input type="file" id="test" />
+        <label for="test">
+          Flash <span aria-owns="id1">the screen</span> times.
+        </label>
+        <div id="id1">
+          <div role="combobox">
+            <div role="textbox"></div>
+            <ul role="listbox" style="list-style-type: none;">
+              <li role="option" aria-selected="true">1</li>
+              <li role="option">2</li>
+              <li role="option">3</li>
+            </ul>
+          </div>
+        </div>
+      `,
+      container
+    );
+    const elem = document.getElementById('test')!;
+    expect(computeTextAlternative(elem).name).toBe('Flash the screen 1 times.');
+  });
+
+  // http://wpt.live/accname/name_file-label-owned-combobox-owned-listbox-manual.html
+  it('allows aria-owned nodes to be chained together across multiple nodes', () => {
+    render(
+      html`
+        <input type="file" id="test" />
+        <label for="test">
+          Flash <span aria-owns="id1">the screen</span> times.
+        </label>
+        <div>
+          <div id="id1" role="combobox" aria-owns="id2">
+            <div role="textbox"></div>
+          </div>
+        </div>
+        <div>
+          <ul id="id2" role="listbox" style="list-style-type: none;">
+            <li role="option">1</li>
+            <li role="option" aria-selected="true">2</li>
+            <li role="option">3</li>
+          </ul>
+        </div>
+      `,
+      container
+    );
+    const elem = document.getElementById('test')!;
+    expect(computeTextAlternative(elem).name).toBe('Flash the screen 2 times.');
+  });
 });
