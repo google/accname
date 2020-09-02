@@ -1,5 +1,3 @@
-import {closest} from './polyfill';
-
 // Input types for whom placeholders should be considered when computing
 // a text alternative. See https://www.w3.org/TR/html-aam-1.0/#input-type-text-input-type-password-input-type-search-input-type-tel-input-type-email-input-type-url-and-textarea-element-accessible-name-computation
 const TEXTUAL_INPUT_TYPES = [
@@ -21,11 +19,8 @@ export function rule2I(node: Node): string | null {
     return null;
   }
 
-  // Title value inherited from closest ancestor (or node itself, if title is present).
-  // See https://html.spec.whatwg.org/multipage/dom.html#the-title-attribute
-  const titleElem = closest(node, '[title]') as HTMLElement;
-  if (titleElem) {
-    return titleElem.title;
+  if (node.title) {
+    return node.title;
   }
 
   // Placeholder considered if no title is present.
