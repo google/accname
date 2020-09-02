@@ -614,8 +614,11 @@ var accname = (function (exports) {
     function getCssContent(elem, pseudoElementName) {
         const cssContent = window.getComputedStyle(elem, pseudoElementName)
             .content;
-        // <string> CSS content identified by surrounding double-quotes
-        if (cssContent[0] === '"' && cssContent[cssContent.length - 1] === '"') {
+        // <string> CSS content identified by surrounding quotes
+        // see: https://developer.mozilla.org/en-US/docs/Web/CSS/content
+        // and: https://developer.mozilla.org/en-US/docs/Web/CSS/string
+        if ((cssContent[0] === '"' && cssContent[cssContent.length - 1] === '"') ||
+            (cssContent[0] === "'" && cssContent[cssContent.length - 1] === "'")) {
             return cssContent.slice(1, -1);
         }
         return '';
