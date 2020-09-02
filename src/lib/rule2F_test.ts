@@ -79,7 +79,7 @@ describe('The function for rule 2F', () => {
       html`
         <style>
           #foo:before {
-            url("a/url/to/some/image");
+            content: url('a/url/to/some/image');
           }
         </style>
         <div id="foo">
