@@ -643,7 +643,7 @@ var accname = (function (exports) {
         const ariaOwnedNodeIds = node.getAttribute('aria-owns');
         if (ariaOwnedNodeIds) {
             for (const idref of ariaOwnedNodeIds.split(' ')) {
-                const referencedNode = document.querySelector(`[id='${idref}']`);
+                const referencedNode = document.getElementById(idref);
                 if (referencedNode) {
                     a11yChildNodes.push(referencedNode);
                 }

@@ -107,13 +107,13 @@ describe('The computeTextAlternative function', () => {
   });
 
   // http://wpt.live/accname/name_file-label-owned-combobox-manual.html
-  it("doesn't visit the same node twice during a recursive traversal", () => {
+  it('includes aria-owned nodes in the subtree of the current node', () => {
     render(
       html`
         <input type="file" id="test" />
-        <label for="test"
-          >Flash <span aria-owns="id1">the screen</span> times.</label
-        >
+        <label for="test">
+          Flash <span aria-owns="id1">the screen</span> times.
+        </label>
         <div id="id1">
           <div role="combobox">
             <div role="textbox"></div>
@@ -132,13 +132,13 @@ describe('The computeTextAlternative function', () => {
   });
 
   // http://wpt.live/accname/name_file-label-owned-combobox-owned-listbox-manual.html
-  it("doesn't visit the same node twice during a recursive traversal", () => {
+  it('allows aria-owned nodes to be chained together across multiple nodes', () => {
     render(
       html`
         <input type="file" id="test" />
-        <label for="test"
-          >Flash <span aria-owns="id1">the screen</span> times.</label
-        >
+        <label for="test">
+          Flash <span aria-owns="id1">the screen</span> times.
+        </label>
         <div>
           <div id="id1" role="combobox" aria-owns="id2">
             <div role="textbox"></div>
