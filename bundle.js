@@ -614,14 +614,14 @@ var accname = (function (exports) {
     function getCssContent(elem, pseudoElementName) {
         const cssContent = window.getComputedStyle(elem, pseudoElementName)
             .content;
-        if (cssContent === 'none') {
-            return '';
-        }
-        else {
-            // slicing off unnecessary double quotes (")
-            // from either end of the string.
+        // <string> CSS content identified by surrounding quotes
+        // see: https://developer.mozilla.org/en-US/docs/Web/CSS/content
+        // and: https://developer.mozilla.org/en-US/docs/Web/CSS/string
+        if ((cssContent[0] === '"' && cssContent[cssContent.length - 1] === '"') ||
+            (cssContent[0] === "'" && cssContent[cssContent.length - 1] === "'")) {
             return cssContent.slice(1, -1);
         }
+        return '';
     }
     /**
      * Implementation of rule 2F
