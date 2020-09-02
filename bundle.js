@@ -700,11 +700,8 @@ var accname = (function (exports) {
         if (!(node instanceof HTMLElement)) {
             return null;
         }
-        // Title value inherited from closest ancestor (or node itself, if title is present).
-        // See https://html.spec.whatwg.org/multipage/dom.html#the-title-attribute
-        const titleElem = closest(node, '[title]');
-        if (titleElem) {
-            return titleElem.title;
+        if (node.title) {
+            return node.title;
         }
         // Placeholder considered if no title is present.
         // See https://www.w3.org/TR/html-aam-1.0/#input-type-text-input-type-password-input-type-search-input-type-tel-input-type-email-input-type-url-and-textarea-element-accessible-name-computation

@@ -22,18 +22,6 @@ describe('The function for rule 2I', () => {
     expect(rule2I(document.getElementById('foo')!)).toBe(null);
   });
 
-  it('returns closest ancestor title attribute value', () => {
-    render(
-      html`
-        <div title="Hello world">
-          <div id="foo"></div>
-        </div>
-      `,
-      container
-    );
-    expect(rule2I(document.getElementById('foo')!)).toBe('Hello world');
-  });
-
   it('returns placeholder for textual inputs if title not present', () => {
     render(
       html` <input id="foo" type="text" placeholder="Hello world" /> `,
