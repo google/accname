@@ -489,7 +489,7 @@ var accname = (function (exports) {
      * to their implicit aria roles.
      * (https://www.w3.org/TR/html-aria/#docconformance)
      */
-    const NAME_FROM_CONTENT_ELEM_NODE_NAME = [
+    const NAME_FROM_CONTENT_TAGS = [
         'h1',
         'h2',
         'h3',
@@ -575,12 +575,96 @@ var accname = (function (exports) {
             return true;
         }
         const elemNodeName = elem.nodeName.toLowerCase();
-        if (NAME_FROM_CONTENT_ELEM_NODE_NAME.includes(elemNodeName)) {
+        if (NAME_FROM_CONTENT_TAGS.includes(elemNodeName)) {
             return true;
         }
         const nameFromContentFunction = getFunctionCalculatingAllowsNameFromContent(elemNodeName);
         if (nameFromContentFunction) {
             return nameFromContentFunction(elem);
+        }
+        return false;
+    }
+    // See https://lists.w3.org/Archives/Public/public-aria/2017Jun/0057.html
+    // for discussion of roles & tags that forbid name from content.
+    const NO_NAME_FROM_CONTENT_ROLES = [
+        'application',
+        'alert',
+        'log',
+        'marquee',
+        'timer',
+        'alertdialog',
+        'dialog',
+        'banner',
+        'complementary',
+        'form',
+        'main',
+        'navigation',
+        'region',
+        'search',
+        'article',
+        'document',
+        'feed',
+        'figure',
+        'img',
+        'math',
+        'toolbar',
+        'menu',
+        'menubar',
+        'grid',
+        'listbox',
+        'radiogroup',
+        'textbox',
+        'searchbox',
+        'spinbutton',
+        'scrollbar',
+        'slider',
+        'tablist',
+        'tabpanel',
+        'tree',
+        'treegrid',
+        'separator',
+        'rowgroup',
+        'group',
+    ];
+    const NO_NAME_FROM_CONTENT_TAGS = [
+        'article',
+        'aside',
+        'body',
+        'select',
+        'datalist',
+        'optgroup',
+        'dialog',
+        'figure',
+        'footer',
+        'form',
+        'header',
+        'hr',
+        'img',
+        'textarea',
+        'input',
+        'main',
+        'math',
+        'menu',
+        'nav',
+        'section',
+        'thead',
+        'tbody',
+        'tfoot',
+        'fieldset',
+    ];
+    /**
+     * Checks if 'elem' is forbidden from allowing 'name from content'
+     * @param elem - element whose text alternative is being computed
+     */
+    function forbidsNameFromContent(elem) {
+        var _a, _b;
+        const explicitRole = (_b = (_a = elem.getAttribute('role')) === null || _a === void 0 ? void 0 : _a.trim().toLowerCase()) !== null && _b !== void 0 ? _b : '';
+        if (NO_NAME_FROM_CONTENT_ROLES.includes(explicitRole)) {
+            return true;
+        }
+        const elemNodeName = elem.nodeName.toLowerCase();
+        if (NO_NAME_FROM_CONTENT_TAGS.includes(elemNodeName)) {
+            return true;
         }
         return false;
     }
@@ -592,6 +676,9 @@ var accname = (function (exports) {
      * @return - whether or not rule 2Fs condition has been satisfied
      */
     function rule2FCondition(elem, context) {
+        if (forbidsNameFromContent(elem)) {
+            return false;
+        }
         if (allowsNameFromContent(elem)) {
             return true;
         }
