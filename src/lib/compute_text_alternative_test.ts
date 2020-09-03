@@ -158,7 +158,7 @@ describe('The computeTextAlternative function', () => {
     expect(computeTextAlternative(elem).name).toBe('Flash the screen 2 times.');
   });
 
-  // http://wpt.live/accname/name_file-label-owned-combobox-owned-listbox-manual.html
+  // http://wpt.live/accname/name_checkbox-label-embedded-menu-manual.html
   it('allows aria-owned nodes to be chained together across multiple nodes', () => {
     render(
       html`
