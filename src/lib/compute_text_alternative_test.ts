@@ -159,7 +159,7 @@ describe('The computeTextAlternative function', () => {
   });
 
   // http://wpt.live/accname/name_checkbox-label-embedded-menu-manual.html
-  it('allows aria-owned nodes to be chained together across multiple nodes', () => {
+  it('ignores elements who should never allow name from content, in this case role="menuitem"', () => {
     render(
       html`
         <input type="checkbox" id="test" />

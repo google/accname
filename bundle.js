@@ -460,61 +460,144 @@ var accname = (function (exports) {
         return textAlternative || null;
     }
 
-    // Explicit roles allowing 'name from content'
-    // (https://www.w3.org/TR/wai-aria-1.1/#namefromcontent)
-    const NAME_FROM_CONTENT_ROLES = [
-        'button',
-        'cell',
-        'checkbox',
-        'columnheader',
-        'gridcell',
-        'heading',
-        'link',
-        'menuitem',
-        'menuitemcheckbox',
-        'menuitemradio',
-        'option',
-        'radio',
-        'row',
-        'rowgroup',
-        'rowheader',
-        'switch',
-        'tab',
-        'tooltip',
-        'tree',
-        'treeitem',
-    ];
-    /**
-     * HTML element types that allow name from content according
-     * to their implicit aria roles.
-     * (https://www.w3.org/TR/html-aria/#docconformance)
-     */
-    const NAME_FROM_CONTENT_TAGS = [
-        'h1',
-        'h2',
-        'h3',
-        'h4',
-        'h5',
-        'h6',
-        'tbody',
-        'thead',
-        'tfoot',
-        'summary',
-        'button',
-    ];
-    /**
-     * HTML input elements allow name from content when
-     * they have the following values for 'type' attribute
-     * (https://www.w3.org/TR/html-aria/#docconformance)
-     */
-    const NAME_FROM_CONTENT_INPUT_TYPES = [
-        'button',
-        'checkbox',
-        'image',
-        'radio',
-        'reset',
-        'submit',
-    ];
+    const ALWAYS_NAME_FROM_CONTENT = {
+        // Explicit roles allowing 'name from content'
+        // (https://www.w3.org/TR/wai-aria-1.1/#namefromcontent)
+        roles: [
+            'button',
+            'cell',
+            'checkbox',
+            'columnheader',
+            'gridcell',
+            'heading',
+            'link',
+            'menuitem',
+            'menuitemcheckbox',
+            'menuitemradio',
+            'option',
+            'radio',
+            'row',
+            'rowgroup',
+            'rowheader',
+            'switch',
+            'tab',
+            'tooltip',
+            'tree',
+            'treeitem',
+        ],
+        // HTML element types that allow name from content according
+        // to their implicit aria roles.
+        // (https://www.w3.org/TR/html-aria/#docconformance)
+        tags: [
+            'button',
+            'h1',
+            'h2',
+            'h3',
+            'h4',
+            'h5',
+            'h6',
+            'summary',
+            'tbody',
+            'tfoot',
+            'thead',
+        ],
+    };
+    // See https://lists.w3.org/Archives/Public/public-aria/2017Jun/0057.html
+    // for discussion of roles & tags that forbid name from content.
+    //
+    // *This case is not explicitly included in version 1.1 of the spec, however,
+    // as per the thread linked above we have included it (as have other implementations).
+    const NEVER_NAME_FROM_CONTENT = {
+        roles: [
+            'alert',
+            'alertdialog',
+            'application',
+            'article',
+            'banner',
+            'complementary',
+            'contentinfo',
+            'definition',
+            'dialog',
+            'directory',
+            'document',
+            'feed',
+            'figure',
+            'form',
+            'grid',
+            'group',
+            'img',
+            'list',
+            'listbox',
+            'log',
+            'main',
+            'marquee',
+            'math',
+            'menu',
+            'menubar',
+            'navigation',
+            'note',
+            'radiogroup',
+            'region',
+            'row',
+            'rowgroup',
+            'scrollbar',
+            'search',
+            'searchbox',
+            'separator',
+            'slider',
+            'spinbutton',
+            'status',
+            'table',
+            'tablist',
+            'tabpanel',
+            'term',
+            'textbox',
+            'timer',
+            'toolbar',
+            'tree',
+            'treegrid',
+        ],
+        tags: [
+            'article',
+            'aside',
+            'body',
+            'datalist',
+            'dialog',
+            'fieldset',
+            'figure',
+            'footer',
+            'form',
+            'header',
+            'hr',
+            'img',
+            'input',
+            'main',
+            'math',
+            'menu',
+            'nav',
+            'optgroup',
+            'section',
+            'select',
+            'tbody',
+            'textarea',
+            'tfoot',
+            'thead',
+        ],
+    };
+    // List 3 from https://lists.w3.org/Archives/Public/public-aria/2017Jun/0057.html
+    const SOMETIMES_NAME_FROM_CONTENT = {
+        roles: [
+            'contentinfo',
+            'definition',
+            'directory',
+            'list',
+            'note',
+            'status',
+            'table',
+            'term',
+        ],
+        tags: ['dd', 'details', 'dl', 'ol', 'output', 'table', 'ul'],
+    };
     /**
      * Some HTML elements allow name from context only if certain
      * conditions apply. This function maps element types to functions that
@@ -539,12 +622,6 @@ var accname = (function (exports) {
                 return (elem) => {
                     return closest(elem, 'select,datalist') !== null;
                 };
-            case 'input':
-                return (elem) => {
-                    var _a, _b;
-                    const inputType = (_b = (_a = elem.getAttribute('type')) === null || _a === void 0 ? void 0 : _a.trim().toLowerCase()) !== null && _b !== void 0 ? _b : '';
-                    return NAME_FROM_CONTENT_INPUT_TYPES.includes(inputType);
-                };
             case 'a':
                 return (elem) => {
                     return elem.hasAttribute('href');
@@ -562,113 +639,20 @@ var accname = (function (exports) {
         }
     }
     /**
-     * Calculates whether or not an element's name may be calculated using
-     * its contents. Elements may allow name from content when they have certain
-     * roles, be they explicit (role attribute) or implicit (semantic HTML).
-     * @param elem - the function checks if 'elem' allows name from content
-     * @return - true if elem allows name from content, false otherwise
+     * Checks if a given HTMLElement matches any of the roles in a given RoleType.
+     * @param elem - element whose role type is in question.
+     * @param roleType - lists of indicators for some role type.
      */
-    function roleAllowsNameFromContent(elem) {
+    function matchesRole(elem, roleType) {
         var _a, _b;
+        // Explicit roles : specified using 'role' attribute
         const explicitRole = (_b = (_a = elem.getAttribute('role')) === null || _a === void 0 ? void 0 : _a.trim().toLowerCase()) !== null && _b !== void 0 ? _b : '';
-        if (NAME_FROM_CONTENT_ROLES.includes(explicitRole)) {
-            return true;
-        }
-        const elemNodeName = elem.nodeName.toLowerCase();
-        if (NAME_FROM_CONTENT_TAGS.includes(elemNodeName)) {
-            return true;
-        }
-        const nameFromContentFunction = getFunctionCalculatingAllowsNameFromContent(elemNodeName);
-        if (nameFromContentFunction) {
-            return nameFromContentFunction(elem);
-        }
-        return false;
-    }
-    // See https://lists.w3.org/Archives/Public/public-aria/2017Jun/0057.html
-    // for discussion of roles & tags that forbid name from content.
-    //
-    // *This case is not explicitly included in version 1.1 of the spec, however,
-    // as per the thread linked above we have included it (as have other implementations).
-    const NEVER_NAME_FROM_CONTENT_ROLES = [
-        'application',
-        'alert',
-        'log',
-        'marquee',
-        'timer',
-        'alertdialog',
-        'dialog',
-        'banner',
-        'complementary',
-        'form',
-        'main',
-        'navigation',
-        'region',
-        'search',
-        'article',
-        'document',
-        'feed',
-        'figure',
-        'img',
-        'math',
-        'toolbar',
-        'menu',
-        'menubar',
-        'grid',
-        'listbox',
-        'radiogroup',
-        'textbox',
-        'searchbox',
-        'spinbutton',
-        'scrollbar',
-        'slider',
-        'tablist',
-        'tabpanel',
-        'tree',
-        'treegrid',
-        'separator',
-        'rowgroup',
-        'group',
-    ];
-    // These tag names imply roles that forbid name from content.
-    const NEVER_NAME_FROM_CONTENT_TAGS = [
-        'article',
-        'aside',
-        'body',
-        'select',
-        'datalist',
-        'optgroup',
-        'dialog',
-        'figure',
-        'footer',
-        'form',
-        'header',
-        'hr',
-        'img',
-        'textarea',
-        'input',
-        'main',
-        'math',
-        'menu',
-        'nav',
-        'section',
-        'thead',
-        'tbody',
-        'tfoot',
-        'fieldset',
-    ];
-    /**
-     * Checks if 'elem' is forbidden from allowing 'name from content'
-     * @param elem - element whose text alternative is being computed
-     */
-    function roleForbidsNameFromContent(elem) {
-        var _a, _b;
-        const explicitRole = (_b = (_a = elem.getAttribute('role')) === null || _a === void 0 ? void 0 : _a.trim().toLowerCase()) !== null && _b !== void 0 ? _b : '';
-        if (NEVER_NAME_FROM_CONTENT_ROLES.includes(explicitRole)) {
+        if (roleType.roles.includes(explicitRole)) {
             return true;
         }
         // Implicit roles : implied by current node tag name.
         const elemNodeName = elem.nodeName.toLowerCase();
-        if (NEVER_NAME_FROM_CONTENT_TAGS.includes(elemNodeName)) {
+        if (roleType.tags.includes(elemNodeName)) {
             return true;
         }
         return false;
@@ -682,10 +666,33 @@ var accname = (function (exports) {
      * @return - whether or not rule 2Fs condition has been satisfied
      */
     function allowsNameFromContent(elem, context) {
-        if (roleForbidsNameFromContent(elem)) {
+        // focasable elements should allow name from content.
+        if (elem.hasAttribute('tabindex')) {
+            return true;
+        }
+        // The terms 'list 1', 'list 2', 'list 3' are used in reference
+        // to the following thread: see: https://lists.w3.org/Archives/Public/public-aria/2017Jun/0057.html
+        // Handles list 3 roles
+        if (context.inherited.partOfName && elem.parentElement) {
+            const parent = elem.parentElement;
+            if (matchesRole(parent, ALWAYS_NAME_FROM_CONTENT) &&
+                matchesRole(elem, SOMETIMES_NAME_FROM_CONTENT)) {
+                return true;
+            }
+        }
+        // Handles list 2 roles
+        if (matchesRole(elem, NEVER_NAME_FROM_CONTENT)) {
             return false;
         }
-        if (roleAllowsNameFromContent(elem)) {
+        // Handles list 1 roles
+        if (matchesRole(elem, ALWAYS_NAME_FROM_CONTENT)) {
+            return true;
+        }
+        // Elements that conditionally have an implicit role that matches
+        // ALWAYS_NAME_FROM_CONTENT
+        const elemNodeName = elem.nodeName.toLowerCase();
+        const nameFromContentFunction = getFunctionCalculatingAllowsNameFromContent(elemNodeName);
+        if (nameFromContentFunction && nameFromContentFunction(elem)) {
             return true;
         }
         if (context.directLabelReference) {
