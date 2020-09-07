@@ -1,9 +1,9 @@
 import {html, render} from 'lit-html';
 import {TEST_ONLY} from './rule2F';
 
-const {allowsNameFromContent} = TEST_ONLY;
+const {roleAllowsNameFromContent} = TEST_ONLY;
 
-describe('The function allowsNameFromContent', () => {
+describe('The function roleAllowsNameFromContent', () => {
   let container: HTMLElement;
   beforeEach(() => {
     container = document.createElement('div');
@@ -24,7 +24,7 @@ describe('The function allowsNameFromContent', () => {
       container
     );
     const elem = document.getElementById('foo');
-    expect(allowsNameFromContent(elem!)).toBe(true);
+    expect(roleAllowsNameFromContent(elem!)).toBe(true);
   });
 
   it('returns false for roles that do not allow name from content', () => {
@@ -37,7 +37,7 @@ describe('The function allowsNameFromContent', () => {
       container
     );
     const elem = document.getElementById('foo');
-    expect(allowsNameFromContent(elem!)).toBe(false);
+    expect(roleAllowsNameFromContent(elem!)).toBe(false);
   });
 
   it('returns true for semantic html elements that imply a role that allows name from content', () => {
@@ -50,7 +50,7 @@ describe('The function allowsNameFromContent', () => {
       container
     );
     const elem = document.getElementById('foo');
-    expect(allowsNameFromContent(elem!)).toBe(true);
+    expect(roleAllowsNameFromContent(elem!)).toBe(true);
   });
 
   it('returns true for td elements if they are within a table', () => {
@@ -63,7 +63,7 @@ describe('The function allowsNameFromContent', () => {
       container
     );
     const elem = document.getElementById('foo');
-    expect(allowsNameFromContent(elem!)).toBe(true);
+    expect(roleAllowsNameFromContent(elem!)).toBe(true);
   });
 
   it('returns true for th elements if they are within a table', () => {
@@ -76,13 +76,13 @@ describe('The function allowsNameFromContent', () => {
       container
     );
     const elem = document.getElementById('foo');
-    expect(allowsNameFromContent(elem!)).toBe(true);
+    expect(roleAllowsNameFromContent(elem!)).toBe(true);
   });
 
   it('returns false for option elements if they are not within a datalist or select', () => {
     render(html` <option id="foo"></option> `, container);
     const elem = document.getElementById('foo');
-    expect(allowsNameFromContent(elem!)).toBe(false);
+    expect(roleAllowsNameFromContent(elem!)).toBe(false);
   });
 
   it('returns true for option elements if they are within a select', () => {
@@ -95,7 +95,7 @@ describe('The function allowsNameFromContent', () => {
       container
     );
     const elem = document.getElementById('foo');
-    expect(allowsNameFromContent(elem!)).toBe(true);
+    expect(roleAllowsNameFromContent(elem!)).toBe(true);
   });
 
   it('returns true for option elements if they are within a datalist', () => {
@@ -108,60 +108,60 @@ describe('The function allowsNameFromContent', () => {
       container
     );
     const elem = document.getElementById('foo');
-    expect(allowsNameFromContent(elem!)).toBe(true);
+    expect(roleAllowsNameFromContent(elem!)).toBe(true);
   });
 
   it('returns true for inputs with a type that allows name from content', () => {
     render(html` <input id="foo" type="button" /> `, container);
     const elem = document.getElementById('foo');
-    expect(allowsNameFromContent(elem!)).toBe(true);
+    expect(roleAllowsNameFromContent(elem!)).toBe(true);
   });
 
   it('returns false for inputs whose type does not allow name from content', () => {
     render(html` <input id="foo" type="color" /> `, container);
     const elem = document.getElementById('foo');
-    expect(allowsNameFromContent(elem!)).toBe(false);
+    expect(roleAllowsNameFromContent(elem!)).toBe(false);
   });
 
   it('returns true for links if they have a href attribute', () => {
     render(html` <a id="foo" href="#"></a> `, container);
     const elem = document.getElementById('foo');
-    expect(allowsNameFromContent(elem!)).toBe(true);
+    expect(roleAllowsNameFromContent(elem!)).toBe(true);
   });
 
   it('returns false for links if they do not have a href attribute', () => {
     render(html` <a id="foo"></a> `, container);
     const elem = document.getElementById('foo');
-    expect(allowsNameFromContent(elem!)).toBe(false);
+    expect(roleAllowsNameFromContent(elem!)).toBe(false);
   });
 
   it('returns true for area elements if they have a href attribute', () => {
     render(html` <area id="foo" href="#"></area> `, container);
     const elem = document.getElementById('foo');
-    expect(allowsNameFromContent(elem!)).toBe(true);
+    expect(roleAllowsNameFromContent(elem!)).toBe(true);
   });
 
   it('returns false for area elements if they do not have a href attribute', () => {
     render(html` <area id="foo"></area> `, container);
     const elem = document.getElementById('foo');
-    expect(allowsNameFromContent(elem!)).toBe(false);
+    expect(roleAllowsNameFromContent(elem!)).toBe(false);
   });
 
   it('returns true for link elements if they have a href attribute', () => {
     render(html` <link id="foo" href="#"></link> `, container);
     const elem = document.getElementById('foo');
-    expect(allowsNameFromContent(elem!)).toBe(true);
+    expect(roleAllowsNameFromContent(elem!)).toBe(true);
   });
 
   it('returns false for link elements if they do not have a href attribute', () => {
     render(html` <link id="foo"></link> `, container);
     const elem = document.getElementById('foo');
-    expect(allowsNameFromContent(elem!)).toBe(false);
+    expect(roleAllowsNameFromContent(elem!)).toBe(false);
   });
 
   it('returns false for input elements if they do not have a type attribute', () => {
     render(html` <input id="foo"></link> `, container);
     const elem = document.getElementById('foo');
-    expect(allowsNameFromContent(elem!)).toBe(false);
+    expect(roleAllowsNameFromContent(elem!)).toBe(false);
   });
 });

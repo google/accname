@@ -568,7 +568,7 @@ var accname = (function (exports) {
      * @param elem - the function checks if 'elem' allows name from content
      * @return - true if elem allows name from content, false otherwise
      */
-    function allowsNameFromContent(elem) {
+    function roleAllowsNameFromContent(elem) {
         var _a, _b;
         const explicitRole = (_b = (_a = elem.getAttribute('role')) === null || _a === void 0 ? void 0 : _a.trim().toLowerCase()) !== null && _b !== void 0 ? _b : '';
         if (NAME_FROM_CONTENT_ROLES.includes(explicitRole)) {
@@ -586,7 +586,10 @@ var accname = (function (exports) {
     }
     // See https://lists.w3.org/Archives/Public/public-aria/2017Jun/0057.html
     // for discussion of roles & tags that forbid name from content.
-    const NO_NAME_FROM_CONTENT_ROLES = [
+    //
+    // *This case is not explicitly included in version 1.1 of the spec, however,
+    // as per the thread linked above we have included it (as have other implementations).
+    const NEVER_NAME_FROM_CONTENT_ROLES = [
         'application',
         'alert',
         'log',
@@ -626,7 +629,8 @@ var accname = (function (exports) {
         'rowgroup',
         'group',
     ];
-    const NO_NAME_FROM_CONTENT_TAGS = [
+    // These tag names imply roles that forbid name from content.
+    const NEVER_NAME_FROM_CONTENT_TAGS = [
         'article',
         'aside',
         'body',
@@ -656,30 +660,32 @@ var accname = (function (exports) {
      * Checks if 'elem' is forbidden from allowing 'name from content'
      * @param elem - element whose text alternative is being computed
      */
-    function forbidsNameFromContent(elem) {
+    function roleForbidsNameFromContent(elem) {
         var _a, _b;
         const explicitRole = (_b = (_a = elem.getAttribute('role')) === null || _a === void 0 ? void 0 : _a.trim().toLowerCase()) !== null && _b !== void 0 ? _b : '';
-        if (NO_NAME_FROM_CONTENT_ROLES.includes(explicitRole)) {
+        if (NEVER_NAME_FROM_CONTENT_ROLES.includes(explicitRole)) {
             return true;
         }
+        // Implicit roles : implied by current node tag name.
         const elemNodeName = elem.nodeName.toLowerCase();
-        if (NO_NAME_FROM_CONTENT_TAGS.includes(elemNodeName)) {
+        if (NEVER_NAME_FROM_CONTENT_TAGS.includes(elemNodeName)) {
             return true;
         }
         return false;
     }
     /**
-     * Checks if 'elem' in with 'context' satisfies the conditions
-     * necessary to apply rule 2F.
+     * Checks if the contents of 'elem' with context 'context' should
+     * be used in its accesssible name. This is the condition for
+     * rule 2F.
      * @param elem - elem whose text alternative is being computed
      * @param context - additional information about the context of elem
      * @return - whether or not rule 2Fs condition has been satisfied
      */
-    function rule2FCondition(elem, context) {
-        if (forbidsNameFromContent(elem)) {
+    function allowsNameFromContent(elem, context) {
+        if (roleForbidsNameFromContent(elem)) {
             return false;
         }
-        if (allowsNameFromContent(elem)) {
+        if (roleAllowsNameFromContent(elem)) {
             return true;
         }
         if (context.directLabelReference) {
@@ -722,7 +728,9 @@ var accname = (function (exports) {
         if (!(node instanceof HTMLElement)) {
             return null;
         }
-        if (!rule2FCondition(node, context)) {
+        // The condition for rule 2F determines if the contents of the
+        // current node should be used in its accessible name.
+        if (!allowsNameFromContent(node, context)) {
             return null;
         }
         const a11yChildNodes = Array.from(node.childNodes);

@@ -115,7 +115,7 @@ function getFunctionCalculatingAllowsNameFromContent(
  * @param elem - the function checks if 'elem' allows name from content
  * @return - true if elem allows name from content, false otherwise
  */
-function allowsNameFromContent(elem: HTMLElement): boolean {
+function roleAllowsNameFromContent(elem: HTMLElement): boolean {
   const explicitRole = elem.getAttribute('role')?.trim().toLowerCase() ?? '';
   if (NAME_FROM_CONTENT_ROLES.includes(explicitRole)) {
     return true;
@@ -136,11 +136,14 @@ function allowsNameFromContent(elem: HTMLElement): boolean {
   return false;
 }
 
-export const TEST_ONLY = {allowsNameFromContent};
+export const TEST_ONLY = {roleAllowsNameFromContent};
 
 // See https://lists.w3.org/Archives/Public/public-aria/2017Jun/0057.html
 // for discussion of roles & tags that forbid name from content.
-const NO_NAME_FROM_CONTENT_ROLES = [
+//
+// *This case is not explicitly included in version 1.1 of the spec, however,
+// as per the thread linked above we have included it (as have other implementations).
+const NEVER_NAME_FROM_CONTENT_ROLES = [
   'application',
   'alert',
   'log',
@@ -180,7 +183,8 @@ const NO_NAME_FROM_CONTENT_ROLES = [
   'rowgroup',
   'group',
 ];
-const NO_NAME_FROM_CONTENT_TAGS = [
+// These tag names imply roles that forbid name from content.
+const NEVER_NAME_FROM_CONTENT_TAGS = [
   'article',
   'aside',
   'body',
@@ -211,14 +215,15 @@ const NO_NAME_FROM_CONTENT_TAGS = [
  * Checks if 'elem' is forbidden from allowing 'name from content'
  * @param elem - element whose text alternative is being computed
  */
-function forbidsNameFromContent(elem: HTMLElement): boolean {
+function roleForbidsNameFromContent(elem: HTMLElement): boolean {
   const explicitRole = elem.getAttribute('role')?.trim().toLowerCase() ?? '';
-  if (NO_NAME_FROM_CONTENT_ROLES.includes(explicitRole)) {
+  if (NEVER_NAME_FROM_CONTENT_ROLES.includes(explicitRole)) {
     return true;
   }
 
+  // Implicit roles : implied by current node tag name.
   const elemNodeName = elem.nodeName.toLowerCase();
-  if (NO_NAME_FROM_CONTENT_TAGS.includes(elemNodeName)) {
+  if (NEVER_NAME_FROM_CONTENT_TAGS.includes(elemNodeName)) {
     return true;
   }
 
@@ -226,18 +231,19 @@ function forbidsNameFromContent(elem: HTMLElement): boolean {
 }
 
 /**
- * Checks if 'elem' in with 'context' satisfies the conditions
- * necessary to apply rule 2F.
+ * Checks if the contents of 'elem' with context 'context' should
+ * be used in its accesssible name. This is the condition for
+ * rule 2F.
  * @param elem - elem whose text alternative is being computed
  * @param context - additional information about the context of elem
  * @return - whether or not rule 2Fs condition has been satisfied
  */
-function rule2FCondition(elem: HTMLElement, context: Context): boolean {
-  if (forbidsNameFromContent(elem)) {
+function allowsNameFromContent(elem: HTMLElement, context: Context): boolean {
+  if (roleForbidsNameFromContent(elem)) {
     return false;
   }
 
-  if (allowsNameFromContent(elem)) {
+  if (roleAllowsNameFromContent(elem)) {
     return true;
   }
 
@@ -291,7 +297,9 @@ export function rule2F(
     return null;
   }
 
-  if (!rule2FCondition(node, context)) {
+  // The condition for rule 2F determines if the contents of the
+  // current node should be used in its accessible name.
+  if (!allowsNameFromContent(node, context)) {
     return null;
   }
 
