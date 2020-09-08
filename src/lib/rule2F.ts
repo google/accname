@@ -225,7 +225,7 @@ function matchesRole(elem: HTMLElement, roleType: RoleType): boolean {
  * @return - whether or not rule 2Fs condition has been satisfied
  */
 function allowsNameFromContent(elem: HTMLElement, context: Context): boolean {
-  // focasable elements should allow name from content.
+  // focusable elements should allow name from content.
   if (
     matchesRole(elem, NEVER_NAME_FROM_CONTENT) &&
     elem.hasAttribute('tabindex')

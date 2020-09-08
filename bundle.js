@@ -666,7 +666,7 @@ var accname = (function (exports) {
      * @return - whether or not rule 2Fs condition has been satisfied
      */
     function allowsNameFromContent(elem, context) {
-        // focasable elements should allow name from content.
+        // focusable elements should allow name from content.
         if (matchesRole(elem, NEVER_NAME_FROM_CONTENT) &&
             elem.hasAttribute('tabindex')) {
             return true;
