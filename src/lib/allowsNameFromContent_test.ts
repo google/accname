@@ -148,8 +148,11 @@ describe('The function allowsNameFromContent', () => {
     expect(allowsNameFromContent(elem!, getDefaultContext())).toBe(false);
   });
 
-  it('returns true for elements that are focusable', () => {
-    render(html` <div id="foo" tabindex="0">Hello world</div> `, container);
+  it('returns true for elements in NEVER_NFC that are focusable', () => {
+    render(
+      html` <article id="foo" tabindex="0">Hello world</article> `,
+      container
+    );
     const elem = document.getElementById('foo');
     expect(allowsNameFromContent(elem!, getDefaultContext())).toBe(true);
   });

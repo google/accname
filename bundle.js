@@ -667,7 +667,8 @@ var accname = (function (exports) {
      */
     function allowsNameFromContent(elem, context) {
         // focasable elements should allow name from content.
-        if (elem.hasAttribute('tabindex')) {
+        if (matchesRole(elem, NEVER_NAME_FROM_CONTENT) &&
+            elem.hasAttribute('tabindex')) {
             return true;
         }
         // The terms 'list 1', 'list 2', 'list 3' are used in reference

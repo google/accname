@@ -226,7 +226,10 @@ function matchesRole(elem: HTMLElement, roleType: RoleType): boolean {
  */
 function allowsNameFromContent(elem: HTMLElement, context: Context): boolean {
   // focasable elements should allow name from content.
-  if (elem.hasAttribute('tabindex')) {
+  if (
+    matchesRole(elem, NEVER_NAME_FROM_CONTENT) &&
+    elem.hasAttribute('tabindex')
+  ) {
     return true;
   }
 
