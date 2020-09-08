@@ -159,7 +159,7 @@ describe('The computeTextAlternative function', () => {
   });
 
   // http://wpt.live/accname/name_checkbox-label-embedded-menu-manual.html
-  it('ignores elements who should never allow name from content, in this case role="menuitem"', () => {
+  it('ignores elements who should never allow name from content, in this case role="menu"', () => {
     render(
       html`
         <input type="checkbox" id="test" />
@@ -177,5 +177,67 @@ describe('The computeTextAlternative function', () => {
     );
     const elem = document.getElementById('test')!;
     expect(computeTextAlternative(elem).name).toBe('Flash the screen times.');
+  });
+
+  // http://wpt.live/accname/name_test_case_733-manual.html
+  it('Does not allow name from content for role=menu even if focusable', () => {
+    render(
+      html`
+        <label for="test">
+          crazy
+          <select name="member" size="1" role="menu" tabindex="0">
+            <option role="menuitem" value="beard" selected="true">clown</option>
+            <option role="menuitem" value="scuba">rich</option>
+          </select>
+        </label>
+        <input type="password" id="test" />
+      `,
+      container
+    );
+    const elem = document.getElementById('test')!;
+    expect(computeTextAlternative(elem).name).toBe('crazy');
+  });
+
+  // http://wpt.live/accname/name_from_content-manual.html
+  it('Allows name from content for <tbody>', () => {
+    render(
+      html`
+        <style>
+          .hidden {
+            display: none;
+          }
+        </style>
+        <div id="test" role="link" tabindex="0">
+          <span aria-hidden="true"><i> Hello, </i></span>
+          <span>My</span> name is
+          <div>
+            <img src="file.jpg" title="Bryan" alt="" role="presentation" />
+          </div>
+          <span role="presentation" aria-label="Eli">
+            <span aria-label="Garaventa">Zambino</span>
+          </span>
+          <span>the weird.</span>
+          (QED)
+          <span class="hidden"
+            ><i><b>and don't you forget it.</b></i></span
+          >
+          <table>
+            <tbody>
+              <tr>
+                <td>Where</td>
+                <td style="visibility:hidden;"><div>in</div></td>
+                <td><div style="display:none;">the world</div></td>
+                <td>are my marbles?</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `,
+      container
+    );
+    const elem = document.getElementById('test')!;
+    expect(computeTextAlternative(elem).name).toBe(
+      'My name is Eli the weird. (QED) Where are my marbles?'
+    );
   });
 });

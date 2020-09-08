@@ -578,10 +578,7 @@ var accname = (function (exports) {
             'optgroup',
             'section',
             'select',
-            'tbody',
             'textarea',
-            'tfoot',
-            'thead',
         ],
     };
     // List 3 from https://lists.w3.org/Archives/Public/public-aria/2017Jun/0057.html
@@ -668,6 +665,7 @@ var accname = (function (exports) {
     function allowsNameFromContent(elem, context) {
         // The terms 'list 1', 'list 2', 'list 3' are used in reference
         // to the following thread: see: https://lists.w3.org/Archives/Public/public-aria/2017Jun/0057.html
+        var _a;
         // Handles list 3 roles
         if (context.inherited.partOfName && elem.parentElement) {
             const parent = elem.parentElement;
@@ -678,7 +676,12 @@ var accname = (function (exports) {
         }
         // Handles list 2 roles
         if (matchesRole(elem, NEVER_NAME_FROM_CONTENT)) {
-            return elem.hasAttribute('tabindex');
+            // role=menu should not allow name from content even if focusable.
+            // See http://wpt.live/accname/name_test_case_733-manual.html
+            if (((_a = elem.getAttribute('role')) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === 'menu') {
+                return false;
+            }
+            return elem.hasAttribute('tabindex') || elem.isContentEditable;
         }
         // Handles list 1 roles
         if (matchesRole(elem, ALWAYS_NAME_FROM_CONTENT)) {
