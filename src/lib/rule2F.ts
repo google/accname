@@ -225,14 +225,6 @@ function matchesRole(elem: HTMLElement, roleType: RoleType): boolean {
  * @return - whether or not rule 2Fs condition has been satisfied
  */
 function allowsNameFromContent(elem: HTMLElement, context: Context): boolean {
-  // focusable elements should allow name from content.
-  if (
-    matchesRole(elem, NEVER_NAME_FROM_CONTENT) &&
-    elem.hasAttribute('tabindex')
-  ) {
-    return true;
-  }
-
   // The terms 'list 1', 'list 2', 'list 3' are used in reference
   // to the following thread: see: https://lists.w3.org/Archives/Public/public-aria/2017Jun/0057.html
 
@@ -249,7 +241,7 @@ function allowsNameFromContent(elem: HTMLElement, context: Context): boolean {
 
   // Handles list 2 roles
   if (matchesRole(elem, NEVER_NAME_FROM_CONTENT)) {
-    return false;
+    return elem.hasAttribute('tabindex');
   }
 
   // Handles list 1 roles
