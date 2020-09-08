@@ -157,4 +157,25 @@ describe('The computeTextAlternative function', () => {
     const elem = document.getElementById('test')!;
     expect(computeTextAlternative(elem).name).toBe('Flash the screen 2 times.');
   });
+
+  // http://wpt.live/accname/name_checkbox-label-embedded-menu-manual.html
+  it('ignores elements who should never allow name from content, in this case role="menuitem"', () => {
+    render(
+      html`
+        <input type="checkbox" id="test" />
+        <label for="test"
+          >Flash the screen
+          <span role="menu">
+            <span role="menuitem" aria-selected="true">1</span>
+            <span role="menuitem" hidden="">2</span>
+            <span role="menuitem" hidden="">3</span>
+          </span>
+          times.
+        </label>
+      `,
+      container
+    );
+    const elem = document.getElementById('test')!;
+    expect(computeTextAlternative(elem).name).toBe('Flash the screen times.');
+  });
 });

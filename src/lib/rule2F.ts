@@ -2,63 +2,146 @@ import {Context, getDefaultContext} from './context';
 import {computeTextAlternative} from './compute_text_alternative';
 import {closest} from './polyfill';
 
-// Explicit roles allowing 'name from content'
-// (https://www.w3.org/TR/wai-aria-1.1/#namefromcontent)
-const NAME_FROM_CONTENT_ROLES = [
-  'button',
-  'cell',
-  'checkbox',
-  'columnheader',
-  'gridcell',
-  'heading',
-  'link',
-  'menuitem',
-  'menuitemcheckbox',
-  'menuitemradio',
-  'option',
-  'radio',
-  'row',
-  'rowgroup',
-  'rowheader',
-  'switch',
-  'tab',
-  'tooltip',
-  'tree',
-  'treeitem',
-];
+const ALWAYS_NAME_FROM_CONTENT = {
+  // Explicit roles allowing 'name from content'
+  // (https://www.w3.org/TR/wai-aria-1.1/#namefromcontent)
+  roles: [
+    'button',
+    'cell',
+    'checkbox',
+    'columnheader',
+    'gridcell',
+    'heading',
+    'link',
+    'menuitem',
+    'menuitemcheckbox',
+    'menuitemradio',
+    'option',
+    'radio',
+    'row',
+    'rowgroup',
+    'rowheader',
+    'switch',
+    'tab',
+    'tooltip',
+    'tree',
+    'treeitem',
+  ],
+  // HTML element types that allow name from content according
+  // to their implicit aria roles.
+  // (https://www.w3.org/TR/html-aria/#docconformance)
+  tags: [
+    'button',
+    'h1',
+    'h2',
+    'h3',
+    'h4',
+    'h5',
+    'h6',
+    'summary',
+    'tbody',
+    'tfoot',
+    'thead',
+  ],
+};
 
-/**
- * HTML element types that allow name from content according
- * to their implicit aria roles.
- * (https://www.w3.org/TR/html-aria/#docconformance)
- */
-const NAME_FROM_CONTENT_ELEM_NODE_NAME = [
-  'h1',
-  'h2',
-  'h3',
-  'h4',
-  'h5',
-  'h6',
-  'tbody',
-  'thead',
-  'tfoot',
-  'summary',
-  'button',
-];
+// See https://lists.w3.org/Archives/Public/public-aria/2017Jun/0057.html
+// for discussion of roles & tags that forbid name from content.
+//
+// *This case is not explicitly included in version 1.1 of the spec, however,
+// as per the thread linked above we have included it (as have other implementations).
+const NEVER_NAME_FROM_CONTENT = {
+  roles: [
+    'alert',
+    'alertdialog',
+    'application',
+    'article',
+    'banner',
+    'complementary',
+    'contentinfo',
+    'definition',
+    'dialog',
+    'directory',
+    'document',
+    'feed',
+    'figure',
+    'form',
+    'grid',
+    'group',
+    'img',
+    'list',
+    'listbox',
+    'log',
+    'main',
+    'marquee',
+    'math',
+    'menu',
+    'menubar',
+    'navigation',
+    'note',
+    'radiogroup',
+    'region',
+    'row',
+    'rowgroup',
+    'scrollbar',
+    'search',
+    'searchbox',
+    'separator',
+    'slider',
+    'spinbutton',
+    'status',
+    'table',
+    'tablist',
+    'tabpanel',
+    'term',
+    'textbox',
+    'timer',
+    'toolbar',
+    'tree',
+    'treegrid',
+  ],
+  tags: [
+    'article',
+    'aside',
+    'body',
+    'datalist',
+    'dialog',
+    'fieldset',
+    'figure',
+    'footer',
+    'form',
+    'header',
+    'hr',
+    'img',
+    'input',
+    'main',
+    'math',
+    'menu',
+    'nav',
+    'optgroup',
+    'section',
+    'select',
+    'tbody',
+    'textarea',
+    'tfoot',
+    'thead',
+  ],
+};
 
-/**
- * HTML input elements allow name from content when
- * they have the following values for 'type' attribute
- * (https://www.w3.org/TR/html-aria/#docconformance)
- */
-const NAME_FROM_CONTENT_INPUT_TYPES = [
-  'button',
-  'checkbox',
-  'image',
-  'radio',
-  'reset',
-  'submit',
-];
+// List 3 from https://lists.w3.org/Archives/Public/public-aria/2017Jun/0057.html
+const SOMETIMES_NAME_FROM_CONTENT = {
+  roles: [
+    'contentinfo',
+    'definition',
+    'directory',
+    'list',
+    'note',
+    'status',
+    'table',
+    'term',
+  ],
+  tags: ['dd', 'details', 'dl', 'ol', 'output', 'table', 'ul'],
+};
 
 /**
  * Some HTML elements allow name from context only if certain
@@ -86,11 +169,6 @@ function getFunctionCalculatingAllowsNameFromContent(
       return (elem: HTMLElement) => {
         return closest(elem, 'select,datalist') !== null;
       };
-    case 'input':
-      return (elem: HTMLElement) => {
-        const inputType = elem.getAttribute('type')?.trim().toLowerCase() ?? '';
-        return NAME_FROM_CONTENT_INPUT_TYPES.includes(inputType);
-      };
     case 'a':
       return (elem: HTMLElement) => {
         return elem.hasAttribute('href');
@@ -109,44 +187,75 @@ function getFunctionCalculatingAllowsNameFromContent(
 }
 
 /**
- * Calculates whether or not an element's name may be calculated using
- * its contents. Elements may allow name from content when they have certain
- * roles, be they explicit (role attribute) or implicit (semantic HTML).
- * @param elem - the function checks if 'elem' allows name from content
- * @return - true if elem allows name from content, false otherwise
+ * A container for lists of roles (explicit) and tags (implicit) that
+ * together account for a certain genre / type of role.
  */
-function allowsNameFromContent(elem: HTMLElement): boolean {
+interface RoleType {
+  roles: string[];
+  tags: string[];
+}
+
+/**
+ * Checks if a given HTMLElement matches any of the roles in a given RoleType.
+ * @param elem - element whose role type is in question.
+ * @param roleType - lists of indicators for some role type.
+ */
+function matchesRole(elem: HTMLElement, roleType: RoleType): boolean {
+  // Explicit roles : specified using 'role' attribute
   const explicitRole = elem.getAttribute('role')?.trim().toLowerCase() ?? '';
-  if (NAME_FROM_CONTENT_ROLES.includes(explicitRole)) {
+  if (roleType.roles.includes(explicitRole)) {
     return true;
   }
 
+  // Implicit roles : implied by current node tag name.
   const elemNodeName = elem.nodeName.toLowerCase();
-  if (NAME_FROM_CONTENT_ELEM_NODE_NAME.includes(elemNodeName)) {
+  if (roleType.tags.includes(elemNodeName)) {
     return true;
-  }
-
-  const nameFromContentFunction = getFunctionCalculatingAllowsNameFromContent(
-    elemNodeName
-  );
-  if (nameFromContentFunction) {
-    return nameFromContentFunction(elem);
   }
 
   return false;
 }
 
-export const TEST_ONLY = {allowsNameFromContent};
-
 /**
- * Checks if 'elem' in with 'context' satisfies the conditions
- * necessary to apply rule 2F.
+ * Checks if the contents of 'elem' with context 'context' should
+ * be used in its accesssible name. This is the condition for
+ * rule 2F.
  * @param elem - elem whose text alternative is being computed
  * @param context - additional information about the context of elem
  * @return - whether or not rule 2Fs condition has been satisfied
  */
-function rule2FCondition(elem: HTMLElement, context: Context): boolean {
-  if (allowsNameFromContent(elem)) {
+function allowsNameFromContent(elem: HTMLElement, context: Context): boolean {
+  // The terms 'list 1', 'list 2', 'list 3' are used in reference
+  // to the following thread: see: https://lists.w3.org/Archives/Public/public-aria/2017Jun/0057.html
+
+  // Handles list 3 roles
+  if (context.inherited.partOfName && elem.parentElement) {
+    const parent = elem.parentElement;
+    if (
+      matchesRole(parent, ALWAYS_NAME_FROM_CONTENT) &&
+      matchesRole(elem, SOMETIMES_NAME_FROM_CONTENT)
+    ) {
+      return true;
+    }
+  }
+
+  // Handles list 2 roles
+  if (matchesRole(elem, NEVER_NAME_FROM_CONTENT)) {
+    return elem.hasAttribute('tabindex');
+  }
+
+  // Handles list 1 roles
+  if (matchesRole(elem, ALWAYS_NAME_FROM_CONTENT)) {
+    return true;
+  }
+
+  // Elements that conditionally have an implicit role that matches
+  // ALWAYS_NAME_FROM_CONTENT
+  const elemNodeName = elem.nodeName.toLowerCase();
+  const nameFromContentFunction = getFunctionCalculatingAllowsNameFromContent(
+    elemNodeName
+  );
+  if (nameFromContentFunction && nameFromContentFunction(elem)) {
     return true;
   }
 
@@ -160,6 +269,8 @@ function rule2FCondition(elem: HTMLElement, context: Context): boolean {
 
   return false;
 }
+
+export const TEST_ONLY = {allowsNameFromContent};
 
 /**
  * Gets text content generated by CSS pseudo elements for a given HTMLElement
@@ -200,7 +311,9 @@ export function rule2F(
     return null;
   }
 
-  if (!rule2FCondition(node, context)) {
+  // The condition for rule 2F determines if the contents of the
+  // current node should be used in its accessible name.
+  if (!allowsNameFromContent(node, context)) {
     return null;
   }
 
