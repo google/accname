@@ -121,10 +121,7 @@ const NEVER_NAME_FROM_CONTENT = {
     'optgroup',
     'section',
     'select',
-    'tbody',
     'textarea',
-    'tfoot',
-    'thead',
   ],
 };
 
@@ -241,7 +238,12 @@ function allowsNameFromContent(elem: HTMLElement, context: Context): boolean {
 
   // Handles list 2 roles
   if (matchesRole(elem, NEVER_NAME_FROM_CONTENT)) {
-    return elem.hasAttribute('tabindex');
+    // role=menu should not allow name from content even if focusable.
+    // See http://wpt.live/accname/name_test_case_733-manual.html
+    if (elem.getAttribute('role')?.toLowerCase() === 'menu') {
+      return false;
+    }
+    return elem.hasAttribute('tabindex') || elem.isContentEditable;
   }
 
   // Handles list 1 roles
