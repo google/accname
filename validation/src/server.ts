@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import favicon from 'serve-favicon';
 import {runHTMLSnippetComparison, runURLComparison} from './lib/compare';
+import {NoTargetError} from './lib/node_ref';
 
 const app = express();
 // Set static folder as src/static
@@ -81,7 +82,10 @@ app.post('/api/runSnippetComparison', async (req, res) => {
     res.status(200).json(result);
   } catch (err) {
     console.log('An Error occurred while running a SNIPPET COMPARISON:', err);
-    res.status(400).json(err);
+    if (err instanceof NoTargetError) {
+      res.status(400).json(err);
+    }
+    res.status(500).json(err);
   }
 });
 
