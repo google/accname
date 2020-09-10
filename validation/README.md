@@ -1,5 +1,5 @@
 # AccName Comparison App
-This folder, `validation/` , of the `accname` repository, contains the AccName Comparison App. This is a Node.js app that allows users to compare implementations of the [Accessible Name Computation algorithm](https://www.w3.org/TR/accname-1.1/#step1).
+This is a Node.js app that allows users to compare implementations of the [Accessible Name Computation algorithm](https://www.w3.org/TR/accname-1.1/#step1).
 
 The purpose of this app is to identify disparities between different implementations.
 
@@ -11,11 +11,14 @@ The purpose of this app is to identify disparities between different implementat
 - [AccName](https://github.com/googleinterns/accessible-name)
 
 ## Running the app
-- Clone this GitHub repository locally.
-- Navigate to this folder, `validation/`.
-- Run `$ npm install` to install dependencies.
-- Run `$ npm run serve` to start the server.
-- Visit `http://localhost:3000/` to use the app.
+Run the following commands in terminal:
+```
+git clone https://github.com/googleinterns/accessible-name.git
+cd accessible-name/validation/
+npm install
+npm run serve
+```
+Then visit `http://localhost:3000/` to use the app.
 
 ## Main Features
 
