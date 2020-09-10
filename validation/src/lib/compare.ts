@@ -1,129 +1,9 @@
 import {CDPSession, Page} from 'puppeteer';
-import puppeteer from 'puppeteer';
 import {Protocol} from 'devtools-protocol';
 import fetch from 'node-fetch';
-import {NodeRef, getNodeRefFromSelector} from './node_ref';
+import {NodeRef} from './node_ref';
 import {getHTMLUsed} from './html_used';
-import {writeTestcase, writeSnippetCase, writeUrlSummary} from './output';
-
 import axe from 'axe-core';
-
-/**
- * Compares AccName implementations on a HTML snippet containing a target element
- * identified by the presence of an 'accnameComparisonTarget' attribute.
- * @param HTMLSnippet - The HTML snippet containing the target element.
- * @return An object containing the accessible names computed by 5 different implementations
- * and, in the case that there was some disagreement between implementations, an ID
- * for the test case file containing the details of that disagreement.
- */
-export async function runHTMLSnippetComparison(
-  HTMLSnippet: string
-): Promise<[{[implementation: string]: string}, number?]> {
-  // Load HTML snippet into Puppeteer browser
-  const browser = await puppeteer.launch({
-    args: ['--enable-blink-features=AccessibilityObjectModel'],
-  });
-  const page = await browser.newPage();
-  await page.goto('data:text/html,' + HTMLSnippet);
-  const client = await page.target().createCDPSession();
-
-  await loadAccNameLibraries(page);
-
-  const targetNodeRef = await getNodeRefFromSelector('[ac]', client, page);
-
-  const comparisonResults = await runComparison(targetNodeRef, page, client);
-  await browser.close();
-  if (comparisonResults.disagrees) {
-    const casePreview = writeTestcase(comparisonResults, {
-      inputSnippet: HTMLSnippet,
-    });
-    writeSnippetCase(casePreview);
-    return [comparisonResults.accnames, casePreview.caseId];
-  }
-
-  return [comparisonResults.accnames];
-}
-
-/**
- * Compares AccName implementations on every Node in the DOM of the web page
- * at the URL provided.
- * @param url - The URL for the web page whose Nodes will be used to compare
- * AccName implementations.
- * @return The name of the directory containing the results of the URL comparison.
- */
-export async function runURLComparison(url: string): Promise<number> {
-  const browser = await puppeteer.launch({
-    args: ['--enable-blink-features=AccessibilityObjectModel'],
-  });
-  const page = await browser.newPage();
-  const client = await page.target().createCDPSession();
-
-  const httpResponse = await page.goto(url);
-  if (!httpResponse?.ok()) {
-    throw new Error(
-      `URL '${url}' could not be accessed, HTTP status: (${httpResponse?.status}) : ${httpResponse?.statusText}'`
-    );
-  }
-
-  await loadAccNameLibraries(page);
-
-  // Associates each category encountered with the number
-  // of occurrences of that category
-  const categoryCount: {[categoryHash: string]: number} = {};
-  const cases: number[] = [];
-
-  const allNodes = await page.$$('body *');
-  for (let i = 0; i < allNodes.length; i++) {
-    console.log(i + 1 + '/' + allNodes.length);
-    const node = allNodes[i];
-
-    await page.evaluate(
-      node => node.setAttribute('accnameComparisonTarget', 'true'),
-      node
-    );
-
-    const targetNodeRef = await getNodeRefFromSelector(
-      '[accnameComparisonTarget]',
-      client,
-      page
-    );
-
-    const comparisonResults = await runComparison(targetNodeRef, page, client);
-    if (comparisonResults.disagrees) {
-      // Count category occurrences, save test case for any new categories.
-      const categoryHash = JSON.stringify(comparisonResults.category);
-      if (categoryCount[categoryHash]) {
-        categoryCount[categoryHash] += 1;
-      } else {
-        const casePreview = writeTestcase(comparisonResults, {url: url});
-        cases.push(casePreview.caseId);
-        categoryCount[categoryHash] = 1;
-      }
-    }
-
-    await page.evaluate(
-      node => node.removeAttribute('accnameComparisonTarget'),
-      node
-    );
-  }
-
-  // All categories encountered duirng comparison and their associated counts.
-  const categoryStats = Object.entries(categoryCount).map((entry, i) => ({
-    category: JSON.parse(entry[0]) as Category,
-    count: entry[1],
-    caseId: cases[i],
-  }));
-
-  const pageSummary: UrlSummary = {
-    url: url,
-    nodesOnPage: allNodes.length,
-    stats: categoryStats,
-  };
-  const pageSummaryId = writeUrlSummary(pageSummary);
-
-  await browser.close();
-  return pageSummaryId;
-}
 
 /**
  * Compare AccName implementations for a given DOM Node and categorise
@@ -132,7 +12,7 @@ export async function runURLComparison(url: string): Promise<number> {
  * @param page - The page containing the target DOM Node.
  * @param client - A CDPSession for page.
  */
-async function runComparison(
+export async function runComparison(
   nodeRef: NodeRef,
   page: Page,
   client: CDPSession
@@ -240,7 +120,7 @@ async function getAccNames(
  * Prepare AccName implementation libraries to be run on the current page.
  * @param page - The page in which the libraries
  */
-async function loadAccNameLibraries(page: Page) {
+export async function loadAccNameLibraries(page: Page) {
   // Load axe-core
   await page.evaluate(axe.source);
   await page.evaluate(

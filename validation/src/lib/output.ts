@@ -86,6 +86,31 @@ export function writeUrlSummary(urlSummary: UrlSummary): number {
   return urlSummaryId;
 }
 
+export function writeWPTResults(wptResults: WPTResults) {
+  const wptResultId = fs.readdirSync(
+    path.join(__dirname, '../../output/wpt_result/')
+  ).length;
+
+  fs.writeFileSync(
+    path.join(__dirname, `../../output/wpt_result/wpt_${wptResultId}.json`),
+    JSON.stringify(wptResults, null, 2)
+  );
+
+  const wptResultPreview = {
+    wptResultId: wptResultId,
+    percentIncorrect: (wptResults.totalIncorrect / wptResults.testsRun) * 100,
+  };
+
+  const preview = getPreviewJson();
+  preview.wptResults.push(wptResultPreview);
+  fs.writeFileSync(
+    path.join(__dirname, '../../output/preview.json'),
+    JSON.stringify(preview, null, 2)
+  );
+
+  return wptResultId;
+}
+
 /**
  * If preview.json exists:
  * > returns the contents of preview.json
@@ -101,7 +126,7 @@ function getPreviewJson(): Preview {
     return JSON.parse(previewRaw.toString());
   } catch (err) {
     if (err.code === 'ENOENT') {
-      return {snippets: [], pageSummaries: []};
+      return {snippets: [], pageSummaries: [], wptResults: []};
     } else {
       throw err;
     }

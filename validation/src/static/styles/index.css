@@ -11,7 +11,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .content {
-  width: 60%;
+  width: 80%;
 }
 
 .titleContainer {
@@ -37,8 +37,12 @@ h1, h2, h3, h4, h5, h6 {
 
 .introText {
   font-size: 16pt;
-  word-spacing: 5px;
+  word-spacing: 3px;
   color: #4A70D0;
+}
+
+#introComma {
+  margin-left: -10px;
 }
 
 button {
@@ -59,9 +63,9 @@ button:hover {
 }
 
 .chooseComparisonBtn {
-  padding: 10px;
-  padding-left: 25px;
-  padding-right: 25px;
+  padding: 7px;
+  padding-left: 15px;
+  padding-right: 15px;
 }
 
 .runComparisonInputSection {

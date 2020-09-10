@@ -25,7 +25,8 @@
       <section class="introTextContainer">
         <h2 class="introText">
           Run comparison on <button class="chooseComparisonBtn" onclick="toggleComparisonSectionVisibility('snippetComparison', this);">HTML Snippet</button>
-          or <button class="chooseComparisonBtn" onclick="toggleComparisonSectionVisibility('urlComparison', this);">Web-Page</button>
+          <span id="introComma">,</span> <button class="chooseComparisonBtn" onclick="toggleComparisonSectionVisibility('urlComparison', this);">Web-Page</button> or 
+          <button class="chooseComparisonBtn" onclick="toggleComparisonSectionVisibility('wptComparison', this); getWPTComparison();">Web Platform Tests</button>
         </h2>
       </section>
       <!-- Snippet comparison -->
@@ -83,6 +84,11 @@
           </div>
         </div>
       </section>
+      <!-- WPT comparison -->
+      <section id="wptComparison" class="hidden comparisonSection">
+        <div id="wptResults">
+        </div>
+      </section>
       <!-- Comparison history -->
       <section id="previewSection">
         <h2 class="previewHeader">Comparison History</h2>
@@ -97,6 +103,12 @@
             <h3 class="comparisonTitle">Web-Pages</h3>
             <h4 class="comparisonKey">Target URL<span>disagreement%</span></h4>
             <div id="summaryPreviews" class="previewCardContainer">
+            </div>
+          </section>
+          <section class="comparisonType">
+            <h3 class="comparisonTitle">Web Platform Tests</h3>
+            <h4 class="comparisonKey">Index</h4>
+            <div id="wptPreviews" class="previewCardContainer">
             </div>
           </section>
         </div>

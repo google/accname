@@ -120,6 +120,38 @@ const getURLComparison = async () => {
   }
 };
 
+const getWPTComparison = async () => {
+  const wptResults = getElem('wptResults');
+  if (!wptResults) return;
+
+  // Adds an animated CSS Loading Spinner
+  const spinner = document.createElement('div');
+  spinner.classList.add('loader');
+  wptResults.append(spinner);
+
+  const rawResponse = await fetch(
+    'http://localhost:3000/api/runWPTComparison',
+    {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+
+  // Remove spinner once we get a response
+  spinner.remove();
+
+  if (rawResponse.status === 200) {
+    const wptResultId = await rawResponse.json();
+    wptResults.innerHTML = `<div class="bluetext comparisonResultText">View the results for the Web Platform Tests comparison - <a href="/wpt/${wptResults}" class="linkBtn">Run ${wptResultId}</a></div>`;
+  } else if (rawResponse.status === 400) {
+    const error = await rawResponse.json();
+    wptResults.innerHTML = `<div class="redtext comparisonResultText">Error: ${error.message}</div>`;
+  }
+};
+
 /**
  * Displays the contents of preview.json in the 'Comparison History' section.
  * @param preview - the Preview to be displayed under 'Comparison History'
@@ -131,7 +163,9 @@ async function displayPreview() {
 
   const snippetContainer = getElem('snippetPreviews');
   const summaryContainer = getElem('summaryPreviews');
-  if (!snippetContainer || !summaryContainer) throw new ElemNotFound();
+  const wptContainer = getElem('wptPreviews');
+  if (!snippetContainer || !summaryContainer || !wptContainer)
+    throw new ElemNotFound();
 
   // Empty preview containers to prevent duplicate cards
   snippetContainer.innerHTML = '';
@@ -154,6 +188,14 @@ async function displayPreview() {
     summaryContainer.innerHTML =
       `<a href="/summary/${summary.urlSummaryId}" class="invisibleLink"><div class="previewCard">${summary.url} <span>${disagreement}%</span></div></a>` +
       summaryContainer.innerHTML;
+  }
+
+  for (const wptResult of preview.wptResults) {
+    wptContainer.innerHTML += `<a href="/wpt/${
+      wptResult.wptResultId
+    }" class="invisibleLink"><div class="previewCard">Run ${
+      wptResult.wptResultId
+    } <span>${Math.round(wptResult.percentIncorrect)}%</span></div></a>`;
   }
 }
 
