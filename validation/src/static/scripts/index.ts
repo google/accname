@@ -75,8 +75,8 @@ const getSnippetComparison = async () => {
     }
     await displayPreview();
   } else {
-    const error = await rawResponse.json();
-    resultsContainer.innerHTML = `<div class="redtext comparisonResultText">Error: ${error.message}</div>`;
+    resultsContainer.innerHTML =
+      "<div class=\"redtext comparisonResultText\">An error occurred. Make sure to mark your target element with an 'ac' attribute if you haven't! e.g. &lt;div ac&gt;Hello world&lt;/div&gt;. See console for more detail.</div>";
   }
 };
 
