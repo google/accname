@@ -82,23 +82,31 @@ export async function runURLComparison(url: string): Promise<number> {
       node
     );
 
-    const targetNodeRef = await getNodeRefFromSelector(
-      '[accnameComparisonTarget]',
-      client,
-      page
-    );
+    try {
+      const targetNodeRef = await getNodeRefFromSelector(
+        '[accnameComparisonTarget]',
+        client,
+        page
+      );
 
-    const comparisonResults = await runComparison(targetNodeRef, page, client);
-    if (comparisonResults.disagrees) {
-      // Count category occurrences, save test case for any new categories.
-      const categoryHash = JSON.stringify(comparisonResults.category);
-      if (categoryCount[categoryHash]) {
-        categoryCount[categoryHash] += 1;
-      } else {
-        const casePreview = writeTestcase(comparisonResults, {url: url});
-        cases.push(casePreview.caseId);
-        categoryCount[categoryHash] = 1;
+      const comparisonResults = await runComparison(
+        targetNodeRef,
+        page,
+        client
+      );
+      if (comparisonResults.disagrees) {
+        // Count category occurrences, save test case for any new categories.
+        const categoryHash = JSON.stringify(comparisonResults.category);
+        if (categoryCount[categoryHash]) {
+          categoryCount[categoryHash] += 1;
+        } else {
+          const casePreview = writeTestcase(comparisonResults, {url: url});
+          cases.push(casePreview.caseId);
+          categoryCount[categoryHash] = 1;
+        }
       }
+    } catch (error) {
+      console.log(`Skipped node due to error:\n${error}`);
     }
 
     await page.evaluate(
