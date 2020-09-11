@@ -119,7 +119,6 @@ const getURLComparison = async () => {
     await displayPreview();
   } else {
     const error = await rawResponse.json();
-    console.log(error.status);
     urlResults.innerHTML = `<div class="redtext comparisonResultText">Error: ${error.message}</div>`;
   }
 };
