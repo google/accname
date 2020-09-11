@@ -74,9 +74,12 @@ const getSnippetComparison = async () => {
       `;
     }
     await displayPreview();
+  } else if (rawResponse.status === 400) {
+    resultsContainer.innerHTML =
+      "<div class=\"redtext comparisonResultText\">No target element found. Make sure to mark your target element with an 'ac' attribute if you haven't!<br/>e.g. &lt;div ac&gt;Hello world&lt;/div&gt;</div>";
   } else {
     resultsContainer.innerHTML =
-      "<div class=\"redtext comparisonResultText\">An error occurred. Make sure to mark your target element with an 'ac' attribute if you haven't! e.g. &lt;div ac&gt;Hello world&lt;/div&gt;. See console for more detail.</div>";
+      '<div class="redtext comparisonResultText">An error occurred on the server. Check terminal for details.</div>';
   }
 };
 
