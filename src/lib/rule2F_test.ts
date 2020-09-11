@@ -52,19 +52,15 @@ describe('The function for rule 2F', () => {
   it('returns a string concatenated with CSS generated text content', () => {
     render(
       html`
-        <div id="foo">
-          world
-          <div>
-            <style>
-              #foo:before {
-                content: 'Hello';
-              }
-              #foo:after {
-                content: '!';
-              }
-            </style>
-          </div>
-        </div>
+        <style>
+          #foo:before {
+            content: 'Hello';
+          }
+          #foo:after {
+            content: '!';
+          }
+        </style>
+        <div id="foo">world</div>
       `,
       container
     );

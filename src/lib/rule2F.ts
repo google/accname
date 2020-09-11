@@ -297,6 +297,63 @@ function getCssContent(elem: HTMLElement, pseudoElementName: string): string {
   return '';
 }
 
+// See https://developer.mozilla.org/en-US/docs/Web/HTML/Inline_elements
+// 'br' removed as it should add a whitespace to the accessible name.
+const inlineTags = [
+  'a',
+  'abbr',
+  'acronym',
+  'b',
+  'bdi',
+  'bdo',
+  'big',
+  'button',
+  'canvas',
+  'cite',
+  'code',
+  'data',
+  'datalist',
+  'del',
+  'dfn',
+  'em',
+  'embed',
+  'i',
+  'iframe',
+  'img',
+  'input',
+  'ins',
+  'kbd',
+  'label',
+  'map',
+  'mark',
+  'meter',
+  'noscript',
+  'object',
+  'output',
+  'picture',
+  'progress',
+  'q',
+  'ruby',
+  's',
+  'samp',
+  'script',
+  'select',
+  'slot',
+  'small',
+  'span',
+  'strong',
+  'sub',
+  'sup',
+  'template',
+  'textarea',
+  'time',
+  'tt',
+  'u',
+  'var',
+  'video',
+  'wbr',
+];
+
 /**
  * Implementation of rule 2F
  * @param node - node whose text alternative is being calculated
@@ -342,7 +399,14 @@ export function rule2F(
         inherited: context.inherited,
       }).name;
 
-      textAlterantives.push(textAlterantive);
+      if (
+        inlineTags.includes(childNode.nodeName.toLowerCase()) ||
+        childNode.nodeType === Node.TEXT_NODE
+      ) {
+        textAlterantives.push(textAlterantive);
+      } else {
+        textAlterantives.push(` ${textAlterantive} `);
+      }
     }
   }
 
@@ -352,7 +416,9 @@ export function rule2F(
   // for readability
   const accumulatedText = textAlterantives
     .filter(textAlterantive => textAlterantive !== '')
-    .join(' ');
+    .join('')
+    .replace(/\s+/g, ' ')
+    .trim();
 
   const cssBeforeContent = getCssContent(node, ':before');
   const cssAfterContent = getCssContent(node, ':after');

@@ -13,14 +13,7 @@ describe('The function for rule 2G', () => {
   });
 
   it('returns text content text nodes', () => {
-    render(
-      html`
-        <div id="foo">
-          Hello world
-        </div>
-      `,
-      container
-    );
+    render(html` <div id="foo">Hello world</div> `, container);
     const node = document.getElementById('foo')?.childNodes[0];
     expect(rule2G(node!)).toBe('Hello world');
   });
@@ -29,11 +22,9 @@ describe('The function for rule 2G', () => {
     render(
       // prettier-ignore
       html`
-        <div id="foo">
-          Hello world
+        <div id="foo">Hello world
 
-          newline
-        </div>
+        newline</div>
       `,
       container
     );
@@ -45,9 +36,7 @@ describe('The function for rule 2G', () => {
     render(
       // prettier-ignore
       html`
-        <div id="foo">
-          Hello    world
-        </div>
+        <div id="foo">Hello    world</div>
       `,
       container
     );
