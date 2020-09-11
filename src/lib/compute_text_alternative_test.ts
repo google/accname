@@ -244,16 +244,10 @@ describe('The computeTextAlternative function', () => {
   // http://wpt.live/accname/name_file-label-inline-block-elements-manual.html
   it('passes WPT testing whitespace', () => {
     render(
+      // prettier-ignore
       html`
-        <input type="file" id="test" />
-        <label for="test"
-          >W<i>h<b>a</b></i
-          >t<br />is
-          <div>
-            your
-            <div>name<b>?</b></div>
-          </div></label
-        >
+        <input type="file" id="test">
+        <label for="test">W<i>h<b>a</b></i>t<br>is<div>your<div>name<b>?</b></div></div></label>    
       `,
       container
     );
