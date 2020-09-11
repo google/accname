@@ -283,8 +283,9 @@ export const TEST_ONLY = {allowsNameFromContent};
  * empty string otherwise.
  */
 function getCssContent(elem: HTMLElement, pseudoElementName: string): string {
-  const cssContent: string = window.getComputedStyle(elem, pseudoElementName)
-    .content;
+  const computedStyle = window.getComputedStyle(elem, pseudoElementName);
+  const cssContent: string = computedStyle.content;
+  const isBlockDisplay = computedStyle.display === 'block';
   // <string> CSS content identified by surrounding quotes
   // see: https://developer.mozilla.org/en-US/docs/Web/CSS/content
   // and: https://developer.mozilla.org/en-US/docs/Web/CSS/string
@@ -292,7 +293,9 @@ function getCssContent(elem: HTMLElement, pseudoElementName: string): string {
     (cssContent[0] === '"' && cssContent[cssContent.length - 1] === '"') ||
     (cssContent[0] === "'" && cssContent[cssContent.length - 1] === "'")
   ) {
-    return cssContent.slice(1, -1);
+    return isBlockDisplay
+      ? ' ' + cssContent.slice(1, -1) + ' '
+      : cssContent.slice(1, -1);
   }
   return '';
 }
