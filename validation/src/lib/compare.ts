@@ -82,23 +82,48 @@ export async function runURLComparison(url: string): Promise<number> {
       node
     );
 
-    const targetNodeRef = await getNodeRefFromSelector(
-      '[accnameComparisonTarget]',
-      client,
-      page
-    );
+    let successfullyCompared = false;
+    let comparisonAttempts = 0;
+    while (!successfullyCompared && comparisonAttempts < 3) {
+      try {
+        const targetNodeRef = await getNodeRefFromSelector(
+          '[accnameComparisonTarget]',
+          client,
+          page
+        );
 
-    const comparisonResults = await runComparison(targetNodeRef, page, client);
-    if (comparisonResults.disagrees) {
-      // Count category occurrences, save test case for any new categories.
-      const categoryHash = JSON.stringify(comparisonResults.category);
-      if (categoryCount[categoryHash]) {
-        categoryCount[categoryHash] += 1;
-      } else {
-        const casePreview = writeTestcase(comparisonResults, {url: url});
-        cases.push(casePreview.caseId);
-        categoryCount[categoryHash] = 1;
+        const comparisonResults = await runComparison(
+          targetNodeRef,
+          page,
+          client
+        );
+        if (comparisonResults.disagrees) {
+          // Count category occurrences, save test case for any new categories.
+          const categoryHash = JSON.stringify(comparisonResults.category);
+          if (categoryCount[categoryHash]) {
+            categoryCount[categoryHash] += 1;
+          } else {
+            const casePreview = writeTestcase(comparisonResults, {url: url});
+            cases.push(casePreview.caseId);
+            categoryCount[categoryHash] = 1;
+          }
+        }
+        successfullyCompared = true;
+      } catch (error) {
+        ++comparisonAttempts;
+        console.log(
+          `Error: ${error}, ${comparisonAttempts} attempts made, trying again.\n`
+        );
       }
+    }
+    if (!successfullyCompared) {
+      const skippedNodeOuterHTML = await page.evaluate(
+        node => node.outerHTML,
+        node
+      );
+      console.log(
+        `Skipping node comparison for node with the following outerHTML after ${comparisonAttempts} attempts:\n\n${skippedNodeOuterHTML}\n`
+      );
     }
 
     await page.evaluate(
