@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import favicon from 'serve-favicon';
 import {runHTMLSnippetComparison, runURLComparison} from './lib/compare';
+import {NoTargetError} from './lib/node_ref';
 
 const app = express();
 // Set static folder as src/static
@@ -33,7 +34,7 @@ app.get('/summary/:id', (_req, res) => {
 app.get('/api/preview', (_req, res) => {
   fs.readFile(path.join(__dirname, '../output/preview.json'), (err, data) => {
     if (err) {
-      res.status(400).json(err);
+      res.status(500).json(err);
     } else if (data) {
       res.status(200).json(JSON.parse(data.toString()));
     } else {
@@ -48,7 +49,7 @@ app.get('/api/summary/:id', (req, res) => {
     path.join(__dirname, `../output/url_summary/summary_${summaryId}.json`),
     (err, data) => {
       if (err) {
-        res.status(400).json(err);
+        res.status(500).json(err);
       } else if (data) {
         res.status(200).json(JSON.parse(data.toString()));
       } else {
@@ -64,7 +65,7 @@ app.get('/api/case/:id', (req, res) => {
     path.join(__dirname, `../output/case/case_${caseId}.json`),
     (err, data) => {
       if (err) {
-        res.status(400).json(err);
+        res.status(500).json(err);
       } else if (data) {
         res.status(200).json(JSON.parse(data.toString()));
       } else {
@@ -81,7 +82,10 @@ app.post('/api/runSnippetComparison', async (req, res) => {
     res.status(200).json(result);
   } catch (err) {
     console.log('An Error occurred while running a SNIPPET COMPARISON:', err);
-    res.status(400).json(err);
+    if (err instanceof NoTargetError) {
+      res.status(400).json(err);
+    }
+    res.status(500).json(err);
   }
 });
 
@@ -92,7 +96,7 @@ app.post('/api/runURLComparison', async (req, res) => {
     res.status(200).json(result);
   } catch (err) {
     console.log('An Error occurred while running a URL COMPARISON:', err);
-    res.status(400).json(err);
+    res.status(500).json(err);
   }
 });
 
