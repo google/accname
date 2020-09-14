@@ -221,4 +221,10 @@ describe('The function for rule 2D', () => {
     const elem = document.getElementById('foo');
     expect(rule2D(elem!)).toBe(null);
   });
+
+  it('returns the text content of a direct child <title> for <svg> elements', () => {
+    render(html` <svg id="foo"><title>Hello world</title></svg> `, container);
+    const elem = document.getElementById('foo');
+    expect(rule2D(elem!)).toBe('Hello world');
+  });
 });
