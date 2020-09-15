@@ -9,7 +9,7 @@ export function rule2G(node: Node): string | null {
     // 'Flattening' the string with .replace()
     // #SPEC_ASSUMPTION (G.1) : that the resulting text alternative
     // from 2G should be a flat string.
-    return node.textContent?.replace(/\s\s+/g, ' ').trim() ?? '';
+    return node.textContent?.replace(/\s\s+/g, ' ') ?? '';
   }
   return null;
 }

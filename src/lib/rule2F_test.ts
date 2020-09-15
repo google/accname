@@ -52,19 +52,15 @@ describe('The function for rule 2F', () => {
   it('returns a string concatenated with CSS generated text content', () => {
     render(
       html`
-        <div id="foo">
-          world
-          <div>
-            <style>
-              #foo:before {
-                content: 'Hello';
-              }
-              #foo:after {
-                content: '!';
-              }
-            </style>
-          </div>
-        </div>
+        <style>
+          #foo:before {
+            content: 'Hello';
+          }
+          #foo:after {
+            content: '!';
+          }
+        </style>
+        <div id="foo">world</div>
       `,
       container
     );
@@ -72,6 +68,28 @@ describe('The function for rule 2F', () => {
     const context = getDefaultContext();
     context.directLabelReference = true;
     expect(rule2F(elem!, context)).toBe('Helloworld!');
+  });
+
+  it('returns a string concatenated with CSS generated text content', () => {
+    render(
+      html`
+        <style>
+          #foo:before {
+            content: 'Hello';
+            display: block;
+          }
+          #foo:after {
+            content: '!';
+          }
+        </style>
+        <div id="foo">world</div>
+      `,
+      container
+    );
+    const elem = document.getElementById('foo');
+    const context = getDefaultContext();
+    context.directLabelReference = true;
+    expect(rule2F(elem!, context)).toBe('Hello world!');
   });
 
   it("doesn't include non-textual CSS content", () => {

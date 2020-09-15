@@ -240,4 +240,38 @@ describe('The computeTextAlternative function', () => {
       'My name is Eli the weird. (QED) Where are my marbles?'
     );
   });
+
+  // http://wpt.live/accname/name_file-label-inline-block-elements-manual.html
+  it('passes WPT testing whitespace', () => {
+    render(
+      // prettier-ignore
+      html`
+        <input type="file" id="test">
+        <label for="test">W<i>h<b>a</b></i>t<br>is<div>your<div>name<b>?</b></div></div></label>    
+      `,
+      container
+    );
+    const elem = document.getElementById('test')!;
+    expect(computeTextAlternative(elem).name).toBe('What is your name?');
+  });
+
+  it('doesnt add whitespace between inline elements (span in this case)', () => {
+    render(html` <h1 id="test"><span>E</span><span>E</span></h1> `, container);
+    const elem = document.getElementById('test')!;
+    expect(computeTextAlternative(elem).name).toBe('EE');
+  });
+
+  it('does add whitespace if inline elements are on different lines', () => {
+    render(
+      html`
+        <h1 id="test">
+          <span>E</span>
+          <span>E</span>
+        </h1>
+      `,
+      container
+    );
+    const elem = document.getElementById('test')!;
+    expect(computeTextAlternative(elem).name).toBe('E E');
+  });
 });
