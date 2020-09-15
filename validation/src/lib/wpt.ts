@@ -1,6 +1,4 @@
 import puppeteer from 'puppeteer';
-import fetch from 'node-fetch';
-import {JSDOM} from 'jsdom';
 import {loadAccNameLibraries, runComparison} from './compare';
 import {getNodeRefFromSelector} from './node_ref';
 import {writeWPTResults} from './output';
@@ -15,82 +13,71 @@ export async function runWPT(): Promise<number> {
     args: ['--enable-blink-features=AccessibilityObjectModel'],
   });
   const page = await browser.newPage();
-  const client = await page.target().createCDPSession();
+  await page.goto('http://wpt.live/accname/');
 
-  const response = await fetch('http://wpt.live/accname/');
-  const responseBody = await response.text();
-  const testListDom = new JSDOM(responseBody);
-  // Generate the URLs to each test listed on wpt.live/accname
-  const nameTestUrls = Array.from(
-    testListDom.window.document.querySelectorAll('a')
-  )
-    .filter(node => node.href.slice(0, 4) === 'name')
-    .map(node => `http://wpt.live/accname/${node.href}`);
+  // Get a list of URLs for the accname tests
+  const nameTestUrls = (await page.evaluate(
+    `Array.from(document.querySelectorAll('a'))
+    .map(node => node.href)
+    .filter(href => href.includes('accname/name'));`
+  )) as string[];
 
+  // Metrics
   const performance: {[impl: string]: number} = {};
-  let totalTests = 0;
+  let numTestsRun = 0;
   let totalIncorrect = 0;
   const testComparisons = new Array<WPTComparison>();
 
-  let i = 0;
   for (const url of nameTestUrls) {
-    console.log(++i, '/', nameTestUrls.length);
-    const testRes = await fetch(url);
-    const testResText = await testRes.text();
-    // Parse test page using JSDOM
-    const testDom = new JSDOM(testResText);
-    const scripts = testDom.window.document.scripts;
-    const scriptText = scripts.item(scripts.length - 1)?.text;
-    if (scriptText) {
-      // Get correct name from JSON data in <script> tag of test page.
-      const jsonBegins = scriptText.indexOf('ATTAcomm(') + 9;
-      const jsonEnds = scriptText.lastIndexOf(')');
-      const testObj = JSON.parse(scriptText.substring(jsonBegins, jsonEnds));
-      const correctName = testObj.steps[0].test.ATK[0][3];
-      try {
-        // Load test input data into puppeteer browser, using #test as target element.
-        await page.goto(
-          'data:text/html,' + testDom.window.document.body.innerHTML
-        );
-        await loadAccNameLibraries(page);
-        const targetNode = await getNodeRefFromSelector('#test', client, page);
-        const res = await runComparison(targetNode, page, client);
+    try {
+      await page.goto(url);
+      const client = await page.target().createCDPSession();
+      await loadAccNameLibraries(page);
+      // Target node identified by #test for each WPT
+      const targetNode = await getNodeRefFromSelector('#test', client, page);
+      const comparison = await runComparison(targetNode, page, client);
 
-        const incorrectImpls = new Array<string>();
+      // Correct name for a given test is sotred in a 'theTest' object
+      // in a <script> tag in the <head> of each WPT page.
+      const correctName = (await page.evaluate(
+        'theTest.Tests[0].test.ATK[0][3];'
+      )) as string;
 
-        // Identify implementations that got the incorrect accessible name
-        for (const [impl, name] of Object.entries(res.accnames)) {
-          if (name !== correctName) {
-            incorrectImpls.push(impl);
-            performance[impl]
-              ? (performance[impl] += 1)
-              : (performance[impl] = 1);
-          }
+      const incorrectImpls = new Array<string>();
+      // Identify implementations that got the incorrect accessible name
+      // Add +1 to performance if incorrect (bigger value --> worse performance)
+      for (const [impl, name] of Object.entries(comparison.accnames)) {
+        if (name !== correctName) {
+          incorrectImpls.push(impl);
+          performance[impl]
+            ? (performance[impl] += 1)
+            : (performance[impl] = 1);
         }
-
-        if (incorrectImpls.length > 0) {
-          totalIncorrect += 1;
-        }
-
-        const testComparison = {
-          correctName: correctName,
-          accnames: res.accnames,
-          incorrectImpls: incorrectImpls,
-          testURL: url,
-        };
-        testComparisons.push(testComparison);
-
-        totalTests += 1;
-      } catch (error) {
-        console.log(
-          `Skipped test at ${url} due to the following error:\n\n${error}`
-        );
       }
+
+      if (incorrectImpls.length > 0) {
+        totalIncorrect += 1;
+      }
+
+      testComparisons.push({
+        correctName: correctName,
+        accnames: comparison.accnames,
+        incorrectImpls: incorrectImpls,
+        testURL: url,
+      });
+
+      numTestsRun += 1;
+      console.log(`${numTestsRun}/${nameTestUrls.length}`);
+    } catch (error) {
+      console.log(
+        `Skipped test at ${url} due to the following error:\n\n${error}`
+      );
     }
   }
 
+  // Results & performance for all WPTs at wpt.live/accname
   const results = {
-    testsRun: totalTests,
+    testsRun: numTestsRun,
     totalIncorrect: totalIncorrect,
     implPerformance: performance,
     testResults: testComparisons,

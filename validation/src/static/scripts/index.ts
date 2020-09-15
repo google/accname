@@ -145,7 +145,7 @@ const getWPTComparison = async () => {
 
   if (rawResponse.status === 200) {
     const wptResultId = await rawResponse.json();
-    wptResults.innerHTML = `<div class="bluetext comparisonResultText">View the results for the Web Platform Tests comparison - <a href="/wpt/${wptResults}" class="linkBtn">Run ${wptResultId}</a></div>`;
+    wptResults.innerHTML = `<div class="bluetext comparisonResultText">View the results for the Web Platform Tests comparison - <a href="/wpt/${wptResultId}" class="linkBtn">Run ${wptResultId}</a></div>`;
   } else if (rawResponse.status === 400) {
     const error = await rawResponse.json();
     wptResults.innerHTML = `<div class="redtext comparisonResultText">Error: ${error.message}</div>`;
@@ -170,6 +170,7 @@ async function displayPreview() {
   // Empty preview containers to prevent duplicate cards
   snippetContainer.innerHTML = '';
   summaryContainer.innerHTML = '';
+  wptContainer.innerHTML = '';
 
   for (const snippet of preview.snippets) {
     // Sort the snippet cases from recent -> old
