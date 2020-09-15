@@ -51,8 +51,7 @@ var accname = (function (exports) {
             return false;
         }
         const visibility = window.getComputedStyle(node).visibility;
-        const notDisplayed = node.offsetHeight === 0 && node.offsetWidth === 0;
-        if (visibility === 'hidden' || notDisplayed) {
+        if (visibility === 'hidden') {
             return true;
         }
         const hiddenAncestor = closest(node, '[hidden],[aria-hidden="true"]');

@@ -23,8 +23,7 @@ function isHidden(node: Node, context: Context): boolean {
   }
 
   const visibility = window.getComputedStyle(node).visibility;
-  const notDisplayed = node.offsetHeight === 0 && node.offsetWidth === 0;
-  if (visibility === 'hidden' || notDisplayed) {
+  if (visibility === 'hidden') {
     return true;
   }
 
