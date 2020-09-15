@@ -11,6 +11,11 @@ export interface NodeRef {
   backendId: Protocol.DOM.BackendNodeId;
 }
 
+export class NoTargetError extends Error {
+    super('No target element could be found in the document provided');
+  }
+}
+
 /**
  * Create a NodeRef for the node uniquely identified by 'selector'
  * @param selector - Selector uniquely identifying the node to be referenced.
@@ -30,6 +35,10 @@ export async function getNodeRefFromSelector(
     nodeId: getDocumentResponse.root.nodeId,
     selector: selector,
   })) as Protocol.DOM.QuerySelectorResponse;
+
+  if (querySelectorResponse.nodeId === 0) {
+    throw new NoTargetError();
+  }
 
   const describeNodeResponse = (await client.send('DOM.describeNode', {
     nodeId: querySelectorResponse.nodeId,

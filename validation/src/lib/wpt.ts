@@ -23,7 +23,7 @@ export async function runWPT(): Promise<number> {
   )) as string[];
 
   // Metrics
-  const performance: {[impl: string]: number} = {};
+  const implToNumTestsFailed: {[impl: string]: number} = {};
   let numTestsRun = 0;
   let totalIncorrect = 0;
   const testComparisons = new Array<WPTComparison>();
@@ -37,7 +37,7 @@ export async function runWPT(): Promise<number> {
       const targetNode = await getNodeRefFromSelector('#test', client, page);
       const comparison = await runComparison(targetNode, page, client);
 
-      // Correct name for a given test is sotred in a 'theTest' object
+      // Correct name for a given test is stored in a 'theTest' object
       // in a <script> tag in the <head> of each WPT page.
       const correctName = (await page.evaluate(
         'theTest.Tests[0].test.ATK[0][3];'
@@ -45,13 +45,12 @@ export async function runWPT(): Promise<number> {
 
       const incorrectImpls = new Array<string>();
       // Identify implementations that got the incorrect accessible name
-      // Add +1 to performance if incorrect (bigger value --> worse performance)
       for (const [impl, name] of Object.entries(comparison.accnames)) {
         if (name !== correctName) {
           incorrectImpls.push(impl);
-          performance[impl]
-            ? (performance[impl] += 1)
-            : (performance[impl] = 1);
+          implToNumTestsFailed[impl]
+            ? (implToNumTestsFailed[impl] += 1)
+            : (implToNumTestsFailed[impl] = 1);
         }
       }
 
@@ -79,7 +78,7 @@ export async function runWPT(): Promise<number> {
   const results = {
     testsRun: numTestsRun,
     totalIncorrect: totalIncorrect,
-    implPerformance: performance,
+    implPerformance: implToNumTestsFailed,
     testResults: testComparisons,
   };
 
