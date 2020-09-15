@@ -330,6 +330,15 @@ var accname = (function (exports) {
      */
     function rule2D(node, context = getDefaultContext()) {
         var _a;
+        // <title>s define text alternatives for <svg>s
+        // See: https://www.w3.org/TR/svg-aam-1.0/#mapping_additional_nd
+        if (node instanceof SVGElement) {
+            for (const child of node.childNodes) {
+                if (child instanceof SVGTitleElement) {
+                    return child.textContent;
+                }
+            }
+        }
         if (!(node instanceof HTMLElement)) {
             return null;
         }
