@@ -199,7 +199,7 @@ async function displayPreview() {
       wptResult.wptResultId
     }" class="invisibleLink"><div class="previewCard">Run ${
       wptResult.wptResultId
-    } <span>${Math.round(wptResult.percentIncorrect)}%</span></div></a>`;
+    } <span>${100 - Math.round(wptResult.percentIncorrect)}%</span></div></a>`;
   }
 }
 
