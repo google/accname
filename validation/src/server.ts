@@ -2,14 +2,10 @@ import express from 'express';
 import path from 'path';
 import fs from 'fs';
 import favicon from 'serve-favicon';
-<<<<<<< HEAD
 import {runHTMLSnippetComparison} from './lib/snippet';
 import {runURLComparison} from './lib/url';
 import {runWPT} from './lib/wpt';
-=======
-import {runHTMLSnippetComparison, runURLComparison} from './lib/compare';
 import {NoTargetError} from './lib/node_ref';
->>>>>>> master
 
 const app = express();
 // Set static folder as src/static

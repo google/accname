@@ -12,6 +12,7 @@ export interface NodeRef {
 }
 
 export class NoTargetError extends Error {
+  constructor() {
     super('No target element could be found in the document provided');
   }
 }
