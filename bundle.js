@@ -785,7 +785,6 @@ var accname = (function (exports) {
         'i',
         'iframe',
         'img',
-        'input',
         'ins',
         'kbd',
         'label',

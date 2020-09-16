@@ -324,7 +324,6 @@ const inlineTags = [
   'i',
   'iframe',
   'img',
-  'input',
   'ins',
   'kbd',
   'label',
