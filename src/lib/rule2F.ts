@@ -1,6 +1,7 @@
 import {Context, getDefaultContext} from './context';
 import {computeTextAlternative} from './compute_text_alternative';
 import {closest} from './polyfill';
+import {isFocusable} from './util';
 
 const ALWAYS_NAME_FROM_CONTENT = {
   // Explicit roles allowing 'name from content'
@@ -243,7 +244,7 @@ function allowsNameFromContent(elem: HTMLElement, context: Context): boolean {
     if (elem.getAttribute('role')?.toLowerCase() === 'menu') {
       return false;
     }
-    return elem.hasAttribute('tabindex') || elem.isContentEditable;
+    return isFocusable(elem);
   }
 
   // Handles list 1 roles
