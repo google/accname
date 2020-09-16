@@ -247,7 +247,7 @@ describe('The computeTextAlternative function', () => {
       // prettier-ignore
       html`
         <input type="file" id="test">
-        <label for="test">W<i>h<b>a</b></i>t<br>is<div>your<div>name<b>?</b></div></div></label>    
+        <label for="test">W<i>h<b>a</b></i>t<br>is<div>your<div>name<b>?</b></div></div></label>
       `,
       container
     );
@@ -273,5 +273,18 @@ describe('The computeTextAlternative function', () => {
     );
     const elem = document.getElementById('test')!;
     expect(computeTextAlternative(elem).name).toBe('E E');
+  });
+
+  // http://wpt.live/accname/name_test_case_619-manual.html
+  it('does not consider <input> to be inline', () => {
+    render(
+      html`
+        <input type="password" id="test" />
+        <label for="test">foo<input type="text" value="bar" />baz</label>
+      `,
+      container
+    );
+    const elem = document.getElementById('test')!;
+    expect(computeTextAlternative(elem).name).toBe('foo bar baz');
   });
 });
