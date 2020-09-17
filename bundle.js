@@ -33,6 +33,31 @@ var accname = (function (exports) {
         return element;
     }
 
+    /*
+      util.ts contains helper functions that are used by more than one rule.
+    */
+    /**
+     * Calculates whether or not a given element is focusable.
+     * @param elem - The element whose focusability is to be calculated.
+     */
+    function isFocusable(elem) {
+        // See https://html.spec.whatwg.org/multipage/interaction.html#the-tabindex-attribute
+        if ((elem instanceof HTMLAnchorElement ||
+            elem instanceof HTMLAreaElement ||
+            elem instanceof HTMLLinkElement) &&
+            elem.hasAttribute('href')) {
+            return true;
+        }
+        if ((elem instanceof HTMLInputElement ||
+            elem instanceof HTMLSelectElement ||
+            elem instanceof HTMLTextAreaElement ||
+            elem instanceof HTMLButtonElement) &&
+            !elem.hasAttribute('disabled')) {
+            return true;
+        }
+        return elem.hasAttribute('tabindex') || elem.isContentEditable;
+    }
+
     /**
      * Looks at a variety of characteristics (CSS, size on screen, attributes)
      * to determine if 'node' should be considered hidden
@@ -50,9 +75,12 @@ var accname = (function (exports) {
             context.inherited.partOfName) {
             return false;
         }
-        const visibility = window.getComputedStyle(node).visibility;
         const notDisplayed = node.offsetHeight === 0 && node.offsetWidth === 0;
-        if (visibility === 'hidden' || notDisplayed) {
+        if (notDisplayed && !isFocusable(node)) {
+            return true;
+        }
+        const visibility = window.getComputedStyle(node).visibility;
+        if (visibility === 'hidden') {
             return true;
         }
         const hiddenAncestor = closest(node, '[hidden],[aria-hidden="true"]');
@@ -690,7 +718,7 @@ var accname = (function (exports) {
             if (((_a = elem.getAttribute('role')) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === 'menu') {
                 return false;
             }
-            return elem.hasAttribute('tabindex') || elem.isContentEditable;
+            return isFocusable(elem);
         }
         // Handles list 1 roles
         if (matchesRole(elem, ALWAYS_NAME_FROM_CONTENT)) {

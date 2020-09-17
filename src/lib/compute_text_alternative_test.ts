@@ -275,6 +275,13 @@ describe('The computeTextAlternative function', () => {
     expect(computeTextAlternative(elem).name).toBe('E E');
   });
 
+  // http://wpt.live/accname/name_test_case_608-manual.html
+  it("considers focusable elements to be 'perceivable' and therefore not hidden", () => {
+    render(html` <a href="test.html" id="test" title="Tag"></a> `, container);
+    const elem = document.getElementById('test')!;
+    expect(computeTextAlternative(elem).name).toBe('Tag');
+  });
+
   // http://wpt.live/accname/name_test_case_619-manual.html
   it('does not consider <input> to be inline', () => {
     render(

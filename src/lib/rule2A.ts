@@ -1,5 +1,6 @@
 import {Context, getDefaultContext} from './context';
 import {closest} from './polyfill';
+import {isFocusable} from './util';
 
 /**
  * Looks at a variety of characteristics (CSS, size on screen, attributes)
@@ -22,9 +23,13 @@ function isHidden(node: Node, context: Context): boolean {
     return false;
   }
 
-  const visibility = window.getComputedStyle(node).visibility;
   const notDisplayed = node.offsetHeight === 0 && node.offsetWidth === 0;
-  if (visibility === 'hidden' || notDisplayed) {
+  if (notDisplayed && !isFocusable(node)) {
+    return true;
+  }
+
+  const visibility = window.getComputedStyle(node).visibility;
+  if (visibility === 'hidden') {
     return true;
   }
 
