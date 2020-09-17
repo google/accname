@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@types/serve-favicon": "^2.5.0",
-    "axe-core": "^3.5.5",
+    "axe-core": "^4.0.2",
     "express": "^4.17.1",
     "node-fetch": "^2.6.1",
     "puppeteer": "^5.2.1",
