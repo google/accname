@@ -37,32 +37,19 @@ async function getHTMLFromHandles(
 ): Promise<string> {
   // Get the outerHTML of the nodes used by Chrome
   const htmlString = await page.evaluate((nodes: Element[]) => {
-    // Sort nodes by DOM order
-    nodes.sort((first, second) => {
-      // (See https://developer.mozilla.org/en-US/docs/Web/API/Node/compareDocumentPosition)
-      const DOCUMENT_POSITION_PRECEDING = 2;
-      const DOCUMENT_POSITION_FOLLOWING = 4;
-      const DOCUMENT_POSITION_CONTAINS = 8;
-      const DOCUMENT_POSITION_CONTAINED_BY = 16;
-      const relativePosition = first.compareDocumentPosition(second);
-      if (
-        relativePosition & DOCUMENT_POSITION_PRECEDING ||
-        relativePosition & DOCUMENT_POSITION_CONTAINS
-      ) {
-        return 1;
-      } else if (
-        relativePosition & DOCUMENT_POSITION_FOLLOWING ||
-        relativePosition & DOCUMENT_POSITION_CONTAINED_BY
-      ) {
-        return -1;
-      } else {
-        return 0;
-      }
-    });
-    // Remove 'redundant' nodes: nodes whose outerHTML is included in that of
+    // Find 'redundant' nodes: nodes whose outerHTML is included in that of
     // an ancestor node.
+    const redundantNodes = new Array<Element>();
+    for (const nodeA of nodes) {
+      for (const nodeB of nodes) {
+        if (nodeA.contains(nodeB) && nodeA !== nodeB) {
+          redundantNodes.push(nodeB);
+        }
+      }
+    }
+
     return nodes
-      .filter((node, i) => !nodes[i - 1]?.contains(node))
+      .filter(node => !redundantNodes.includes(node))
       .map(node => node.outerHTML)
       .join('\n');
   }, handles);
