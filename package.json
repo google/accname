@@ -2,7 +2,9 @@
   "name": "accname",
   "version": "1.0.0",
   "description": "This library contains a TypeScript implementation of the [Accessible Name Computation](https://www.w3.org/TR/accname-1.1/).",
-  "main": "accessible-name.js",
+  "main": "dist/accessible_name.js",
+  "module": "dist/accessible_name.js",
+  "types": "dist/accessible_name.d.ts",
   "directories": {
     "doc": "docs"
   },
@@ -50,7 +52,7 @@
     "type": "git",
     "url": "git+https://github.com/googleinterns/accessible-name.git"
   },
-  "keywords": [],
+  "keywords": ["accname", "accessible name", "accessible name computation", "a11y", "web accessibility"],
   "author": "Oisín Nolan",
   "license": "Apache-2.0",
   "bugs": {
