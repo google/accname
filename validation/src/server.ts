@@ -2,7 +2,9 @@ import express from 'express';
 import path from 'path';
 import fs from 'fs';
 import favicon from 'serve-favicon';
-import {runHTMLSnippetComparison, runURLComparison} from './lib/compare';
+import {runHTMLSnippetComparison} from './lib/snippet';
+import {runURLComparison} from './lib/url';
+import {runWPT} from './lib/wpt';
 import {NoTargetError} from './lib/node_ref';
 
 const app = express();
@@ -25,6 +27,10 @@ app.get('/case/:id', (_req, res) => {
 
 app.get('/summary/:id', (_req, res) => {
   res.sendFile(path.join(__dirname, 'static/summary.html'));
+});
+
+app.get('/wpt/:id', (_req, res) => {
+  res.sendFile(path.join(__dirname, 'static/wpt.html'));
 });
 
 /**
@@ -75,6 +81,22 @@ app.get('/api/case/:id', (req, res) => {
   );
 });
 
+app.get('/api/wpt/:id', (req, res) => {
+  const wptId = req.params.id;
+  fs.readFile(
+    path.join(__dirname, `../output/wpt_result/wpt_${wptId}.json`),
+    (err, data) => {
+      if (err) {
+        res.status(400).json(err);
+      } else if (data) {
+        res.status(200).json(JSON.parse(data.toString()));
+      } else {
+        res.status(404).json({message: 'Results could not be found.'});
+      }
+    }
+  );
+});
+
 app.post('/api/runSnippetComparison', async (req, res) => {
   const inputSnippet = req.body.snippet as string;
   try {
@@ -97,6 +119,15 @@ app.post('/api/runURLComparison', async (req, res) => {
   } catch (err) {
     console.log('An Error occurred while running a URL COMPARISON:', err);
     res.status(500).json(err);
+  }
+});
+
+app.get('/api/runWPTComparison', async (_req, res) => {
+  try {
+    const result = await runWPT();
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(400).json(err);
   }
 });
 

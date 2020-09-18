@@ -1,0 +1,25 @@
+#comparisonResultsContainer {
+  width: 40%;
+  margin-top: 5px;
+  margin-bottom: 20px;
+}
+
+.implVal {
+  text-align: center;
+}
+
+.incorrect {
+  background: #cc7386;
+}
+
+.passed {
+  background: #afdfba;
+}
+
+.failed {
+  background: #e2b6bf;
+}
+
+th, td {
+  max-width: 20%;
+}
