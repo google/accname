@@ -1,7 +1,7 @@
 {
-  "name": "accessible-name",
-  "version": "0.0.1",
-  "description": "This library will contain a TypeScript implementation of the [Accessible Name Computation](https://www.w3.org/TR/accname-1.1/).",
+  "name": "accname",
+  "version": "1.0.0",
+  "description": "This library contains a TypeScript implementation of the [Accessible Name Computation](https://www.w3.org/TR/accname-1.1/).",
   "main": "accessible-name.js",
   "directories": {
     "doc": "docs"
@@ -31,7 +31,7 @@
     "typescript": "^3.9.5"
   },
   "files": [
-    "!/src/lib/*_test.ts"
+    "dist/**/*"
   ],
   "scripts": {
     "build": "tsc",
