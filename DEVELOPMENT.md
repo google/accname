@@ -21,8 +21,8 @@ $ npm run test
 ### Code Formatting
 - [Google TypeScript Style](https://www.npmjs.com/package/gts) (GTS) is used to format the TypeScript code for AccName. The code is automatically formatted using a commit-hook. This means that the code is often automatically changed by GTS when it is committed, in which case you can simply `$ git add .` and `$ git commit --amend` to update your commit with the newly-formatted code.
 - AccName uses [JSDoc](https://jsdoc.app/) style comments.
-### Performance
-It is important that contributions to AccName do not have a negative impact on its performance. Performance is currently being measured using the [AccName Comparison App](https://github.com/googleinterns/accessible-name/tree/master/validation). Specifically, we use the following metrics:
+### Output Accuracy
+It is important to keep in mind the accuracy of AccNames output with respect to other implementations of the algorithm. Accuracy is currently being measured using the [AccName Comparison App](https://github.com/googleinterns/accessible-name/tree/master/validation). Specifically, we use the following metrics:
 - % of [Web Platform Tests](http://wpt.live/accname/) passed.
 - % Nodes in real world web-pages for which AccName is likely incorrect. This is defined as the % of Nodes for which AccName produces an accessible name of X with all comparison implementations producing an accessible name of Y. In the context of the Comparison App, this can be described with an agreement grouping of the following form: `{{chrome, aom, axe, bg},{accname}}`.
 ### Spec-oriented Design
