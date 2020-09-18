@@ -55,6 +55,10 @@ We assume that a node must be directly referenced by aria-labelledby to be part 
 We assume that context.partOfName is true implies that the current node is being traversed due to recursion. We can make this assumption because partOfName is set to true any time the algorithm is called recursively.
 ## D.1
 We assume that the [HTML Accessibility API Mappings spec](https://www.w3.org/TR/html-aam-1.0/#accessible-name-and-description-computation) lists all instances in which native elements or attributes define a text alternative. It is this document that we used as a guide to implement 2D.
+
+#### Related GitHub PR
+- https://github.com/w3c/accname/pull/88
+
 ## E.1
 Step 2E accepts elements that are ‘embedded within the label [...] for another widget,’. If we consider only label references here (aria-labelledby, native <label>), then we ignore controls that are embedded within nodes that allow name from content (see 2F).
 ```html
@@ -67,6 +71,10 @@ Step 2E accepts elements that are ‘embedded within the label [...] for another
 If 2E doesn’t pick up elements descended from allow name from content elements, then the output is ‘Flash the screen times’, omitting whatever input value is present.
 
 We assume that step 2E should accept elements within allow name from content elements as well as those within labels.
+
+#### Related GitHub PR
+- https://github.com/w3c/accname/pull/90
+
 ## E.2
 Step 2E calculates text alternatives for <select> controls that are part of an accessible name. It defines the text alternative for a <select> as the text alternative for the chosen option in that <select>. This potentially ignores <select>s in which multiple options may be selected.
 
@@ -78,6 +86,10 @@ We assume that if a <select> has multiple selected options, then the text altern
 </select>
 ```
 So under this assumption, accName(div#foo) = ‘Hello world’
+	
+#### Related GitHub Issues
+- https://github.com/w3c/accname/issues/91
+
 ## E.3
 The term value as used in the ‘textbox’ computation in step 2E is not well defined. We assume that this refers to either:
 (i) HTML .value attribute on <input>s, <textarea>s (implicit textboxes with value specified by host language attribute).
@@ -90,6 +102,10 @@ We assume that the text alternative computation for nodes with role ‘menu butt
 This is based on an assumption that the text alternative for a menu button should be calculated in the same way as that of a button as in 2F.
 
 This assumption relies on the fact that all nodes that are accepted by 2E may also be accepted by 2F due to context.partOfName = true. So ignoring the node in 2E simply results in that node being passed on to 2F.
+
+#### Related GitHub PR
+- https://github.com/w3c/accname/pull/92
+
 ## G.1
 Step 2G: It is stated that the accessible name for an element should be a flat string at the end of section 4.3. In step 2D it’s explicitly stated that the text alternative should be a flat string. 
 Step 2G, however, does not state that the text alternative should be a flat string -- we are assuming that it should be in order to ensure that the accessible name as a whole is a flat string.
