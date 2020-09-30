@@ -1,5 +1,7 @@
 import {html, render} from 'lit-html';
-import {rule2D} from './rule2D';
+import {TEST_ONLY} from './compute_text_alternative';
+
+const rule2D = TEST_ONLY.rule2D;
 
 describe('The function for rule 2D', () => {
   let container: HTMLElement;

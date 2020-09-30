@@ -12,9 +12,10 @@ describe('The computeTextAlternative function', () => {
     document.body.removeChild(container);
   });
 
-  it('returns text alternative of element referenced with aria-labelledby', () => {
-    render(
-      html`
+  it('returns text alternative of element referenced with aria-labelledby',
+     () => {
+       render(
+           html`
         <div id="fee" hidden>world</div>
         <div id="bee">
           Hello
@@ -22,86 +23,83 @@ describe('The computeTextAlternative function', () => {
         </div>
         <div id="foo" aria-labelledby="bee"></div>
       `,
-      container
-    );
-    const elem = document.getElementById('foo');
-    expect(computeTextAlternative(elem!).name).toBe('Hello world');
-  });
+           container);
+       const elem = document.getElementById('foo');
+       expect(computeTextAlternative(elem!).name).toBe('Hello world');
+     });
 
-  it("uses aria-labelledby references when computing 'name from content' nodes", () => {
-    render(
-      html`
+  it('uses aria-labelledby references when computing \'name from content\' nodes',
+     () => {
+       render(
+           html`
         <div id="bar">Hello world</div>
         <button id="foo">
           <div aria-labelledby="bar">hi</div>
         </button>
       `,
-      container
-    );
-    const elem = document.getElementById('foo');
-    expect(computeTextAlternative(elem!).name).toBe('Hello world');
-  });
+           container);
+       const elem = document.getElementById('foo');
+       expect(computeTextAlternative(elem!).name).toBe('Hello world');
+     });
 
   it('prefers input value to aria-label for embedded controls', () => {
     render(
-      html`
+        html`
         <div id="foo" role="link">
           Say hello
           <input aria-label="100" type="range" value="5" />
           times
         </div>
       `,
-      container
-    );
+        container);
     const elem = document.getElementById('foo');
     expect(computeTextAlternative(elem!).name).toBe('Say hello 5 times');
   });
 
-  it('returns correct nodesUsed and rulesApplied sets for simple button input', () => {
-    render(html` <button id="foo">Hello world</button> `, container);
-    const elem = document.getElementById('foo')!;
-    expect(computeTextAlternative(elem)).toEqual({
-      name: 'Hello world',
-      nodesUsed: new Set<Node>([elem, elem.childNodes[0]]),
-      rulesApplied: new Set<Rule>(['2G', '2F']),
-    });
-  });
+  it('returns correct nodesUsed and rulesApplied sets for simple button input',
+     () => {
+       render(html` <button id="foo">Hello world</button> `, container);
+       const elem = document.getElementById('foo')!;
+       expect(computeTextAlternative(elem)).toEqual({
+         name: 'Hello world',
+         nodesUsed: new Set<Node>([elem, elem.childNodes[0]]),
+         rulesApplied: new Set<Rule>(['2G', '2F']),
+       });
+     });
 
-  it('returns correct nodesUsed and rulesApplied sets for aria-labelledby references', () => {
-    render(
-      html`
+  it('returns correct nodesUsed and rulesApplied sets for aria-labelledby references',
+     () => {
+       render(
+           html`
         <div id="foo" aria-labelledby="bar">Hi</div>
         <div id="bar">Hello world</div>
       `,
-      container
-    );
-    const elem1 = document.getElementById('foo')!;
-    const elem2 = document.getElementById('bar')!;
-    expect(computeTextAlternative(elem1)).toEqual({
-      name: 'Hello world',
-      nodesUsed: new Set<Node>([elem1, elem2, elem2.childNodes[0]]),
-      rulesApplied: new Set<Rule>(['2B', '2F', '2G']),
-    });
-  });
+           container);
+       const elem1 = document.getElementById('foo')!;
+       const elem2 = document.getElementById('bar')!;
+       expect(computeTextAlternative(elem1)).toEqual({
+         name: 'Hello world',
+         nodesUsed: new Set<Node>([elem1, elem2, elem2.childNodes[0]]),
+         rulesApplied: new Set<Rule>(['2B', '2F', '2G']),
+       });
+     });
 
   it('check title attribute for name when subtree is empty', () => {
     render(
-      html` <input type="checkbox" title="Hello world" id="foo" /> `,
-      container
-    );
+        html` <input type="checkbox" title="Hello world" id="foo" /> `,
+        container);
     const elem = document.getElementById('foo')!;
     expect(computeTextAlternative(elem).name).toEqual('Hello world');
   });
 
   it('check title attribute for name when subtree is hidden', () => {
     render(
-      html`
+        html`
         <button title="Hello world" id="foo">
           <div aria-hidden="true">Invisible text</div>
         </button>
       `,
-      container
-    );
+        container);
     const elem = document.getElementById('foo')!;
     expect(computeTextAlternative(elem).name).toEqual('Hello world');
   });
@@ -109,7 +107,7 @@ describe('The computeTextAlternative function', () => {
   // http://wpt.live/accname/name_file-label-owned-combobox-manual.html
   it('includes aria-owned nodes in the subtree of the current node', () => {
     render(
-      html`
+        html`
         <input type="file" id="test" />
         <label for="test">
           Flash <span aria-owns="id1">the screen</span> times.
@@ -125,16 +123,16 @@ describe('The computeTextAlternative function', () => {
           </div>
         </div>
       `,
-      container
-    );
+        container);
     const elem = document.getElementById('test')!;
     expect(computeTextAlternative(elem).name).toBe('Flash the screen 1 times.');
   });
 
   // http://wpt.live/accname/name_file-label-owned-combobox-owned-listbox-manual.html
-  it('allows aria-owned nodes to be chained together across multiple nodes', () => {
-    render(
-      html`
+  it('allows aria-owned nodes to be chained together across multiple nodes',
+     () => {
+       render(
+           html`
         <input type="file" id="test" />
         <label for="test">
           Flash <span aria-owns="id1">the screen</span> times.
@@ -152,16 +150,17 @@ describe('The computeTextAlternative function', () => {
           </ul>
         </div>
       `,
-      container
-    );
-    const elem = document.getElementById('test')!;
-    expect(computeTextAlternative(elem).name).toBe('Flash the screen 2 times.');
-  });
+           container);
+       const elem = document.getElementById('test')!;
+       expect(computeTextAlternative(elem).name)
+           .toBe('Flash the screen 2 times.');
+     });
 
   // http://wpt.live/accname/name_checkbox-label-embedded-menu-manual.html
-  it('ignores elements who should never allow name from content, in this case role="menu"', () => {
-    render(
-      html`
+  it('ignores elements who should never allow name from content, in this case role="menu"',
+     () => {
+       render(
+           html`
         <input type="checkbox" id="test" />
         <label for="test"
           >Flash the screen
@@ -173,27 +172,26 @@ describe('The computeTextAlternative function', () => {
           times.
         </label>
       `,
-      container
-    );
-    const elem = document.getElementById('test')!;
-    expect(computeTextAlternative(elem).name).toBe('Flash the screen times.');
-  });
+           container);
+       const elem = document.getElementById('test')!;
+       expect(computeTextAlternative(elem).name)
+           .toBe('Flash the screen times.');
+     });
 
   // http://wpt.live/accname/name_test_case_733-manual.html
   it('Does not allow name from content for role=menu even if focusable', () => {
     render(
-      html`
+        html`
         <label for="test">
           crazy
           <select name="member" size="1" role="menu" tabindex="0">
-            <option role="menuitem" value="beard" selected="true">clown</option>
+            <option role="menuitem" value="beard" selected>clown</option>
             <option role="menuitem" value="scuba">rich</option>
           </select>
         </label>
         <input type="password" id="test" />
       `,
-      container
-    );
+        container);
     const elem = document.getElementById('test')!;
     expect(computeTextAlternative(elem).name).toBe('crazy');
   });
@@ -201,7 +199,7 @@ describe('The computeTextAlternative function', () => {
   // http://wpt.live/accname/name_from_content-manual.html
   it('Allows name from content for <tbody>', () => {
     render(
-      html`
+        html`
         <style>
           .hidden {
             display: none;
@@ -233,64 +231,63 @@ describe('The computeTextAlternative function', () => {
           </table>
         </div>
       `,
-      container
-    );
+        container);
     const elem = document.getElementById('test')!;
-    expect(computeTextAlternative(elem).name).toBe(
-      'My name is Eli the weird. (QED) Where are my marbles?'
-    );
+    expect(computeTextAlternative(elem).name)
+        .toBe('My name is Eli the weird. (QED) Where are my marbles?');
   });
 
   // http://wpt.live/accname/name_file-label-inline-block-elements-manual.html
   it('passes WPT testing whitespace', () => {
     render(
-      // prettier-ignore
-      html`
+        // prettier-ignore
+        html`
         <input type="file" id="test">
         <label for="test">W<i>h<b>a</b></i>t<br>is<div>your<div>name<b>?</b></div></div></label>
       `,
-      container
-    );
+        container);
     const elem = document.getElementById('test')!;
     expect(computeTextAlternative(elem).name).toBe('What is your name?');
   });
 
-  it('doesnt add whitespace between inline elements (span in this case)', () => {
-    render(html` <h1 id="test"><span>E</span><span>E</span></h1> `, container);
-    const elem = document.getElementById('test')!;
-    expect(computeTextAlternative(elem).name).toBe('EE');
-  });
+  it('doesnt add whitespace between inline elements (span in this case)',
+     () => {
+       render(
+           html` <h1 id="test"><span>E</span><span>E</span></h1> `, container);
+       const elem = document.getElementById('test')!;
+       expect(computeTextAlternative(elem).name).toBe('EE');
+     });
 
   it('does add whitespace if inline elements are on different lines', () => {
     render(
-      html`
+        html`
         <h1 id="test">
           <span>E</span>
           <span>E</span>
         </h1>
       `,
-      container
-    );
+        container);
     const elem = document.getElementById('test')!;
     expect(computeTextAlternative(elem).name).toBe('E E');
   });
 
   // http://wpt.live/accname/name_test_case_608-manual.html
-  it("considers focusable elements to be 'perceivable' and therefore not hidden", () => {
-    render(html` <a href="test.html" id="test" title="Tag"></a> `, container);
-    const elem = document.getElementById('test')!;
-    expect(computeTextAlternative(elem).name).toBe('Tag');
-  });
+  it('considers focusable elements to be \'perceivable\' and therefore not hidden',
+     () => {
+       render(
+           html` <a href="test.html" id="test" title="Tag"></a> `, container);
+       const elem = document.getElementById('test')!;
+       expect(computeTextAlternative(elem).name).toBe('Tag');
+     });
 
   // http://wpt.live/accname/name_test_case_619-manual.html
   it('does not consider <input> to be inline', () => {
     render(
-      html`
+        html`
         <input type="password" id="test" />
         <label for="test">foo<input type="text" value="bar" />baz</label>
       `,
-      container
-    );
+        container);
     const elem = document.getElementById('test')!;
     expect(computeTextAlternative(elem).name).toBe('foo bar baz');
   });

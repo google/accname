@@ -1,32 +1,25 @@
-import {Context, getDefaultContext} from './context';
-import {computeTextAlternative} from './compute_text_alternative';
+/**
+ * @license
+ * Copyright 2020 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import {Context} from './context';
 import {closest} from './polyfill';
 import {isFocusable} from './util';
+
 
 const ALWAYS_NAME_FROM_CONTENT = {
   // Explicit roles allowing 'name from content'
   // (https://www.w3.org/TR/wai-aria-1.1/#namefromcontent)
   roles: [
-    'button',
-    'cell',
-    'checkbox',
-    'columnheader',
-    'gridcell',
-    'heading',
-    'link',
-    'menuitem',
-    'menuitemcheckbox',
-    'menuitemradio',
-    'option',
-    'radio',
-    'row',
-    'rowgroup',
-    'rowheader',
-    'switch',
-    'tab',
-    'tooltip',
-    'tree',
-    'treeitem',
+    'button',        'cell',     'checkbox',
+    'columnheader',  'gridcell', 'heading',
+    'link',          'menuitem', 'menuitemcheckbox',
+    'menuitemradio', 'option',   'radio',
+    'row',           'rowgroup', 'rowheader',
+    'switch',        'tab',      'tooltip',
+    'tree',          'treeitem',
   ],
   // HTML element types that allow name from content according
   // to their implicit aria roles.
@@ -50,83 +43,30 @@ const ALWAYS_NAME_FROM_CONTENT = {
 // for discussion of roles & tags that forbid name from content.
 //
 // *This case is not explicitly included in version 1.1 of the spec, however,
-// as per the thread linked above we have included it (as have other implementations).
+// as per the thread linked above we have included it (as have other
+// implementations).
 const NEVER_NAME_FROM_CONTENT = {
   roles: [
-    'alert',
-    'alertdialog',
-    'application',
-    'article',
-    'banner',
-    'complementary',
-    'contentinfo',
-    'definition',
-    'dialog',
-    'directory',
-    'document',
-    'feed',
-    'figure',
-    'form',
-    'grid',
-    'group',
-    'img',
-    'list',
-    'listbox',
-    'log',
-    'main',
-    'marquee',
-    'math',
-    'menu',
-    'menubar',
-    'navigation',
-    'note',
-    'radiogroup',
-    'region',
-    'row',
-    'rowgroup',
-    'scrollbar',
-    'search',
-    'searchbox',
-    'separator',
-    'slider',
-    'spinbutton',
-    'status',
-    'table',
-    'tablist',
-    'tabpanel',
-    'term',
-    'textbox',
-    'timer',
-    'toolbar',
-    'tree',
-    'treegrid',
+    'alert',         'alertdialog', 'application', 'article',   'banner',
+    'complementary', 'contentinfo', 'definition',  'dialog',    'directory',
+    'document',      'feed',        'figure',      'form',      'grid',
+    'group',         'img',         'list',        'listbox',   'log',
+    'main',          'marquee',     'math',        'menu',      'menubar',
+    'navigation',    'note',        'radiogroup',  'region',    'row',
+    'rowgroup',      'scrollbar',   'search',      'searchbox', 'separator',
+    'slider',        'spinbutton',  'status',      'table',     'tablist',
+    'tabpanel',      'term',        'textbox',     'timer',     'toolbar',
+    'tree',          'treegrid',
   ],
   tags: [
-    'article',
-    'aside',
-    'body',
-    'datalist',
-    'dialog',
-    'fieldset',
-    'figure',
-    'footer',
-    'form',
-    'header',
-    'hr',
-    'img',
-    'input',
-    'main',
-    'math',
-    'menu',
-    'nav',
-    'optgroup',
-    'section',
-    'select',
-    'textarea',
+    'article', 'aside', 'body',   'datalist', 'dialog',  'fieldset', 'figure',
+    'footer',  'form',  'header', 'hr',       'img',     'input',    'main',
+    'math',    'menu',  'nav',    'optgroup', 'section', 'select',   'textarea',
   ],
 };
 
-// List 3 from https://lists.w3.org/Archives/Public/public-aria/2017Jun/0057.html
+// List 3 from
+// https://lists.w3.org/Archives/Public/public-aria/2017Jun/0057.html
 const SOMETIMES_NAME_FROM_CONTENT = {
   roles: [
     'contentinfo',
@@ -151,9 +91,8 @@ const SOMETIMES_NAME_FROM_CONTENT = {
  * @return - a function that may be applied to an element of type elemNodeName
  * that returns true if that node allows name from content, and false otherwise.
  */
-function getFunctionCalculatingAllowsNameFromContent(
-  elemNodeName: string
-): ((elem: HTMLElement) => boolean) | null {
+function getFunctionCalculatingAllowsNameFromContent(elemNodeName: string):
+    ((elem: HTMLElement) => boolean)|null {
   switch (elemNodeName) {
     case 'th':
       return (elem: HTMLElement) => {
@@ -222,17 +161,17 @@ function matchesRole(elem: HTMLElement, roleType: RoleType): boolean {
  * @param context - additional information about the context of elem
  * @return - whether or not rule 2Fs condition has been satisfied
  */
-function allowsNameFromContent(elem: HTMLElement, context: Context): boolean {
+export function allowsNameFromContent(
+    elem: HTMLElement, context: Context): boolean {
   // The terms 'list 1', 'list 2', 'list 3' are used in reference
-  // to the following thread: see: https://lists.w3.org/Archives/Public/public-aria/2017Jun/0057.html
+  // to the following thread: see:
+  // https://lists.w3.org/Archives/Public/public-aria/2017Jun/0057.html
 
   // Handles list 3 roles
   if (context.inherited.partOfName && elem.parentElement) {
     const parent = elem.parentElement;
-    if (
-      matchesRole(parent, ALWAYS_NAME_FROM_CONTENT) &&
-      matchesRole(elem, SOMETIMES_NAME_FROM_CONTENT)
-    ) {
+    if (matchesRole(parent, ALWAYS_NAME_FROM_CONTENT) &&
+        matchesRole(elem, SOMETIMES_NAME_FROM_CONTENT)) {
       return true;
     }
   }
@@ -255,9 +194,8 @@ function allowsNameFromContent(elem: HTMLElement, context: Context): boolean {
   // Elements that conditionally have an implicit role that matches
   // ALWAYS_NAME_FROM_CONTENT
   const elemNodeName = elem.nodeName.toLowerCase();
-  const nameFromContentFunction = getFunctionCalculatingAllowsNameFromContent(
-    elemNodeName
-  );
+  const nameFromContentFunction =
+      getFunctionCalculatingAllowsNameFromContent(elemNodeName);
   if (nameFromContentFunction && nameFromContentFunction(elem)) {
     return true;
   }
@@ -283,152 +221,31 @@ export const TEST_ONLY = {allowsNameFromContent};
  * @return - css generated content for pseudoElementName if such content exists,
  * empty string otherwise.
  */
-function getCssContent(elem: HTMLElement, pseudoElementName: string): string {
+export function getCssContent(
+    elem: HTMLElement, pseudoElementName: string): string {
   const computedStyle = window.getComputedStyle(elem, pseudoElementName);
   const cssContent: string = computedStyle.content;
   const isBlockDisplay = computedStyle.display === 'block';
   // <string> CSS content identified by surrounding quotes
   // see: https://developer.mozilla.org/en-US/docs/Web/CSS/content
   // and: https://developer.mozilla.org/en-US/docs/Web/CSS/string
-  if (
-    (cssContent[0] === '"' && cssContent[cssContent.length - 1] === '"') ||
-    (cssContent[0] === "'" && cssContent[cssContent.length - 1] === "'")
-  ) {
-    return isBlockDisplay
-      ? ' ' + cssContent.slice(1, -1) + ' '
-      : cssContent.slice(1, -1);
+  if ((cssContent[0] === '"' && cssContent[cssContent.length - 1] === '"') ||
+      (cssContent[0] === '\'' && cssContent[cssContent.length - 1] === '\'')) {
+    return isBlockDisplay ? ' ' + cssContent.slice(1, -1) + ' ' :
+                            cssContent.slice(1, -1);
   }
   return '';
 }
 
 // See https://developer.mozilla.org/en-US/docs/Web/HTML/Inline_elements
 // 'br' removed as it should add a whitespace to the accessible name.
-const inlineTags = [
-  'a',
-  'abbr',
-  'acronym',
-  'b',
-  'bdi',
-  'bdo',
-  'big',
-  'button',
-  'canvas',
-  'cite',
-  'code',
-  'data',
-  'datalist',
-  'del',
-  'dfn',
-  'em',
-  'embed',
-  'i',
-  'iframe',
-  'img',
-  'ins',
-  'kbd',
-  'label',
-  'map',
-  'mark',
-  'meter',
-  'noscript',
-  'object',
-  'output',
-  'picture',
-  'progress',
-  'q',
-  'ruby',
-  's',
-  'samp',
-  'script',
-  'select',
-  'slot',
-  'small',
-  'span',
-  'strong',
-  'sub',
-  'sup',
-  'template',
-  'textarea',
-  'time',
-  'tt',
-  'u',
-  'var',
-  'video',
-  'wbr',
+export const inlineTags = [
+  'a',      'abbr',     'acronym',  'b',     'bdi',    'bdo',      'big',
+  'button', 'canvas',   'cite',     'code',  'data',   'datalist', 'del',
+  'dfn',    'em',       'embed',    'i',     'iframe', 'img',      'ins',
+  'kbd',    'label',    'map',      'mark',  'meter',  'noscript', 'object',
+  'output', 'picture',  'progress', 'q',     'ruby',   's',        'samp',
+  'script', 'select',   'slot',     'small', 'span',   'strong',   'sub',
+  'sup',    'template', 'textarea', 'time',  'tt',     'u',        'var',
+  'video',  'wbr',
 ];
-
-/**
- * Implementation of rule 2F
- * @param node - node whose text alternative is being calculated
- * @param context - additional info relevant to the calculation of nodes
- * text alternative
- * @return - text alternative for node if the conditions of 2F are satisfied,
- * null otherwise.
- */
-export function rule2F(
-  node: Node,
-  context = getDefaultContext()
-): string | null {
-  if (!(node instanceof HTMLElement)) {
-    return null;
-  }
-
-  // The condition for rule 2F determines if the contents of the
-  // current node should be used in its accessible name.
-  if (!allowsNameFromContent(node, context)) {
-    return null;
-  }
-
-  const a11yChildNodes = Array.from(node.childNodes);
-
-  // Include any aria-owned Nodes in the list of 'child nodes'
-  const ariaOwnedNodeIds = node.getAttribute('aria-owns');
-  if (ariaOwnedNodeIds) {
-    for (const idref of ariaOwnedNodeIds.split(' ')) {
-      const referencedNode = document.getElementById(idref);
-      if (referencedNode) {
-        a11yChildNodes.push(referencedNode);
-      }
-    }
-  }
-
-  const textAlterantives: string[] = [];
-  for (const childNode of a11yChildNodes) {
-    if (!context.inherited.visitedNodes.includes(childNode)) {
-      context.inherited.visitedNodes.push(childNode);
-      context.inherited.partOfName = true;
-
-      const textAlterantive = computeTextAlternative(childNode, {
-        inherited: context.inherited,
-      }).name;
-
-      if (
-        inlineTags.includes(childNode.nodeName.toLowerCase()) ||
-        childNode.nodeType === Node.TEXT_NODE
-      ) {
-        textAlterantives.push(textAlterantive);
-      } else {
-        textAlterantives.push(` ${textAlterantive} `);
-      }
-    }
-  }
-
-  // Consider only non-empty text alternatives to prevent double
-  // spacing between text alternatives in accumulatedText.
-  // #SPEC_ASSUMPTION (F.1) : that accumulated texts should be space separated
-  // for readability
-  const accumulatedText = textAlterantives
-    .filter(textAlterantive => textAlterantive !== '')
-    .join('')
-    .replace(/\s+/g, ' ')
-    .trim();
-
-  const cssBeforeContent = getCssContent(node, ':before');
-  const cssAfterContent = getCssContent(node, ':after');
-
-  // #SPEC_ASSUMPTION (F.2) : that CSS generated content should be
-  // concatenated to accumulatedText
-  const result = (cssBeforeContent + accumulatedText + cssAfterContent).trim();
-
-  return result || null;
-}

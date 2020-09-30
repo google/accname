@@ -1,6 +1,9 @@
 import {html, render} from 'lit-html';
+
+import {TEST_ONLY} from './compute_text_alternative';
 import {getDefaultContext} from './context';
-import {rule2B} from './rule2B';
+
+const rule2B = TEST_ONLY.rule2B;
 
 describe('The function for rule 2B', () => {
   let container: HTMLElement;
@@ -27,39 +30,37 @@ describe('The function for rule 2B', () => {
 
   it('returns concatenation of text alternatives of idreffed elements', () => {
     render(
-      html`
+        html`
         <div id="foo" aria-labelledby="bar baz">Hello</div>
         <div id="bar"></div>
         <div id="baz"></div>
       `,
-      container
-    );
+        container);
     const elem = document.getElementById('foo');
     expect(rule2B(elem!)).toBe('');
   });
 
-  it('returns null if the node is already part of an aria-labelledby traversal', () => {
-    render(
-      html`
+  it('returns null if the node is already part of an aria-labelledby traversal',
+     () => {
+       render(
+           html`
         <div id="foo" aria-labelledby="bar">Hello</div>
         <div id="bar"></div>
       `,
-      container
-    );
-    const elem = document.getElementById('foo');
-    const context = getDefaultContext();
-    context.directLabelReference = true;
-    expect(rule2B(elem!, context)).toBe(null);
-  });
+           container);
+       const elem = document.getElementById('foo');
+       const context = getDefaultContext();
+       context.directLabelReference = true;
+       expect(rule2B(elem!, context)).toBe(null);
+     });
 
   it('returns text alternative of aria-labelledby referenced node', () => {
     render(
-      html`
+        html`
         <div id="foo" aria-labelledby="bar"></div>
         <div id="bar">Hello</div>
       `,
-      container
-    );
+        container);
     const elem = document.getElementById('foo');
     expect(rule2B(elem!)).toBe('Hello');
   });

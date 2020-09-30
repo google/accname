@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2020 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /** `element.matches(selector)` with a polyfill for IE */
 function matches(element: Element, selector: string): boolean {
   interface IEElement extends Element {

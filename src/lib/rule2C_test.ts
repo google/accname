@@ -1,5 +1,7 @@
 import {html, render} from 'lit-html';
-import {rule2C} from './rule2C';
+import {TEST_ONLY} from './compute_text_alternative';
+
+const rule2C = TEST_ONLY.rule2C;
 import {getDefaultContext} from './context';
 
 describe('The function for rule 2C', () => {

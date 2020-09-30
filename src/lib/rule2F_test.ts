@@ -1,6 +1,9 @@
 import {html, render} from 'lit-html';
-import {rule2F} from './rule2F';
+
+import {TEST_ONLY} from './compute_text_alternative';
 import {getDefaultContext} from './context';
+
+const rule2F = TEST_ONLY.rule2F;
 
 describe('The function for rule 2F', () => {
   let container: HTMLElement;
@@ -15,20 +18,19 @@ describe('The function for rule 2F', () => {
 
   it('returns text content of role="button" nodes', () => {
     render(
-      html`
+        html`
         <div id="foo" role="button">
           Hello world
         </div>
       `,
-      container
-    );
+        container);
     const elem = document.getElementById('foo');
     expect(rule2F(elem!)).toBe('Hello world');
   });
 
   it('returns text content of subtree if node is a label element', () => {
     render(
-      html`
+        html`
         <label id="foo">
           <div>
             Hello
@@ -41,8 +43,7 @@ describe('The function for rule 2F', () => {
           <div>!</div>
         </label>
       `,
-      container
-    );
+        container);
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
     context.directLabelReference = true;
@@ -51,7 +52,7 @@ describe('The function for rule 2F', () => {
 
   it('returns a string concatenated with CSS generated text content', () => {
     render(
-      html`
+        html`
         <style>
           #foo:before {
             content: 'Hello';
@@ -62,8 +63,7 @@ describe('The function for rule 2F', () => {
         </style>
         <div id="foo">world</div>
       `,
-      container
-    );
+        container);
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
     context.directLabelReference = true;
@@ -72,7 +72,7 @@ describe('The function for rule 2F', () => {
 
   it('returns a string concatenated with CSS generated text content', () => {
     render(
-      html`
+        html`
         <style>
           #foo:before {
             content: 'Hello';
@@ -84,17 +84,16 @@ describe('The function for rule 2F', () => {
         </style>
         <div id="foo">world</div>
       `,
-      container
-    );
+        container);
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
     context.directLabelReference = true;
     expect(rule2F(elem!, context)).toBe('Hello world!');
   });
 
-  it("doesn't include non-textual CSS content", () => {
+  it('doesn\'t include non-textual CSS content', () => {
     render(
-      html`
+        html`
         <style>
           #foo:before {
             content: url('a/url/to/some/image');
@@ -104,17 +103,16 @@ describe('The function for rule 2F', () => {
           Hello world
         </div>
       `,
-      container
-    );
+        container);
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
     context.directLabelReference = true;
     expect(rule2F(elem!, context)).toBe('Hello world');
   });
 
-  it("doesn't visit the same node twice during a recursive traversal", () => {
+  it('doesn\'t visit the same node twice during a recursive traversal', () => {
     render(
-      html`
+        html`
         <div id="foo">
           Hello
           <div aria-labelledby="bar"></div>
@@ -124,17 +122,17 @@ describe('The function for rule 2F', () => {
           <div aria-labelledby="foo"></div>
         </div>
       `,
-      container
-    );
+        container);
     const elem = document.getElementById('foo');
     const context = getDefaultContext();
     context.directLabelReference = true;
     expect(rule2F(elem!, context)).toBe('Hello world');
   });
 
-  it('returns text alternative for entire subtree of node referenced by aria-labelledby', () => {
-    render(
-      html`
+  it('returns text alternative for entire subtree of node referenced by aria-labelledby',
+     () => {
+       render(
+           html`
         <div id="foo" aria-labelledby="bar">
           <div id="bar">
             Hello
@@ -147,17 +145,17 @@ describe('The function for rule 2F', () => {
           </div>
         </div>
       `,
-      container
-    );
-    const elem = document.getElementById('foo');
-    const context = getDefaultContext();
-    context.directLabelReference = true;
-    expect(rule2F(elem!, context)).toBe('Hello world !');
-  });
+           container);
+       const elem = document.getElementById('foo');
+       const context = getDefaultContext();
+       context.directLabelReference = true;
+       expect(rule2F(elem!, context)).toBe('Hello world !');
+     });
 
-  it('returns null if the conditions for applying rule2F are not satisfied', () => {
-    render(html` <div id="foo"></div> `, container);
-    const elem = document.getElementById('foo');
-    expect(rule2F(elem!)).toBe(null);
-  });
+  it('returns null if the conditions for applying rule2F are not satisfied',
+     () => {
+       render(html` <div id="foo"></div> `, container);
+       const elem = document.getElementById('foo');
+       expect(rule2F(elem!)).toBe(null);
+     });
 });

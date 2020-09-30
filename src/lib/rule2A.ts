@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2020 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import {Context, getDefaultContext} from './context';
 import {closest} from './polyfill';
 import {isFocusable} from './util';
@@ -15,11 +21,8 @@ function isHidden(node: Node, context: Context): boolean {
   }
 
   // #SPEC_ASSUMPTION (A.3) : options shouldn't be hidden
-  if (
-    node instanceof HTMLOptionElement &&
-    closest(node, 'select') !== null &&
-    context.inherited.partOfName
-  ) {
+  if (node instanceof HTMLOptionElement && closest(node, 'select') !== null &&
+      context.inherited.partOfName) {
     return false;
   }
 
@@ -62,10 +65,7 @@ function rule2ACondition(node: Node, context: Context): boolean {
  * null is returned otherwise, indicating that the condition of this rule was
  * not satisfied.
  */
-export function rule2A(
-  node: Node,
-  context = getDefaultContext()
-): string | null {
+export function rule2A(node: Node, context = getDefaultContext()): string|null {
   let result = null;
   if (rule2ACondition(node, context)) {
     result = '';
