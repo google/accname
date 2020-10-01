@@ -104,6 +104,18 @@ describe('The computeTextAlternative function', () => {
     expect(computeTextAlternative(elem).name).toEqual('Hello world');
   });
 
+  it('allows name from content through elements with 0 height and width',
+     () => {
+       render(
+           html`
+        <div role="button" id="foo">
+          <span><div>Hello world</div></span>
+        </div>`,
+           container);
+       const elem = document.getElementById('foo')!;
+       expect(computeTextAlternative(elem).name).toBe('Hello world');
+     });
+
   // http://wpt.live/accname/name_file-label-owned-combobox-manual.html
   it('includes aria-owned nodes in the subtree of the current node', () => {
     render(
@@ -197,7 +209,7 @@ describe('The computeTextAlternative function', () => {
   });
 
   // http://wpt.live/accname/name_from_content-manual.html
-  it('Allows name from content for <tbody>', () => {
+  it('allows name from content for <tbody>', () => {
     render(
         html`
         <style>

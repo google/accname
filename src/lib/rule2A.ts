@@ -26,19 +26,28 @@ function isHidden(node: Node, context: Context): boolean {
     return false;
   }
 
-  const notDisplayed = node.offsetHeight === 0 && node.offsetWidth === 0;
-  if (notDisplayed && !isFocusable(node)) {
+  const styles = window.getComputedStyle(node);
+
+  if (parseInt(styles.height) === 0 && parseInt(styles.width) === 0 &&
+      !isFocusable(node)) {
     return true;
   }
 
-  const visibility = window.getComputedStyle(node).visibility;
-  if (visibility === 'hidden') {
+  if (styles.visibility === 'hidden') {
     return true;
   }
 
-  const hiddenAncestor = closest(node, '[hidden],[aria-hidden="true"]');
-  if (hiddenAncestor !== null) {
+  if (closest(node, '[hidden],[aria-hidden="true"]') !== null) {
     return true;
+  }
+
+  // The "display" style isn't inherited so check ancestors directly
+  let ancestor: HTMLElement|null = node;
+  while (ancestor !== null) {
+    if (window.getComputedStyle(ancestor).display === 'none') {
+      return true;
+    }
+    ancestor = ancestor.parentElement;
   }
 
   return false;
