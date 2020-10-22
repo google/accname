@@ -1,7 +1,12 @@
 import {html, render} from 'lit-html';
+import {customMatchers} from '../testing/custom_matchers';
 import {computeTextAlternative, Rule} from './compute_text_alternative';
 
 describe('The computeTextAlternative function', () => {
+  beforeAll(() => {
+    jasmine.addMatchers(customMatchers);
+  });
+
   let container: HTMLElement;
   beforeEach(() => {
     container = document.createElement('div');
@@ -25,7 +30,7 @@ describe('The computeTextAlternative function', () => {
       `,
            container);
        const elem = document.getElementById('foo');
-       expect(computeTextAlternative(elem!).name).toBe('Hello world');
+       expect(elem!).toHaveTextAlernative('Hello world');
      });
 
   it('uses aria-labelledby references when computing \'name from content\' nodes',
@@ -39,7 +44,7 @@ describe('The computeTextAlternative function', () => {
       `,
            container);
        const elem = document.getElementById('foo');
-       expect(computeTextAlternative(elem!).name).toBe('Hello world');
+       expect(elem!).toHaveTextAlernative('Hello world');
      });
 
   it('prefers input value to aria-label for embedded controls', () => {
@@ -53,7 +58,7 @@ describe('The computeTextAlternative function', () => {
       `,
         container);
     const elem = document.getElementById('foo');
-    expect(computeTextAlternative(elem!).name).toBe('Say hello 5 times');
+    expect(elem!).toHaveTextAlernative('Say hello 5 times');
   });
 
   it('returns correct nodesUsed and rulesApplied sets for simple button input',
@@ -89,7 +94,7 @@ describe('The computeTextAlternative function', () => {
         html` <input type="checkbox" title="Hello world" id="foo" /> `,
         container);
     const elem = document.getElementById('foo')!;
-    expect(computeTextAlternative(elem).name).toEqual('Hello world');
+    expect(elem).toHaveTextAlernative('Hello world');
   });
 
   it('check title attribute for name when subtree is hidden', () => {
@@ -101,7 +106,7 @@ describe('The computeTextAlternative function', () => {
       `,
         container);
     const elem = document.getElementById('foo')!;
-    expect(computeTextAlternative(elem).name).toEqual('Hello world');
+    expect(elem).toHaveTextAlernative('Hello world');
   });
 
   it('allows name from content through elements with 0 height and width',
@@ -113,7 +118,7 @@ describe('The computeTextAlternative function', () => {
         </div>`,
            container);
        const elem = document.getElementById('foo')!;
-       expect(computeTextAlternative(elem).name).toBe('Hello world');
+       expect(elem).toHaveTextAlernative('Hello world');
      });
 
   // http://wpt.live/accname/name_file-label-owned-combobox-manual.html
@@ -137,7 +142,7 @@ describe('The computeTextAlternative function', () => {
       `,
         container);
     const elem = document.getElementById('test')!;
-    expect(computeTextAlternative(elem).name).toBe('Flash the screen 1 times.');
+    expect(elem).toHaveTextAlernative('Flash the screen 1 times.');
   });
 
   // http://wpt.live/accname/name_file-label-owned-combobox-owned-listbox-manual.html
@@ -164,8 +169,7 @@ describe('The computeTextAlternative function', () => {
       `,
            container);
        const elem = document.getElementById('test')!;
-       expect(computeTextAlternative(elem).name)
-           .toBe('Flash the screen 2 times.');
+       expect(elem).toHaveTextAlernative('Flash the screen 2 times.');
      });
 
   // http://wpt.live/accname/name_checkbox-label-embedded-menu-manual.html
@@ -186,8 +190,7 @@ describe('The computeTextAlternative function', () => {
       `,
            container);
        const elem = document.getElementById('test')!;
-       expect(computeTextAlternative(elem).name)
-           .toBe('Flash the screen times.');
+       expect(elem).toHaveTextAlernative('Flash the screen times.');
      });
 
   // http://wpt.live/accname/name_test_case_733-manual.html
@@ -205,7 +208,7 @@ describe('The computeTextAlternative function', () => {
       `,
         container);
     const elem = document.getElementById('test')!;
-    expect(computeTextAlternative(elem).name).toBe('crazy');
+    expect(elem).toHaveTextAlernative('crazy');
   });
 
   // http://wpt.live/accname/name_from_content-manual.html
@@ -245,8 +248,7 @@ describe('The computeTextAlternative function', () => {
       `,
         container);
     const elem = document.getElementById('test')!;
-    expect(computeTextAlternative(elem).name)
-        .toBe('My name is Eli the weird. (QED) Where are my marbles?');
+    expect(elem).toHaveTextAlernative('My name is Eli the weird. (QED) Where are my marbles?');
   });
 
   // http://wpt.live/accname/name_file-label-inline-block-elements-manual.html
@@ -259,7 +261,7 @@ describe('The computeTextAlternative function', () => {
       `,
         container);
     const elem = document.getElementById('test')!;
-    expect(computeTextAlternative(elem).name).toBe('What is your name?');
+    expect(elem).toHaveTextAlernative('What is your name?');
   });
 
   it('doesnt add whitespace between inline elements (span in this case)',
@@ -267,7 +269,7 @@ describe('The computeTextAlternative function', () => {
        render(
            html` <h1 id="test"><span>E</span><span>E</span></h1> `, container);
        const elem = document.getElementById('test')!;
-       expect(computeTextAlternative(elem).name).toBe('EE');
+       expect(elem).toHaveTextAlernative('EE');
      });
 
   it('does add whitespace if inline elements are on different lines', () => {
@@ -280,7 +282,7 @@ describe('The computeTextAlternative function', () => {
       `,
         container);
     const elem = document.getElementById('test')!;
-    expect(computeTextAlternative(elem).name).toBe('E E');
+    expect(elem).toHaveTextAlernative('E E');
   });
 
   // http://wpt.live/accname/name_test_case_608-manual.html
@@ -289,7 +291,7 @@ describe('The computeTextAlternative function', () => {
        render(
            html` <a href="test.html" id="test" title="Tag"></a> `, container);
        const elem = document.getElementById('test')!;
-       expect(computeTextAlternative(elem).name).toBe('Tag');
+       expect(elem).toHaveTextAlernative('Tag');
      });
 
   // http://wpt.live/accname/name_test_case_619-manual.html
@@ -301,6 +303,22 @@ describe('The computeTextAlternative function', () => {
       `,
         container);
     const elem = document.getElementById('test')!;
-    expect(computeTextAlternative(elem).name).toBe('foo bar baz');
+    expect(elem).toHaveTextAlernative('foo bar baz');
+  });
+
+  it('can handle elements in iframes', async () => {
+    render(html`<iframe srcdoc="<body></body>"></iframe>`, container);
+    const iframe = container.querySelector('iframe')!;
+    await iframeLoadedPromise(iframe);
+    const iframeDocument = iframe.contentWindow!.document;
+    render(html`<button>Inside iframe</button>`, iframeDocument.body);
+    const button = iframeDocument.querySelector('button')!;
+    expect(button).toHaveTextAlernative('Inside iframe');
   });
 });
+
+async function iframeLoadedPromise(iframe: HTMLIFrameElement) {
+  return new Promise((resolve) => {
+    iframe.addEventListener('load', resolve, {once: true});
+  });
+}

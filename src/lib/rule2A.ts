@@ -6,7 +6,7 @@
 
 import {Context, getDefaultContext} from './context';
 import {closest} from './polyfill';
-import {isFocusable} from './util';
+import {isFocusable, isHTMLElement, hasTagName} from './util';
 
 /**
  * Looks at a variety of characteristics (CSS, size on screen, attributes)
@@ -16,12 +16,12 @@ import {isFocusable} from './util';
  */
 // #SPEC_ASSUMPTION (A.2) : definition of 'hidden'
 function isHidden(node: Node, context: Context): boolean {
-  if (!(node instanceof HTMLElement)) {
+  if (!isHTMLElement(node)) {
     return false;
   }
 
   // #SPEC_ASSUMPTION (A.3) : options shouldn't be hidden
-  if (node instanceof HTMLOptionElement && closest(node, 'select') !== null &&
+  if (hasTagName(node, 'option') && closest(node, 'select') !== null &&
       context.inherited.partOfName) {
     return false;
   }

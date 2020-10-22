@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import {hasTagName} from './util';
+
 // Input types that imply role 'textbox' if list attribute is not present,
 // and imply role 'combobox' if list attribute is present.
 export const TEXT_INPUT_TYPES = ['email', 'tel', 'text', 'url', 'search'];
@@ -25,12 +27,12 @@ export function getValueIfTextbox(node: HTMLElement): string|null {
   }
 
   // type <textarea> implies role='textbox'
-  if (node instanceof HTMLTextAreaElement) {
+  if (hasTagName(node, 'textarea')) {
     return node.value;
   }
 
   // <input> with certain type values & no list attribute implies role='textbox'
-  if (node instanceof HTMLInputElement &&
+  if (hasTagName(node, 'input') &&
       TEXT_INPUT_TYPES.includes(node.type) && !node.hasAttribute('list')) {
     return node.value;
   }
@@ -61,9 +63,9 @@ export function getValueIfRange(node: HTMLElement): string|null {
     return null;
   }
 
-  const isImplicitRange = (node instanceof HTMLInputElement &&
+  const isImplicitRange = (hasTagName(node, 'input') &&
                            RANGE_INPUT_TYPES.includes(node.type)) ||
-      node instanceof HTMLProgressElement;
+      hasTagName(node, 'progress');
 
   if (isExplicitRange || isImplicitRange) {
     if (node.hasAttribute('aria-valuetext')) {
@@ -72,10 +74,10 @@ export function getValueIfRange(node: HTMLElement): string|null {
     if (node.hasAttribute('aria-valuenow')) {
       return node.getAttribute('aria-valuenow');
     }
-    if (node instanceof HTMLInputElement) {
+    if (hasTagName(node, 'input')) {
       return node.value;
     }
-    if (node instanceof HTMLProgressElement) {
+    if (hasTagName(node, 'progress')) {
       return node.value.toString();
     }
   }

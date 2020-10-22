@@ -11,6 +11,7 @@ import {getValueIfRange, getValueIfTextbox, TEXT_INPUT_TYPES} from './rule2E';
 import {allowsNameFromContent, getCssContent, inlineTags} from './rule2F';
 import {rule2G} from './rule2G';
 import {rule2I} from './rule2I';
+import {hasTagName, isHTMLElement, isSVGElement} from './util';
 
 // taze: SVG types from //javascript/externs:svg_lib
 
@@ -87,7 +88,7 @@ export function computeTextAlternative(
  * not satisfied.
  */
 function rule2B(node: Node, context = getDefaultContext()): string|null {
-  if (!(node instanceof HTMLElement)) {
+  if (!isHTMLElement(node)) {
     return null;
   }
 
@@ -126,7 +127,7 @@ function rule2B(node: Node, context = getDefaultContext()): string|null {
  *     otherwise.
  */
 function rule2C(node: Node, context = getDefaultContext()): string|null {
-  if (!(node instanceof HTMLElement)) {
+  if (!isHTMLElement(node)) {
     return null;
   }
 
@@ -192,15 +193,15 @@ function rule2D(node: Node, context: Context = getDefaultContext()): string|
     null {
   // <title>s define text alternatives for <svg>s
   // See: https://www.w3.org/TR/svg-aam-1.0/#mapping_additional_nd
-  if (node instanceof SVGElement) {
+  if (isSVGElement(node)) {
     for (const child of node.childNodes) {
-      if (child instanceof SVGTitleElement) {
+      if (isSVGElement(child) && hasTagName(child, 'title')) {
         return child.textContent;
       }
     }
   }
 
-  if (!(node instanceof HTMLElement)) {
+  if (!isHTMLElement(node)) {
     return null;
   }
 
@@ -221,7 +222,7 @@ function rule2D(node: Node, context: Context = getDefaultContext()): string|
 
   // If input is not <label>led, use native attribute /
   // element information to compute a text alternative
-  if (node instanceof HTMLInputElement) {
+  if (hasTagName(node, 'input')) {
     const inputTextAlternative = getUnlabelledInputText(node);
     if (inputTextAlternative) {
       return inputTextAlternative;
@@ -229,7 +230,7 @@ function rule2D(node: Node, context: Context = getDefaultContext()): string|
   }
 
   // <caption>s define text alternatives for <table>s
-  if (node instanceof HTMLTableElement) {
+  if (hasTagName(node, 'table')) {
     const captionElem = node.querySelector('caption');
     if (captionElem) {
       context.inherited.partOfName = true;
@@ -241,8 +242,7 @@ function rule2D(node: Node, context: Context = getDefaultContext()): string|
   }
 
   // <figcaption>s define text alternatives for <figure>s
-  // Checking tagName due to lack of HTMLFigureElement
-  if (node.tagName === 'FIGURE') {
+  if (hasTagName(node, 'figure')) {
     const figcaptionElem = node.querySelector('figcaption');
     if (figcaptionElem) {
       context.inherited.partOfName = true;
@@ -254,7 +254,7 @@ function rule2D(node: Node, context: Context = getDefaultContext()): string|
   }
 
   // <legend>s define text alternatives for <fieldset>s
-  if (node instanceof HTMLFieldSetElement) {
+  if (hasTagName(node, 'fieldset')) {
     const legendElem = node.querySelector('legend');
     if (legendElem) {
       context.inherited.partOfName = true;
@@ -268,8 +268,7 @@ function rule2D(node: Node, context: Context = getDefaultContext()): string|
   // alt attributes define text alternatives for
   // <img>s and <area>s
   const altAttribute = node.getAttribute('alt');
-  if (altAttribute &&
-      (node instanceof HTMLImageElement || node instanceof HTMLAreaElement)) {
+  if (altAttribute && (hasTagName(node, 'img') || hasTagName(node, 'area'))) {
     return altAttribute;
   }
 
@@ -298,8 +297,7 @@ function getValueIfComboboxOrListbox(
 
   // Combobox role implied by input type and presence of list attribute,
   // chosen option is the input value.
-  if (node instanceof HTMLInputElement &&
-      TEXT_INPUT_TYPES.includes(node.type) &&
+  if (hasTagName(node, 'input') && TEXT_INPUT_TYPES.includes(node.type) &&
       (node.hasAttribute('list') || nodeRole === 'combobox')) {
     return node.value;
   }
@@ -314,7 +312,7 @@ function getValueIfComboboxOrListbox(
         node.querySelectorAll('[role="option"][aria-selected="true"]'));
   }
   // A <select> element is always implicitly either a listbox or a combobox
-  else if (node instanceof HTMLSelectElement) {
+  else if (hasTagName(node, 'select')) {
     selectedOptions = Array.from(node.selectedOptions);
   }
 
@@ -346,7 +344,7 @@ function getValueIfComboboxOrListbox(
  *     otherwise.
  */
 function rule2E(node: Node, context = getDefaultContext()): string|null {
-  if (!(node instanceof HTMLElement)) {
+  if (!isHTMLElement(node)) {
     return null;
   }
 
@@ -387,7 +385,7 @@ function rule2E(node: Node, context = getDefaultContext()): string|null {
  * null otherwise.
  */
 function rule2F(node: Node, context = getDefaultContext()): string|null {
-  if (!(node instanceof HTMLElement)) {
+  if (!isHTMLElement(node)) {
     return null;
   }
 

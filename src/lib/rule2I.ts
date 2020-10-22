@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { isHTMLElement } from './util';
+
 // Input types for whom placeholders should be considered when computing
 // a text alternative. See
 // https://www.w3.org/TR/html-aam-1.0/#input-type-text-input-type-password-input-type-search-input-type-tel-input-type-email-input-type-url-and-textarea-element-accessible-name-computation
@@ -22,7 +24,7 @@ const TEXTUAL_INPUT_TYPES = [
  * @return - text alternative if rule 2I applies to node, null otherwise.
  */
 export function rule2I(node: Node): string|null {
-  if (!(node instanceof HTMLElement)) {
+  if (!isHTMLElement(node)) {
     return null;
   }
 
