@@ -4,9 +4,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import {ComputeTextAlternative} from './compute_text_alternative';
 import {Context} from './context';
 import {closest} from './polyfill';
-import {isFocusable} from './util';
+import {isFocusable, isHTMLElement} from './util';
 
 
 const ALWAYS_NAME_FROM_CONTENT = {
@@ -249,3 +250,78 @@ export const inlineTags = [
   'sup',    'template', 'textarea', 'time',  'tt',     'u',        'var',
   'video',  'wbr',
 ];
+
+/**
+ * Implementation of rule 2F
+ * @param node - node whose text alternative is being calculated
+ * @param context - additional info relevant to the calculation of nodes
+ * text alternative
+ * @return - text alternative for node if the conditions of 2F are satisfied,
+ * null otherwise.
+ */
+export function rule2F(
+    node: Node,
+    context: Context,
+    computeTextAlternative: ComputeTextAlternative,
+    ): string|null {
+  if (!isHTMLElement(node)) {
+    return null;
+  }
+
+  // The condition for rule 2F determines if the contents of the
+  // current node should be used in its accessible name.
+  if (!allowsNameFromContent(node, context)) {
+    return null;
+  }
+
+  const a11yChildNodes = Array.from(node.childNodes);
+
+  // Include any aria-owned Nodes in the list of 'child nodes'
+  const ariaOwnedNodeIds = node.getAttribute('aria-owns');
+  if (ariaOwnedNodeIds) {
+    for (const idref of ariaOwnedNodeIds.split(' ')) {
+      const referencedNode = document.getElementById(idref);
+      if (referencedNode) {
+        a11yChildNodes.push(referencedNode);
+      }
+    }
+  }
+
+  const textAlterantives: string[] = [];
+  for (const childNode of a11yChildNodes) {
+    if (!context.inherited.visitedNodes.includes(childNode)) {
+      context.inherited.visitedNodes.push(childNode);
+      context.inherited.partOfName = true;
+
+      const textAlterantive = computeTextAlternative(childNode, {
+                                inherited: context.inherited,
+                              }).name;
+
+      if (inlineTags.includes(childNode.nodeName.toLowerCase()) ||
+          childNode.nodeType === Node.TEXT_NODE) {
+        textAlterantives.push(textAlterantive);
+      } else {
+        textAlterantives.push(` ${textAlterantive} `);
+      }
+    }
+  }
+
+  // Consider only non-empty text alternatives to prevent double
+  // spacing between text alternatives in accumulatedText.
+  // #SPEC_ASSUMPTION (F.1) : that accumulated texts should be space separated
+  // for readability
+  const accumulatedText =
+      textAlterantives.filter(textAlterantive => textAlterantive !== '')
+          .join('')
+          .replace(/\s+/g, ' ')
+          .trim();
+
+  const cssBeforeContent = getCssContent(node, ':before');
+  const cssAfterContent = getCssContent(node, ':after');
+
+  // #SPEC_ASSUMPTION (F.2) : that CSS generated content should be
+  // concatenated to accumulatedText
+  const result = (cssBeforeContent + accumulatedText + cssAfterContent).trim();
+
+  return result || null;
+}

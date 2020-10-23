@@ -38,6 +38,12 @@ export function isSVGElement(n: Node): n is SVGElement {
       (n as Element).namespaceURI === `http://www.w3.org/2000/svg`;
 }
 
+/**
+ * Checks whether the `tagName` of a particular element matches a known
+ * tagName. The `tagName` is constrained by the same type mappings that are used
+ * in `document.querySelector`, which allows us to constrain the return type as
+ * well.
+ */
 export function hasTagName<TagName extends keyof HTMLElementTagNameMap>(
     el: HTMLElement, name: TagName): el is HTMLElementTagNameMap[TagName];
 export function hasTagName<TagName extends keyof SVGElementTagNameMap>(

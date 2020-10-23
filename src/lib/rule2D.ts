@@ -4,6 +4,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import {ComputeTextAlternative} from './compute_text_alternative';
+import {Context} from './context';
+import {hasTagName, isHTMLElement, isSVGElement} from './util';
+
 /**
  * Process elem's text alternative if elem is an <input>, assuming
  * that no <label> element references elem.
@@ -54,3 +58,132 @@ export const LABELLABLE_ELEMENT_TYPES = [
   'SELECT',
   'TEXTAREA',
 ];
+
+/**
+ * Gets the text alternative as defined by one or more native <label>s.
+ * @param elem - element whose text alternative is being calculated
+ * @param context - information relevant to the computation of elem's text
+ *     alternative
+ * @return - the text alternative for elem if elem is legally labelled by a
+ *     native
+ * <label>, null otherwise.
+ */
+function getTextIfLabelled(
+    elem: HTMLElement,
+    context: Context,
+    computeTextAlternative: ComputeTextAlternative,
+    ): string|null {
+  // Using querySelectorAll to get <label>s in DOM order.
+  const allLabelElems = document.querySelectorAll('label');
+  const labelElems = Array.from(allLabelElems).filter(label => {
+    return label.control === elem;
+  });
+
+  const textAlternative =
+      labelElems
+          .map(labelElem => computeTextAlternative(labelElem, {
+                              directLabelReference: true,
+                              inherited: context.inherited,
+                            }).name)
+          .filter(text => text !== '')
+          .join(' ');
+
+  return textAlternative || null;
+}
+
+/**
+ * Implementation for rule 2D
+ * @param node - the node whose text alternative is being computed
+ * @param context - information relevant to the text alternative computation
+ * for node
+ * @return - text alternative for node if the conditions for applying
+ * rule 2D are satisfied, null otherwise.
+ */
+export function rule2D(
+    node: Node,
+    context: Context,
+    computeTextAlternative: ComputeTextAlternative,
+    ): string|null {
+  // <title>s define text alternatives for <svg>s
+  // See: https://www.w3.org/TR/svg-aam-1.0/#mapping_additional_nd
+  if (isSVGElement(node)) {
+    for (const child of node.childNodes) {
+      if (isSVGElement(child) && hasTagName(child, 'title')) {
+        return child.textContent;
+      }
+    }
+  }
+
+  if (!isHTMLElement(node)) {
+    return null;
+  }
+
+  const roleAttribute = node.getAttribute('role') ?? '';
+  if (roleAttribute === 'presentation' || roleAttribute === 'none') {
+    return null;
+  }
+
+  // #SPEC_ASSUMPTION (D.1) : html-aam (https://www.w3.org/TR/html-aam-1.0/)
+  // specifies all native attributes and elements that define a text
+  // alternative.
+  if (LABELLABLE_ELEMENT_TYPES.includes(node.tagName)) {
+    const labelText = getTextIfLabelled(node, context, computeTextAlternative);
+    if (labelText) {
+      return labelText;
+    }
+  }
+
+  // If input is not <label>led, use native attribute /
+  // element information to compute a text alternative
+  if (hasTagName(node, 'input')) {
+    const inputTextAlternative = getUnlabelledInputText(node);
+    if (inputTextAlternative) {
+      return inputTextAlternative;
+    }
+  }
+
+  // <caption>s define text alternatives for <table>s
+  if (hasTagName(node, 'table')) {
+    const captionElem = node.querySelector('caption');
+    if (captionElem) {
+      context.inherited.partOfName = true;
+      return computeTextAlternative(captionElem, {
+               inherited: context.inherited,
+             })
+          .name;
+    }
+  }
+
+  // <figcaption>s define text alternatives for <figure>s
+  if (hasTagName(node, 'figure')) {
+    const figcaptionElem = node.querySelector('figcaption');
+    if (figcaptionElem) {
+      context.inherited.partOfName = true;
+      return computeTextAlternative(figcaptionElem, {
+               inherited: context.inherited,
+             })
+          .name;
+    }
+  }
+
+  // <legend>s define text alternatives for <fieldset>s
+  if (hasTagName(node, 'fieldset')) {
+    const legendElem = node.querySelector('legend');
+    if (legendElem) {
+      context.inherited.partOfName = true;
+      return computeTextAlternative(legendElem, {
+               inherited: context.inherited,
+             })
+          .name;
+    }
+  }
+
+  // alt attributes define text alternatives for
+  // <img>s and <area>s
+  const altAttribute = node.getAttribute('alt');
+  if (altAttribute && (hasTagName(node, 'img') || hasTagName(node, 'area'))) {
+    return altAttribute;
+  }
+
+  return null;
+}

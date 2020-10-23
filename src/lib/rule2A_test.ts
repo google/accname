@@ -1,6 +1,10 @@
 import {html, render} from 'lit-html';
+
+import {createRuleRunner} from '../testing/utils';
 import {getDefaultContext} from './context';
-import {rule2A} from './rule2A';
+import {rule2A as rule2AImpl} from './rule2A';
+
+const rule2A = createRuleRunner(rule2AImpl);
 
 describe('The function for rule 2A', () => {
   let container: HTMLElement;
@@ -13,27 +17,29 @@ describe('The function for rule 2A', () => {
     document.body.removeChild(container);
   });
 
-  it("returns empty string for hidden elems that aren't referenced", () => {
+  it('returns empty string for hidden elems that aren\'t referenced', () => {
     render(html`<div id="foo" hidden>Hello world</div>`, container);
     const elem = document.getElementById('foo');
     expect(rule2A(elem!)).toBe('');
   });
 
-  it('returns null for hidden elems that are referenced in an aria-labelledby', () => {
-    render(html`<div id="foo" hidden>Hello world</div>`, container);
-    const elem = document.getElementById('foo');
-    const context = getDefaultContext();
-    context.directLabelReference = true;
-    expect(rule2A(elem!, context)).toBe(null);
-  });
+  it('returns null for hidden elems that are referenced in an aria-labelledby',
+     () => {
+       render(html`<div id="foo" hidden>Hello world</div>`, container);
+       const elem = document.getElementById('foo');
+       const context = getDefaultContext();
+       context.directLabelReference = true;
+       expect(rule2A(elem!, context)).toBe(null);
+     });
 
-  it('returns null for hidden elems that are referenced by a label element', () => {
-    render(html`<div id="foo" hidden>Hello world</div>`, container);
-    const elem = document.getElementById('foo');
-    const context = getDefaultContext();
-    context.directLabelReference = true;
-    expect(rule2A(elem!, context)).toBe(null);
-  });
+  it('returns null for hidden elems that are referenced by a label element',
+     () => {
+       render(html`<div id="foo" hidden>Hello world</div>`, container);
+       const elem = document.getElementById('foo');
+       const context = getDefaultContext();
+       context.directLabelReference = true;
+       expect(rule2A(elem!, context)).toBe(null);
+     });
 
   it('returns null for elem that is not hidden', () => {
     render(html`<div id="foo">Hello world</div>`, container);
@@ -49,7 +55,7 @@ describe('The function for rule 2A', () => {
 
   it('considers CSS display none', () => {
     render(
-      html`
+        html`
         <div id="foo">Hello world</div>
         <style>
           #foo {
@@ -57,15 +63,14 @@ describe('The function for rule 2A', () => {
           }
         </style>
       `,
-      container
-    );
+        container);
     const elem = document.getElementById('foo');
     expect(rule2A(elem!)).toBe('');
   });
 
   it('considers CSS visibility hidden', () => {
     render(
-      html`
+        html`
         <div id="foo">Hello world</div>
         <style>
           #foo {
@@ -73,15 +78,14 @@ describe('The function for rule 2A', () => {
           }
         </style>
       `,
-      container
-    );
+        container);
     const elem = document.getElementById('foo');
     expect(rule2A(elem!)).toBe('');
   });
 
   it('considers hidden ancestors', () => {
     render(
-      html`
+        html`
         <div hidden>
           <div>
             <div>
@@ -90,15 +94,14 @@ describe('The function for rule 2A', () => {
           </div>
         </div>
       `,
-      container
-    );
+        container);
     const elem = document.getElementById('foo');
     expect(rule2A(elem!)).toBe('');
   });
 
   it('considers display:none ancestors', () => {
     render(
-      html`
+        html`
         <div id="bar">
           <div>
             <div>
@@ -112,15 +115,14 @@ describe('The function for rule 2A', () => {
           }
         </style>
       `,
-      container
-    );
+        container);
     const elem = document.getElementById('foo');
     expect(rule2A(elem!)).toBe('');
   });
 
   it('considers visibility:hidden ancestors', () => {
     render(
-      html`
+        html`
         <div id="bar">
           <div>
             <div>
@@ -134,8 +136,7 @@ describe('The function for rule 2A', () => {
           }
         </style>
       `,
-      container
-    );
+        container);
     const elem = document.getElementById('foo');
     expect(rule2A(elem!)).toBe('');
   });

@@ -1,9 +1,10 @@
 import {html, render} from 'lit-html';
 
-import {TEST_ONLY} from './compute_text_alternative';
+import {createRuleRunner} from '../testing/utils';
 import {getDefaultContext} from './context';
+import {rule2F as rule2FImpl} from './rule2F';
 
-const rule2F = TEST_ONLY.rule2F;
+const rule2F = createRuleRunner(rule2FImpl);
 
 describe('The function for rule 2F', () => {
   let container: HTMLElement;

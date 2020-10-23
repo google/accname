@@ -4,9 +4,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {Context, getDefaultContext} from './context';
+import {Context} from './context';
 import {closest} from './polyfill';
-import {isFocusable, isHTMLElement, hasTagName} from './util';
+import {hasTagName, isFocusable, isHTMLElement} from './util';
+
 
 /**
  * Looks at a variety of characteristics (CSS, size on screen, attributes)
@@ -74,7 +75,7 @@ function rule2ACondition(node: Node, context: Context): boolean {
  * null is returned otherwise, indicating that the condition of this rule was
  * not satisfied.
  */
-export function rule2A(node: Node, context = getDefaultContext()): string|null {
+export function rule2A(node: Node, context: Context): string|null {
   let result = null;
   if (rule2ACondition(node, context)) {
     result = '';

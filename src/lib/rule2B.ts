@@ -4,6 +4,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import {ComputeTextAlternative} from './compute_text_alternative';
+import {Context} from './context';
+import {isHTMLElement} from './util';
+
 /**
  * Get any HTMLElement referenced in the aria-labelledby attribute
  * of 'elem' that exist in the document (i.e is 'valid')
@@ -23,4 +27,46 @@ export function resolveValidAriaLabelledbyIdrefs(elem: HTMLElement):
     }
   }
   return validElems;
+}
+
+/**
+ * Implementation of rule 2B
+ * @param node - node whose text alternative is being computed
+ * @param context - Additional information relevant to the text alternative
+ * computation for node
+ * @return - The text alternative string is returned if condition is true,
+ * null is returned otherwise, indicating that the condition of this rule was
+ * not satisfied.
+ */
+export function rule2B(
+    node: Node,
+    context: Context,
+    computeTextAlternative: ComputeTextAlternative,
+    ): string|null {
+  if (!isHTMLElement(node)) {
+    return null;
+  }
+
+  // #SPEC_ASSUMPTION (B.1) : definition of 'part of an aria-labelledby
+  // traversal'
+  if (context.directLabelReference) {
+    return null;
+  }
+
+  const labelElems = resolveValidAriaLabelledbyIdrefs(node);
+  if (labelElems.length === 0) {
+    return null;
+  }
+
+  return labelElems
+      .map(labelElem => {
+        context.inherited.partOfName = true;
+        return computeTextAlternative(labelElem, {
+                 directLabelReference: true,
+                 inherited: context.inherited,
+               })
+            .name;
+      })
+      .join(' ')
+      .trim();
 }

@@ -4,7 +4,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {hasTagName} from './util';
+import {ComputeTextAlternative} from './compute_text_alternative';
+import {Context} from './context';
+import {hasTagName, isHTMLElement} from './util';
 
 // Input types that imply role 'textbox' if list attribute is not present,
 // and imply role 'combobox' if list attribute is present.
@@ -32,8 +34,8 @@ export function getValueIfTextbox(node: HTMLElement): string|null {
   }
 
   // <input> with certain type values & no list attribute implies role='textbox'
-  if (hasTagName(node, 'input') &&
-      TEXT_INPUT_TYPES.includes(node.type) && !node.hasAttribute('list')) {
+  if (hasTagName(node, 'input') && TEXT_INPUT_TYPES.includes(node.type) &&
+      !node.hasAttribute('list')) {
     return node.value;
   }
 
@@ -63,8 +65,8 @@ export function getValueIfRange(node: HTMLElement): string|null {
     return null;
   }
 
-  const isImplicitRange = (hasTagName(node, 'input') &&
-                           RANGE_INPUT_TYPES.includes(node.type)) ||
+  const isImplicitRange =
+      (hasTagName(node, 'input') && RANGE_INPUT_TYPES.includes(node.type)) ||
       hasTagName(node, 'progress');
 
   if (isExplicitRange || isImplicitRange) {
@@ -80,6 +82,111 @@ export function getValueIfRange(node: HTMLElement): string|null {
     if (hasTagName(node, 'progress')) {
       return node.value.toString();
     }
+  }
+
+  return null;
+}
+
+/**
+ * Determines whether a given node has role 'combobox'
+ * or 'listbox' and, if so, gets the text alternative for the
+ * option(s) selected by that combobox / listbox.
+ * @param node - node whose role is being calculated
+ * @param context - information relevant to the calculation of that role
+ * @return - text alternative for selected option(s) if node is a
+ * combobox or listbox, null otherwise.
+ * (null indicates that node is neither combobox nor listbox).
+ */
+function getValueIfComboboxOrListbox(
+    node: HTMLElement,
+    context: Context,
+    computeTextAlternative: ComputeTextAlternative,
+    ): string|null {
+  // Handles the case where node role is explictly overwritten
+  const nodeRole = node.getAttribute('role');
+  if (nodeRole && nodeRole !== 'listbox' && nodeRole !== 'combobox') {
+    return null;
+  }
+
+  // Combobox role implied by input type and presence of list attribute,
+  // chosen option is the input value.
+  if (hasTagName(node, 'input') && TEXT_INPUT_TYPES.includes(node.type) &&
+      (node.hasAttribute('list') || nodeRole === 'combobox')) {
+    return node.value;
+  }
+
+  // Text alternative for elems of role 'listbox' and 'combobox'
+  // consists of the text alternatives for their selected options.
+  let selectedOptions: HTMLElement[] = [];
+  // Listbox may be defined explicitly using 'role',
+  // and using 'aria-selected' attribute to mark selected options.
+  if (nodeRole && nodeRole === 'listbox') {
+    selectedOptions = Array.from(
+        node.querySelectorAll('[role="option"][aria-selected="true"]'));
+  }
+  // A <select> element is always implicitly either a listbox or a combobox
+  else if (hasTagName(node, 'select')) {
+    selectedOptions = Array.from(node.selectedOptions);
+  }
+
+  // If the current node has any selected options (either by aria-selected
+  // or semantic <option selected>) they will be stored in selectedOptions.
+  if (selectedOptions.length > 0) {
+    // #SPEC_ASSUMPTION (E.2) : consider multiple selected options' text
+    // alternatives, joining them with a space as in 2B.ii.c
+    return selectedOptions
+        .map(optionElem => {
+          return computeTextAlternative(optionElem, {
+                   inherited: context.inherited,
+                 })
+              .name;
+        })
+        .filter(alternativeText => alternativeText !== '')
+        .join(' ');
+  }
+
+  return null;
+}
+
+/**
+ * Implementation for rule 2E.
+ * @param node - node whose text alternative is being calculated
+ * @param context - additional information relevant to the computation of a text
+ * alternative for node.
+ * @return text alternative for 'node' if rule 2E accepts 'node', null
+ *     otherwise.
+ */
+export function rule2E(
+    node: Node,
+    context: Context,
+    computeTextAlternative: ComputeTextAlternative,
+    ): string|null {
+  if (!isHTMLElement(node)) {
+    return null;
+  }
+
+  // #SPEC_ASSUMPTION (E.1) : that 'embedded within the label
+  // for another widget' is equivalent to 'part of a name computation'
+  if (!context.inherited.partOfName) {
+    return null;
+  }
+
+  const textboxValue = getValueIfTextbox(node);
+  if (textboxValue) {
+    return textboxValue;
+  }
+
+  // #SPEC_ASSUMPTION (E.4) : menu button is handled by 2F
+
+  const comboboxOrListboxValue =
+      getValueIfComboboxOrListbox(node, context, computeTextAlternative);
+  if (comboboxOrListboxValue) {
+    return comboboxOrListboxValue;
+  }
+
+  const rangeValue = getValueIfRange(node);
+  if (rangeValue) {
+    return rangeValue;
   }
 
   return null;
