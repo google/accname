@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { isHTMLElement } from './util';
+import { isHTMLElement, hasTagName } from './util';
 
 // Input types for whom placeholders should be considered when computing
 // a text alternative. See
@@ -36,12 +36,12 @@ export function rule2I(node: Node): string|null {
   // See
   // https://www.w3.org/TR/html-aam-1.0/#input-type-text-input-type-password-input-type-search-input-type-tel-input-type-email-input-type-url-and-textarea-element-accessible-name-computation
 
-  if (node instanceof HTMLInputElement &&
+  if (hasTagName(node, 'input') &&
       TEXTUAL_INPUT_TYPES.includes(node.type)) {
     return node.placeholder;
   }
 
-  if (node instanceof HTMLTextAreaElement && node.hasAttribute('placeholder')) {
+  if (hasTagName(node, 'textarea') && node.hasAttribute('placeholder')) {
     return node.getAttribute('placeholder');
   }
 
