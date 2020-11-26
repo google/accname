@@ -61,15 +61,29 @@ export interface ComputationDetails {
  */
 export function computeTextAlternative(
     node: Node, context: Context = getDefaultContext()): ComputationDetails {
+  const result = computeRawTextAlternative(node, context);
+  return {
+    name: result.name.trim(),
+    nodesUsed: result.nodesUsed,
+    rulesApplied: result.rulesApplied,
+  };
+}
+
+/**
+ * Compute the text alternative without trimming leading and trailing
+ * whitespace.
+ */
+function computeRawTextAlternative(
+    node: Node, context: Context = getDefaultContext()): ComputationDetails {
   context.inherited.nodesUsed.add(node);
 
   // Try each rule sequentially on the target Node.
   for (const [rule, impl] of Object.entries(ruleToImpl)) {
-    const result = impl(node, context, computeTextAlternative);
+    const result = impl(node, context, computeRawTextAlternative);
     // A rule has been applied if its implementation has
     // returned a string.
     if (result !== null) {
-      context.inherited.rulesApplied.add(<Rule>rule);
+      context.inherited.rulesApplied.add(rule as Rule);
       return {
         name: result,
         nodesUsed: context.inherited.nodesUsed,
