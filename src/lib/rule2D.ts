@@ -59,6 +59,23 @@ export const LABELLABLE_ELEMENT_TYPES = [
   'TEXTAREA',
 ];
 
+/** Checks if `control` is the element that is labelled by `label` */
+function isLabelledControl(
+    label: HTMLLabelElement, control: HTMLElement): boolean {
+  if (label.control !== undefined) {
+    return label.control === control;
+  } else {
+    // For ie & edge
+    if (label.htmlFor !== '' && label.htmlFor === control.id) {
+      return true;
+    } else if (label.htmlFor === '' && label.contains(control)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+}
+
 /**
  * Gets the text alternative as defined by one or more native <label>s.
  * @param elem - element whose text alternative is being calculated
@@ -76,7 +93,7 @@ function getTextIfLabelled(
   // Using querySelectorAll to get <label>s in DOM order.
   const allLabelElems = document.querySelectorAll('label');
   const labelElems = Array.from(allLabelElems).filter(label => {
-    return label.control === elem;
+    return isLabelledControl(label, elem);
   });
 
   const textAlternative =
