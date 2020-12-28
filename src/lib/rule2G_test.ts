@@ -18,32 +18,6 @@ describe('The function for rule 2G', () => {
     expect(rule2G(node!)).toBe('Hello world');
   });
 
-  it('returns text content of text nodes as a flat string', () => {
-    render(
-      // prettier-ignore
-      html`
-        <div id="foo">Hello world
-
-        newline</div>
-      `,
-      container
-    );
-    const node = document.getElementById('foo')?.childNodes[0];
-    expect(rule2G(node!)).toBe('Hello world newline');
-  });
-
-  it('removes excess whitespace from the resulting string', () => {
-    render(
-      // prettier-ignore
-      html`
-        <div id="foo">Hello    world</div>
-      `,
-      container
-    );
-    const node = document.getElementById('foo')?.childNodes[0];
-    expect(rule2G(node!)).toBe('Hello world');
-  });
-
   it('returns the empty string if no text content is present', () => {
     const node = document.createTextNode('');
     expect(rule2G(node)).toBe('');

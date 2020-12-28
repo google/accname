@@ -306,22 +306,15 @@ export function rule2F(
     }
   }
 
-  // Consider only non-empty text alternatives to prevent double
-  // spacing between text alternatives in accumulatedText.
-  // #SPEC_ASSUMPTION (F.1) : that accumulated texts should be space separated
-  // for readability
-  const accumulatedText =
-      textAlterantives.filter(textAlterantive => textAlterantive !== '')
-          .join('')
-          .replace(/\s+/g, ' ')
-          .trim();
+  textAlterantives.unshift(getCssContent(node, ':before'));
+  textAlterantives.push(getCssContent(node, ':after'));
 
-  const cssBeforeContent = getCssContent(node, ':before');
-  const cssAfterContent = getCssContent(node, ':after');
-
-  // #SPEC_ASSUMPTION (F.2) : that CSS generated content should be
-  // concatenated to accumulatedText
-  const result = (cssBeforeContent + accumulatedText + cssAfterContent).trim();
-
-  return result || null;
+  const result = textAlterantives.join('');
+  if (result.trim() === '') {
+    // # SPEC ASSUMPTION: If the name from contents only contains whitespace, we
+    // assume that rule 2F does not apply.
+    return null;
+  } else {
+    return result;
+  }
 }

@@ -63,6 +63,7 @@ export function computeTextAlternative(
     node: Node, context: Context = getDefaultContext()): ComputationDetails {
   const result = computeRawTextAlternative(node, context);
   return {
+    // # SPEC ASSUMPTION: The result of the name computation is trimmed.
     name: result.name.trim(),
     nodesUsed: result.nodesUsed,
     rulesApplied: result.rulesApplied,
@@ -85,7 +86,9 @@ function computeRawTextAlternative(
     if (result !== null) {
       context.inherited.rulesApplied.add(rule as Rule);
       return {
-        name: result,
+        // # SPEC ASSUMPTION: Even though not called out explicitly, every rule
+        // should return an (untrimmed) flat string.
+        name: result.replace(/\s+/g, ' '),
         nodesUsed: context.inherited.nodesUsed,
         rulesApplied: context.inherited.rulesApplied,
       };
@@ -98,3 +101,5 @@ function computeRawTextAlternative(
     rulesApplied: context.inherited.rulesApplied,
   };
 }
+
+export const TEST_ONLY = {computeRawTextAlternative};

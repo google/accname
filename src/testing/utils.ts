@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {computeTextAlternative, RuleImpl} from '../lib/compute_text_alternative';
+import {RuleImpl, TEST_ONLY} from '../lib/compute_text_alternative';
 import {Context, getDefaultContext} from '../lib/context';
 
 type RuleRunner = (node: Node, context?: Context) => string|null;
@@ -15,6 +15,8 @@ type RuleRunner = (node: Node, context?: Context) => string|null;
  */
 export function createRuleRunner(rule: RuleImpl): RuleRunner {
   return (node: Node, context = getDefaultContext()) => {
-    return rule(node, context, computeTextAlternative);
+    const result = rule(node, context, TEST_ONLY.computeRawTextAlternative);
+    // Tests expect a trimmed flat string.
+    return result?.replace(/\s+/g, ' ').trim() ?? null;
   };
 }

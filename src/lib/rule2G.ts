@@ -12,10 +12,7 @@
  */
 export function rule2G(node: Node): string|null {
   if (node.nodeType === Node.TEXT_NODE) {
-    // 'Flattening' the string with .replace()
-    // #SPEC_ASSUMPTION (G.1) : that the resulting text alternative
-    // from 2G should be a flat string.
-    return node.textContent?.replace(/\s\s+/g, ' ') ?? '';
+    return (node as Text).data;
   }
   return null;
 }
