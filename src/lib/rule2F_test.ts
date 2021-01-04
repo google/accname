@@ -2,7 +2,7 @@ import {html, render} from 'lit-html';
 
 import {createRuleRunner} from '../testing/utils';
 import {getDefaultContext} from './context';
-import {rule2F as rule2FImpl} from './rule2F';
+import {rule2F as rule2FImpl, TEST_ONLY} from './rule2F';
 
 const rule2F = createRuleRunner(rule2FImpl);
 
@@ -159,4 +159,29 @@ describe('The function for rule 2F', () => {
        const elem = document.getElementById('foo');
        expect(rule2F(elem!)).toBe(null);
      });
+});
+
+
+describe('name from content tables', () => {
+  const tables = new Map([
+    ['always', TEST_ONLY.ALWAYS_NAME_FROM_CONTENT],
+    ['sometimes', TEST_ONLY.SOMETIMES_NAME_FROM_CONTENT],
+    ['never', TEST_ONLY.NEVER_NAME_FROM_CONTENT],
+  ]);
+
+  for (const [name1, table1] of tables.entries()) {
+    describe(`the set of roles that take name from content "${name1}"`, () => {
+      for (const [name2, table2] of tables.entries()) {
+        if (name1 !== name2) {
+          it(`should not contain any of the roles that take name from content "${
+                 name2}"`,
+             () => {
+               for (const role of table2.roles) {
+                 expect(table1.roles).not.toContain(role);
+               }
+             });
+        }
+      }
+    });
+  }
 });
