@@ -135,12 +135,9 @@ function getValueIfComboboxOrListbox(
     // #SPEC_ASSUMPTION (E.2) : consider multiple selected options' text
     // alternatives, joining them with a space as in 2B.ii.c
     return selectedOptions
-        .map(optionElem => {
-          return computeTextAlternative(optionElem, {
-                   inherited: context.inherited,
-                 })
-              .name;
-        })
+        .map(optionElem => computeTextAlternative(optionElem, {
+                             inherited: context.inherited,
+                           }).name)
         .filter(alternativeText => alternativeText !== '')
         .join(' ');
   }

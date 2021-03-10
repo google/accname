@@ -92,9 +92,8 @@ function getTextIfLabelled(
     ): string|null {
   // Using querySelectorAll to get <label>s in DOM order.
   const allLabelElems = document.querySelectorAll('label');
-  const labelElems = Array.from(allLabelElems).filter(label => {
-    return isLabelledControl(label, elem);
-  });
+  const labelElems =
+      Array.from(allLabelElems).filter(label => isLabelledControl(label, elem));
 
   const textAlternative =
       labelElems

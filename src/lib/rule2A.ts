@@ -29,7 +29,7 @@ function isHidden(node: Node, context: Context): boolean {
 
   const styles = window.getComputedStyle(node);
 
-  if (parseInt(styles.height) === 0 && parseInt(styles.width) === 0 &&
+  if (sizeToNumber(styles.height) === 0 && sizeToNumber(styles.width) === 0 &&
       !isFocusable(node)) {
     return true;
   }
@@ -52,6 +52,14 @@ function isHidden(node: Node, context: Context): boolean {
   }
 
   return false;
+}
+
+/**
+ * Strip the units from a css size attribute string and cast to a number. e.g.
+ * "12px" -> 12, "6em" -> 6, "75%" -> 75
+ */
+function sizeToNumber(size: string): number {
+  return Number(size.replace('px', '').replace('em', '').replace('%', ''));
 }
 
 /**

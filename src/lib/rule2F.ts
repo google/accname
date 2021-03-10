@@ -94,29 +94,17 @@ function getFunctionCalculatingAllowsNameFromContent(elemNodeName: string):
     ((elem: HTMLElement) => boolean)|null {
   switch (elemNodeName) {
     case 'th':
-      return (elem: HTMLElement) => {
-        return closest(elem, 'table') !== null;
-      };
+      return (elem: HTMLElement) => closest(elem, 'table') !== null;
     case 'td':
-      return (elem: HTMLElement) => {
-        return closest(elem, 'table') !== null;
-      };
+      return (elem: HTMLElement) => closest(elem, 'table') !== null;
     case 'option':
-      return (elem: HTMLElement) => {
-        return closest(elem, 'select,datalist') !== null;
-      };
+      return (elem: HTMLElement) => closest(elem, 'select,datalist') !== null;
     case 'a':
-      return (elem: HTMLElement) => {
-        return elem.hasAttribute('href');
-      };
+      return (elem: HTMLElement) => elem.hasAttribute('href');
     case 'area':
-      return (elem: HTMLElement) => {
-        return elem.hasAttribute('href');
-      };
+      return (elem: HTMLElement) => elem.hasAttribute('href');
     case 'link':
-      return (elem: HTMLElement) => {
-        return elem.hasAttribute('href');
-      };
+      return (elem: HTMLElement) => elem.hasAttribute('href');
     default:
       return null;
   }

@@ -17,97 +17,92 @@ describe('The function allowsNameFromContent', () => {
 
   it('returns true for roles that allow name from content', () => {
     render(
-      html`
+        html`
         <div id="foo" role="button">
           Hello world
         </div>
       `,
-      container
-    );
+        container);
     const elem = document.getElementById('foo');
     expect(allowsNameFromContent(elem!, getDefaultContext())).toBe(true);
   });
 
   it('returns false for roles that do not allow name from content', () => {
     render(
-      html`
+        html`
         <div id="foo" role="presentation">
           Hello world
         </div>
       `,
-      container
-    );
+        container);
     const elem = document.getElementById('foo');
     expect(allowsNameFromContent(elem!, getDefaultContext())).toBe(false);
   });
 
-  it('returns true for semantic html elements that imply a role that allows name from content', () => {
-    render(
-      html`
+  it('returns true for semantic html elements that imply a role that allows name from content',
+     () => {
+       render(
+           html`
         <h1 id="foo">
           Hello world
         </h1>
       `,
-      container
-    );
-    const elem = document.getElementById('foo');
-    expect(allowsNameFromContent(elem!, getDefaultContext())).toBe(true);
-  });
+           container);
+       const elem = document.getElementById('foo');
+       expect(allowsNameFromContent(elem!, getDefaultContext())).toBe(true);
+     });
 
   it('returns true for td elements if they are within a table', () => {
     render(
-      html`
+        html`
         <table>
           <td id="foo"></td>
         </table>
       `,
-      container
-    );
+        container);
     const elem = document.getElementById('foo');
     expect(allowsNameFromContent(elem!, getDefaultContext())).toBe(true);
   });
 
   it('returns true for th elements if they are within a table', () => {
     render(
-      html`
+        html`
         <table>
           <th id="foo"></th>
         </table>
       `,
-      container
-    );
+        container);
     const elem = document.getElementById('foo');
     expect(allowsNameFromContent(elem!, getDefaultContext())).toBe(true);
   });
 
-  it('returns false for option elements if they are not within a datalist or select', () => {
-    render(html` <option id="foo"></option> `, container);
-    const elem = document.getElementById('foo');
-    expect(allowsNameFromContent(elem!, getDefaultContext())).toBe(false);
-  });
+  it('returns false for option elements if they are not within a datalist or select',
+     () => {
+       render(html` <option id="foo"></option> `, container);
+       const elem = document.getElementById('foo');
+       expect(allowsNameFromContent(elem!, getDefaultContext())).toBe(false);
+     });
 
   it('returns true for option elements if they are within a select', () => {
     render(
-      html`
+        html`
         <select>
           <option id="foo"></option>
         </select>
       `,
-      container
-    );
+        container);
     const elem = document.getElementById('foo');
     expect(allowsNameFromContent(elem!, getDefaultContext())).toBe(true);
   });
 
   it('returns true for option elements if they are within a datalist', () => {
     render(
-      html`
+        html`
         <datalist>
           <option id="foo"></option>
         </datalist>
       `,
-      container
-    );
+        container);
     const elem = document.getElementById('foo');
     expect(allowsNameFromContent(elem!, getDefaultContext())).toBe(true);
   });
@@ -130,11 +125,12 @@ describe('The function allowsNameFromContent', () => {
     expect(allowsNameFromContent(elem!, getDefaultContext())).toBe(true);
   });
 
-  it('returns false for area elements if they do not have a href attribute', () => {
-    render(html` <area id="foo"></area> `, container);
-    const elem = document.getElementById('foo');
-    expect(allowsNameFromContent(elem!, getDefaultContext())).toBe(false);
-  });
+  it('returns false for area elements if they do not have a href attribute',
+     () => {
+       render(html` <area id="foo"></area> `, container);
+       const elem = document.getElementById('foo');
+       expect(allowsNameFromContent(elem!, getDefaultContext())).toBe(false);
+     });
 
   it('returns true for link elements if they have a href attribute', () => {
     render(html` <link id="foo" href="#"></link> `, container);
@@ -142,17 +138,17 @@ describe('The function allowsNameFromContent', () => {
     expect(allowsNameFromContent(elem!, getDefaultContext())).toBe(true);
   });
 
-  it('returns false for link elements if they do not have a href attribute', () => {
-    render(html` <link id="foo"></link> `, container);
-    const elem = document.getElementById('foo');
-    expect(allowsNameFromContent(elem!, getDefaultContext())).toBe(false);
-  });
+  it('returns false for link elements if they do not have a href attribute',
+     () => {
+       render(html` <link id="foo"></link> `, container);
+       const elem = document.getElementById('foo');
+       expect(allowsNameFromContent(elem!, getDefaultContext())).toBe(false);
+     });
 
   it('returns true for elements in NEVER_NFC that are focusable', () => {
     render(
-      html` <article id="foo" tabindex="0">Hello world</article> `,
-      container
-    );
+        html` <article id="foo" tabindex="0">Hello world</article> `,
+        container);
     const elem = document.getElementById('foo');
     expect(allowsNameFromContent(elem!, getDefaultContext())).toBe(true);
   });

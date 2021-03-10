@@ -25,13 +25,12 @@ describe('The function for rule 2G', () => {
 
   it('returns null if the node is not a text node', () => {
     render(
-      html`
+        html`
         <div id="foo">
           Hello world newline
         </div>
       `,
-      container
-    );
+        container);
     const node = document.getElementById('foo');
     expect(rule2G(node!)).toBe(null);
   });

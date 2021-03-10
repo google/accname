@@ -248,7 +248,8 @@ describe('The computeTextAlternative function', () => {
       `,
         container);
     const elem = document.getElementById('test')!;
-    expect(elem).toHaveTextAlernative('My name is Eli the weird. (QED) Where are my marbles?');
+    expect(elem).toHaveTextAlernative(
+        'My name is Eli the weird. (QED) Where are my marbles?');
   });
 
   // http://wpt.live/accname/name_file-label-inline-block-elements-manual.html

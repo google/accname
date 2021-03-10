@@ -8,6 +8,7 @@ import 'jasmine';
 import {computeTextAlternative} from '../lib/compute_text_alternative';
 
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace jasmine {
     interface Matchers<T> {
       toHaveTextAlernative(expected: string): void;
@@ -40,7 +41,7 @@ ${Array.from(textAlternative.nodesUsed).map(serialize).join('\n')}
 
 
 function serialize(node: Node): string {
-  switch(node.nodeType){
+  switch (node.nodeType) {
     case Node.TEXT_NODE:
       return `Text("${(node as Text).data}")`;
     case Node.ELEMENT_NODE:
