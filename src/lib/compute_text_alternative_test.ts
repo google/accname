@@ -316,6 +316,35 @@ describe('The computeTextAlternative function', () => {
     const button = iframeDocument.querySelector('button')!;
     expect(button).toHaveTextAlernative('Inside iframe');
   });
+
+  it('can handle Unicode BiDi control characters', () => {
+    render(
+        html`
+        <button class="target" aria-label="يلا&#x202C; foo &#x202A;يلا bar &#x202B;يلا">foo</button>
+        <button class="target">يلا&#x202C; foo &#x202A;يلا bar &#x202B;يلا</button>
+
+        <select class="target">
+          <option>يلا&#x202C;</option>
+          <option>foo</option>
+          <option>&#x202A;يلا</option>
+          <option>bar</option>
+          <option>&#x202B;يلا</option>
+        </select>
+        `,
+        container);
+    const targets = document.getElementsByClassName('target');
+    expect(targets.length).toBeGreaterThan(0);
+    for (const elem of targets) {
+      expect(elem).toHaveTextAlernative(
+          'يلا\u202C foo \u202Aيلا bar \u202Bيلا');
+    }
+
+    const options = document.querySelectorAll('option');
+    expect(options.length).toBeGreaterThan(0);
+    for (const elem of options) {
+      expect(elem).toHaveTextAlernative(elem.textContent!);
+    }
+  });
 });
 
 async function iframeLoadedPromise(iframe: HTMLIFrameElement) {
