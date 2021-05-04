@@ -7,7 +7,7 @@
 import {ComputeTextAlternative} from './compute_text_alternative';
 import {Context} from './context';
 import {rule2E} from './rule2E';
-import {isHTMLElement} from './util';
+import {isElement} from './util';
 
 /**
  * Implementation for rule 2C
@@ -22,7 +22,7 @@ export function rule2C(
     context: Context,
     computeTextAlternative: ComputeTextAlternative,
     ): string|null {
-  if (!isHTMLElement(node)) {
+  if (!isElement(node)) {
     return null;
   }
 

@@ -26,16 +26,19 @@ export function isFocusable(elem: HTMLElement): boolean {
   return elem.hasAttribute('tabindex') || elem.isContentEditable;
 }
 
+/** Whether this `node` is an `Element` */
+export function isElement(n: Node): n is Element {
+  return n.nodeType === Node.ELEMENT_NODE;
+}
+
 /** Whether this `node` is an `HTMLElement` */
 export function isHTMLElement(n: Node): n is HTMLElement {
-  return n.nodeType === Node.ELEMENT_NODE &&
-      (n as Element).namespaceURI === `http://www.w3.org/1999/xhtml`;
+  return isElement(n) && n.namespaceURI === `http://www.w3.org/1999/xhtml`;
 }
 
 /** Whether this `node` is an `SVGElement` */
 export function isSVGElement(n: Node): n is SVGElement {
-  return n.nodeType === Node.ELEMENT_NODE &&
-      (n as Element).namespaceURI === `http://www.w3.org/2000/svg`;
+  return isElement(n) && n.namespaceURI === `http://www.w3.org/2000/svg`;
 }
 
 /**

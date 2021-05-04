@@ -23,7 +23,7 @@ describe('The function for rule 2C', () => {
     expect(rule2C(elem!)).toBe(null);
   });
 
-  it('returns null if node is not HTMLElement', () => {
+  it('returns null if node is not an Element', () => {
     const elem = document.createTextNode('Hello');
     container.appendChild(elem);
     expect(rule2C(elem)).toBe(null);
@@ -42,6 +42,12 @@ describe('The function for rule 2C', () => {
        const elem = document.getElementById('foo');
        expect(rule2C(elem!)).toBe(null);
      });
+
+  it('returns aria-label value for SVGElements', () => {
+    render(html`<svg id="foo" aria-label="hello"></svg>`, container);
+    const elem = document.getElementById('foo');
+    expect(rule2C(elem!)).toBe('hello');
+  });
 
   it('returns aria-label value for controls if they are not already part of a name',
      () => {
