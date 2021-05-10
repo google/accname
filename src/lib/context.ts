@@ -3,7 +3,8 @@
  * Copyright 2020 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
-import {Rule} from './compute_text_alternative';
+
+import {ComputationStep} from './compute_text_alternative';
 
 /**
  * This interface will be used to pass additional information
@@ -42,18 +43,14 @@ export interface Context {
      */
     visitedNodes: Node[];
 
-    // TODO: Look into merging 'nodesUsed' and 'visitedNodes'
+    // TODO: Look into merging 'steps' and 'visitedNodes'
 
     /**
-     * nodesUsed stores any Nodes used during the name computation
-     * algorithm, including the original target node.
+     * Keeps track of the details of the name computation, i.e. Rules that were
+     * applied during the name computation algorithm and the node on which the
+     * rule was applied.
      */
-    nodesUsed: Set<Node>;
-    /**
-     * rulesApplied stores all Rules that were applied during the
-     * name computation algorithm.
-     */
-    rulesApplied: Set<Rule>;
+    steps: ComputationStep[];
   };
 }
 
@@ -64,8 +61,7 @@ export function getDefaultContext(): Context {
   return {
     inherited: {
       visitedNodes: [],
-      nodesUsed: new Set<Node>(),
-      rulesApplied: new Set<Rule>(),
+      steps: [],
     },
   };
 }

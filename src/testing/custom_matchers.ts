@@ -5,7 +5,8 @@
  */
 
 import 'jasmine';
-import {computeTextAlternative} from '../lib/compute_text_alternative';
+
+import {ComputationStep, computeTextAlternative} from '../lib/compute_text_alternative';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -29,9 +30,8 @@ export const customMatchers: jasmine.CustomMatcherFactories = {
 Expected name: "${expected}"
 Actual name: "${textAlternative.name}"
 
-Rules applied: ${JSON.stringify(Array.from(textAlternative.rulesApplied))}
-Nodes used:
-${Array.from(textAlternative.nodesUsed).map(serialize).join('\n')}
+Details:
+${textAlternative.steps.map(printStep).join('\n')}
 `
         };
       },
@@ -39,11 +39,15 @@ ${Array.from(textAlternative.nodesUsed).map(serialize).join('\n')}
   },
 };
 
+function printStep(step: ComputationStep): string {
+  return ` - Got '${step.text}' by applying rule ${step.rule} on ${
+      serialize(step.node)}`;
+}
 
 function serialize(node: Node): string {
   switch (node.nodeType) {
     case Node.TEXT_NODE:
-      return `Text("${(node as Text).data}")`;
+      return `Text("${(node as Text).data.replace(/\n/g, '\\n')}")`;
     case Node.ELEMENT_NODE:
       return (node as Element).outerHTML;
     default:

@@ -1,6 +1,8 @@
 import {html, render} from 'lit-html';
+
 import {customMatchers} from '../testing/custom_matchers';
-import {computeTextAlternative, Rule} from './compute_text_alternative';
+
+import {computeTextAlternative} from './compute_text_alternative';
 
 describe('The computeTextAlternative function', () => {
   beforeAll(() => {
@@ -67,8 +69,10 @@ describe('The computeTextAlternative function', () => {
        const elem = document.getElementById('foo')!;
        expect(computeTextAlternative(elem)).toEqual({
          name: 'Hello world',
-         nodesUsed: new Set<Node>([elem, elem.childNodes[0]]),
-         rulesApplied: new Set<Rule>(['2G', '2F']),
+         steps: [
+           {rule: '2G', node: elem.childNodes[0], text: 'Hello world'},
+           {rule: '2F', node: elem, text: 'Hello world'},
+         ],
        });
      });
 
@@ -84,8 +88,11 @@ describe('The computeTextAlternative function', () => {
        const elem2 = document.getElementById('bar')!;
        expect(computeTextAlternative(elem1)).toEqual({
          name: 'Hello world',
-         nodesUsed: new Set<Node>([elem1, elem2, elem2.childNodes[0]]),
-         rulesApplied: new Set<Rule>(['2B', '2F', '2G']),
+         steps: [
+           {rule: '2G', node: elem2.childNodes[0], text: 'Hello world'},
+           {rule: '2F', node: elem2, text: 'Hello world'},
+           {rule: '2B', node: elem1, text: 'Hello world'},
+         ],
        });
      });
 

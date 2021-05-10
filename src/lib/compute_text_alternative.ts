@@ -3,6 +3,7 @@
  * Copyright 2020 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
+
 import {Context, getDefaultContext} from './context';
 import {rule2A} from './rule2A';
 import {rule2B} from './rule2B';
@@ -29,7 +30,7 @@ export type ComputeTextAlternative = (node: Node, context: Context) =>
  * time circular references between files
  */
 export type RuleImpl =
-    (node: Node, context: Context, textAlterantive: ComputeTextAlternative) =>
+    (node: Node, context: Context, textAlternative: ComputeTextAlternative) =>
         string|null;
 
 const ruleToImpl: {[rule in Rule]: RuleImpl} = {
@@ -44,13 +45,21 @@ const ruleToImpl: {[rule in Rule]: RuleImpl} = {
 };
 
 /**
+ * Represents a step in the accessible name computation.
+ */
+export interface ComputationStep {
+  rule: Rule;
+  node: Node;
+  text: string;
+}
+
+/**
  * Provides details about the computation of some accessible name, such as
  * the Nodes used and rules applied during computation.
  */
 export interface ComputationDetails {
   name: string;
-  nodesUsed: Set<Node>;
-  rulesApplied: Set<Rule>;
+  steps: ComputationStep[];
 }
 
 /**
@@ -65,8 +74,7 @@ export function computeTextAlternative(
   return {
     // # SPEC ASSUMPTION: The result of the name computation is trimmed.
     name: result.name.trim(),
-    nodesUsed: result.nodesUsed,
-    rulesApplied: result.rulesApplied,
+    steps: result.steps,
   };
 }
 
@@ -76,29 +84,31 @@ export function computeTextAlternative(
  */
 function computeRawTextAlternative(
     node: Node, context: Context = getDefaultContext()): ComputationDetails {
-  context.inherited.nodesUsed.add(node);
-
   // Try each rule sequentially on the target Node.
   for (const [rule, impl] of Object.entries(ruleToImpl)) {
     const result = impl(node, context, computeRawTextAlternative);
     // A rule has been applied if its implementation has
     // returned a string.
     if (result !== null) {
-      context.inherited.rulesApplied.add(rule as Rule);
+      // # SPEC ASSUMPTION: Even though not called out explicitly, every rule
+      // should return an (untrimmed) flat string.
+      const text = result.replace(/\s+/g, ' ');
+      context.inherited.steps.push({
+        rule: rule as Rule,
+        node,
+        text,
+      });
+
       return {
-        // # SPEC ASSUMPTION: Even though not called out explicitly, every rule
-        // should return an (untrimmed) flat string.
-        name: result.replace(/\s+/g, ' '),
-        nodesUsed: context.inherited.nodesUsed,
-        rulesApplied: context.inherited.rulesApplied,
+        name: text,
+        steps: context.inherited.steps,
       };
     }
   }
 
   return {
     name: '',
-    nodesUsed: context.inherited.nodesUsed,
-    rulesApplied: context.inherited.rulesApplied,
+    steps: context.inherited.steps,
   };
 }
 
