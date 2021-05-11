@@ -76,6 +76,21 @@ function isLabelledControl(
   }
 }
 
+function hasPresentationRole(el: HTMLElement): boolean {
+  const explicitRole = el.getAttribute('role');
+  if (explicitRole === 'presentation' || explicitRole === 'none') {
+    return true;
+  }
+
+  // Implicit presentation role.
+  if (explicitRole === null && hasTagName(el, 'img') &&
+      el.getAttribute('alt') === '') {
+    return true;
+  }
+
+  return false;
+}
+
 /**
  * Gets the text alternative as defined by one or more native <label>s.
  * @param elem - element whose text alternative is being calculated
@@ -134,8 +149,7 @@ export function rule2D(
     return null;
   }
 
-  const roleAttribute = node.getAttribute('role') ?? '';
-  if (roleAttribute === 'presentation' || roleAttribute === 'none') {
+  if (hasPresentationRole(node)) {
     return null;
   }
 

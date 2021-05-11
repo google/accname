@@ -6,11 +6,11 @@
 
 import {Context} from './context';
 import {closest} from './polyfill';
-import {hasTagName, isFocusable, isHTMLElement} from './util';
+import {isHTMLElement} from './util';
 
 
 /**
- * Looks at a variety of characteristics (CSS, size on screen, attributes)
+ * Looks at a variety of characteristics (CSS, attributes)
  * to determine if 'node' should be considered hidden
  * @param node - node whose hidden-ness is being calculated
  * @return - whether or not the node is considered hidden
@@ -21,20 +21,7 @@ function isHidden(node: Node, context: Context): boolean {
     return false;
   }
 
-  // #SPEC_ASSUMPTION (A.3) : options shouldn't be hidden
-  if (hasTagName(node, 'option') && closest(node, 'select') !== null &&
-      context.inherited.partOfName) {
-    return false;
-  }
-
-  const styles = window.getComputedStyle(node);
-
-  if (sizeToNumber(styles.height) === 0 && sizeToNumber(styles.width) === 0 &&
-      !isFocusable(node)) {
-    return true;
-  }
-
-  if (styles.visibility === 'hidden') {
+  if (window.getComputedStyle(node).visibility === 'hidden') {
     return true;
   }
 
@@ -52,14 +39,6 @@ function isHidden(node: Node, context: Context): boolean {
   }
 
   return false;
-}
-
-/**
- * Strip the units from a css size attribute string and cast to a number. e.g.
- * "12px" -> 12, "6em" -> 6, "75%" -> 75
- */
-function sizeToNumber(size: string): number {
-  return Number(size.replace('px', '').replace('em', '').replace('%', ''));
 }
 
 /**

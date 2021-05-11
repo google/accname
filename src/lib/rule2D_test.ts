@@ -113,6 +113,13 @@ describe('The function for rule 2D', () => {
     expect(rule2D(elem!)).toBe(null);
   });
 
+  it('returns null for elements with implicit role presentation', () => {
+    render(html`<img alt="">`, container);
+
+    const target = container.querySelector('img');
+    expect(rule2D(target!)).toBe(null);
+  });
+
   it('returns null if node is not a HTMLElement', () => {
     const node = document.createTextNode('Hello');
     expect(rule2D(node)).toBe(null);
