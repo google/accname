@@ -21,8 +21,18 @@ declare global {
 export const customMatchers: jasmine.CustomMatcherFactories = {
   toHaveTextAlernative(util: jasmine.MatchersUtil) {
     return {
-      compare(node: Node, expected: string) {
-        const textAlternative = computeTextAlternative(node);
+      compare(nodeOrHtml: Node|string, expected: string) {
+        let textAlternative;
+        if (typeof nodeOrHtml === 'string') {
+          const div = document.createElement('div');
+          div.innerHTML = nodeOrHtml;
+          document.body.appendChild(div);
+          textAlternative = computeTextAlternative(div.querySelector('#test')!);
+          document.body.removeChild(div);
+        } else {
+          textAlternative = computeTextAlternative(nodeOrHtml);
+        }
+
         return {
           pass: util.equals(textAlternative.name, expected),
           message: `Text alternative check failed:
