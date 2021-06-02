@@ -6,6 +6,7 @@
 
 import {ComputeTextAlternative} from './compute_text_alternative';
 import {Context} from './context';
+import {AccnameOptions} from './options';
 import {closest} from './polyfill';
 import {isFocusable, isHTMLElement} from './util';
 
@@ -245,6 +246,7 @@ export const inlineTags = [
  */
 export function rule2F(
     node: Node,
+    options: AccnameOptions,
     context: Context,
     computeTextAlternative: ComputeTextAlternative,
     ): string|null {
@@ -277,7 +279,7 @@ export function rule2F(
       context.inherited.visitedNodes.push(childNode);
       context.inherited.partOfName = true;
 
-      const textAlterantive = computeTextAlternative(childNode, {
+      const textAlterantive = computeTextAlternative(childNode, options, {
                                 inherited: context.inherited,
                               }).name;
 
@@ -290,8 +292,10 @@ export function rule2F(
     }
   }
 
-  textAlterantives.unshift(getCssContent(node, ':before'));
-  textAlterantives.push(getCssContent(node, ':after'));
+  if (options.includePseudoElements) {
+    textAlterantives.unshift(getCssContent(node, ':before'));
+    textAlterantives.push(getCssContent(node, ':after'));
+  }
 
   const result = textAlterantives.join('');
   if (result.trim() === '') {

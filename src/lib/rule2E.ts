@@ -6,7 +6,9 @@
 
 import {ComputeTextAlternative} from './compute_text_alternative';
 import {Context} from './context';
+import {AccnameOptions} from './options';
 import {hasTagName, isHTMLElement} from './util';
+
 
 // Input types that imply role 'textbox' if list attribute is not present,
 // and imply role 'combobox' if list attribute is present.
@@ -99,6 +101,7 @@ export function getValueIfRange(node: HTMLElement): string|null {
  */
 function getValueIfComboboxOrListbox(
     node: HTMLElement,
+    options: AccnameOptions,
     context: Context,
     computeTextAlternative: ComputeTextAlternative,
     ): string|null {
@@ -135,7 +138,7 @@ function getValueIfComboboxOrListbox(
     // #SPEC_ASSUMPTION (E.2) : consider multiple selected options' text
     // alternatives, joining them with a space as in 2B.ii.c
     return selectedOptions
-        .map(optionElem => computeTextAlternative(optionElem, {
+        .map(optionElem => computeTextAlternative(optionElem, options, {
                              inherited: context.inherited,
                            }).name)
         .filter(alternativeText => alternativeText !== '')
@@ -155,6 +158,7 @@ function getValueIfComboboxOrListbox(
  */
 export function rule2E(
     node: Node,
+    options: AccnameOptions,
     context: Context,
     computeTextAlternative: ComputeTextAlternative,
     ): string|null {
@@ -175,8 +179,8 @@ export function rule2E(
 
   // #SPEC_ASSUMPTION (E.4) : menu button is handled by 2F
 
-  const comboboxOrListboxValue =
-      getValueIfComboboxOrListbox(node, context, computeTextAlternative);
+  const comboboxOrListboxValue = getValueIfComboboxOrListbox(
+      node, options, context, computeTextAlternative);
   if (comboboxOrListboxValue) {
     return comboboxOrListboxValue;
   }

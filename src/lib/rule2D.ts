@@ -6,6 +6,7 @@
 
 import {ComputeTextAlternative} from './compute_text_alternative';
 import {Context} from './context';
+import {AccnameOptions} from './options';
 import {hasTagName, isHTMLElement, isSVGElement} from './util';
 
 /**
@@ -102,6 +103,7 @@ function hasPresentationRole(el: HTMLElement): boolean {
  */
 function getTextIfLabelled(
     elem: HTMLElement,
+    options: AccnameOptions,
     context: Context,
     computeTextAlternative: ComputeTextAlternative,
     ): string|null {
@@ -112,7 +114,7 @@ function getTextIfLabelled(
 
   const textAlternative =
       labelElems
-          .map(labelElem => computeTextAlternative(labelElem, {
+          .map(labelElem => computeTextAlternative(labelElem, options, {
                               directLabelReference: true,
                               inherited: context.inherited,
                             }).name)
@@ -132,6 +134,7 @@ function getTextIfLabelled(
  */
 export function rule2D(
     node: Node,
+    options: AccnameOptions,
     context: Context,
     computeTextAlternative: ComputeTextAlternative,
     ): string|null {
@@ -157,7 +160,8 @@ export function rule2D(
   // specifies all native attributes and elements that define a text
   // alternative.
   if (LABELLABLE_ELEMENT_TYPES.includes(node.tagName)) {
-    const labelText = getTextIfLabelled(node, context, computeTextAlternative);
+    const labelText =
+        getTextIfLabelled(node, options, context, computeTextAlternative);
     if (labelText) {
       return labelText;
     }
@@ -177,7 +181,7 @@ export function rule2D(
     const captionElem = node.querySelector('caption');
     if (captionElem) {
       context.inherited.partOfName = true;
-      return computeTextAlternative(captionElem, {
+      return computeTextAlternative(captionElem, options, {
                inherited: context.inherited,
              })
           .name;
@@ -189,7 +193,7 @@ export function rule2D(
     const figcaptionElem = node.querySelector('figcaption');
     if (figcaptionElem) {
       context.inherited.partOfName = true;
-      return computeTextAlternative(figcaptionElem, {
+      return computeTextAlternative(figcaptionElem, options, {
                inherited: context.inherited,
              })
           .name;
@@ -201,7 +205,7 @@ export function rule2D(
     const legendElem = node.querySelector('legend');
     if (legendElem) {
       context.inherited.partOfName = true;
-      return computeTextAlternative(legendElem, {
+      return computeTextAlternative(legendElem, options, {
                inherited: context.inherited,
              })
           .name;

@@ -1,7 +1,9 @@
 import {html, render} from 'lit-html';
 
 import {createRuleRunner} from '../testing/utils';
+
 import {getDefaultContext} from './context';
+import {withDefaults} from './options';
 import {rule2F as rule2FImpl, TEST_ONLY} from './rule2F';
 
 const rule2F = createRuleRunner(rule2FImpl);
@@ -110,6 +112,28 @@ describe('The function for rule 2F', () => {
     context.directLabelReference = true;
     expect(rule2F(elem!, context)).toBe('Hello world');
   });
+
+  it('ignores CSS generated text content if includePseudoElements is false',
+     () => {
+       render(
+           html`
+        <style>
+          #foo:before {
+            content: 'Hello';
+          }
+          #foo:after {
+            content: '!';
+          }
+        </style>
+        <div id="foo">world</div>
+      `,
+           container);
+       const elem = document.getElementById('foo');
+       const context = getDefaultContext();
+       const options = withDefaults({includePseudoElements: false});
+       context.directLabelReference = true;
+       expect(rule2F(elem!, context, options)).toBe('world');
+     });
 
   it('doesn\'t visit the same node twice during a recursive traversal', () => {
     render(

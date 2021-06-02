@@ -5,9 +5,9 @@
  */
 
 import {Context} from './context';
+import {AccnameOptions} from './options';
 import {closest} from './polyfill';
 import {isHTMLElement} from './util';
-
 
 /**
  * Looks at a variety of characteristics (CSS, attributes)
@@ -62,7 +62,8 @@ function rule2ACondition(node: Node, context: Context): boolean {
  * null is returned otherwise, indicating that the condition of this rule was
  * not satisfied.
  */
-export function rule2A(node: Node, context: Context): string|null {
+export function rule2A(
+    node: Node, options: AccnameOptions, context: Context): string|null {
   let result = null;
   if (rule2ACondition(node, context)) {
     result = '';

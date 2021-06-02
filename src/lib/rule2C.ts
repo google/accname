@@ -6,6 +6,7 @@
 
 import {ComputeTextAlternative} from './compute_text_alternative';
 import {Context} from './context';
+import {AccnameOptions} from './options';
 import {rule2E} from './rule2E';
 import {isElement} from './util';
 
@@ -19,6 +20,7 @@ import {isElement} from './util';
  */
 export function rule2C(
     node: Node,
+    options: AccnameOptions,
     context: Context,
     computeTextAlternative: ComputeTextAlternative,
     ): string|null {
@@ -36,8 +38,8 @@ export function rule2C(
   if (context.inherited.partOfName) {
     // 'rule2EResult !== null' indicates that 'node' is an embedded
     // control as defined in step 2E.
-    const rule2EResult =
-        rule2E(node, {inherited: context.inherited}, computeTextAlternative);
+    const rule2EResult = rule2E(
+        node, options, {inherited: context.inherited}, computeTextAlternative);
     if (rule2EResult !== null) {
       return rule2EResult;
     }

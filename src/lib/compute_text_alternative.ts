@@ -5,6 +5,7 @@
  */
 
 import {Context, getDefaultContext} from './context';
+import {AccnameOptions, withDefaults} from './options';
 import {rule2A} from './rule2A';
 import {rule2B} from './rule2B';
 import {rule2C} from './rule2C';
@@ -22,16 +23,17 @@ import {rule2I} from './rule2I';
 export type Rule = '2A'|'2B'|'2C'|'2D'|'2E'|'2F'|'2G'|'2I';
 
 /** Type signature for the computeTextAlternative function. */
-export type ComputeTextAlternative = (node: Node, context: Context) =>
-    ComputationDetails;
+export type ComputeTextAlternative =
+    (node: Node, options: AccnameOptions, context: Context) =>
+        ComputationDetails;
 
 /**
  * We pass the main function to compute textAlternative to avoid having build
  * time circular references between files
  */
 export type RuleImpl =
-    (node: Node, context: Context, textAlternative: ComputeTextAlternative) =>
-        string|null;
+    (node: Node, options: AccnameOptions, context: Context,
+     textAlternative: ComputeTextAlternative) => string|null;
 
 const ruleToImpl: {[rule in Rule]: RuleImpl} = {
   '2A': rule2A,
@@ -69,8 +71,10 @@ export interface ComputationDetails {
  * @return - The text alternative for node
  */
 export function computeTextAlternative(
-    node: Node, context: Context = getDefaultContext()): ComputationDetails {
-  const result = computeRawTextAlternative(node, context);
+    node: Node, options: Partial<AccnameOptions> = {},
+    context: Context = getDefaultContext()): ComputationDetails {
+  const result =
+      computeRawTextAlternative(node, withDefaults(options), context);
   return {
     // # SPEC ASSUMPTION: The result of the name computation is trimmed.
     name: result.name.trim(),
@@ -83,10 +87,11 @@ export function computeTextAlternative(
  * whitespace.
  */
 function computeRawTextAlternative(
-    node: Node, context: Context = getDefaultContext()): ComputationDetails {
+    node: Node, options: AccnameOptions = withDefaults({}),
+    context: Context = getDefaultContext()): ComputationDetails {
   // Try each rule sequentially on the target Node.
   for (const [rule, impl] of Object.entries(ruleToImpl)) {
-    const result = impl(node, context, computeRawTextAlternative);
+    const result = impl(node, options, context, computeRawTextAlternative);
     // A rule has been applied if its implementation has
     // returned a string.
     if (result !== null) {

@@ -6,6 +6,7 @@
 
 import {ComputeTextAlternative} from './compute_text_alternative';
 import {Context} from './context';
+import {AccnameOptions} from './options';
 import {isHTMLElement} from './util';
 
 /**
@@ -40,6 +41,7 @@ export function resolveValidAriaLabelledbyIdrefs(elem: HTMLElement):
  */
 export function rule2B(
     node: Node,
+    options: AccnameOptions,
     context: Context,
     computeTextAlternative: ComputeTextAlternative,
     ): string|null {
@@ -61,7 +63,7 @@ export function rule2B(
   return labelElems
       .map(labelElem => {
         context.inherited.partOfName = true;
-        return computeTextAlternative(labelElem, {
+        return computeTextAlternative(labelElem, options, {
                  directLabelReference: true,
                  inherited: context.inherited,
                })
