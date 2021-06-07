@@ -229,7 +229,9 @@ export const WPT_TEST_CASES: TestCase[] = [
   },
   {
     title: 'Name file-label-inline-block-styles',
-    expectedName: 'This is a test.',
+    // Should be "This is a test." but we match browser behaviour by ignoring
+    // :before and :after
+    expectedName: 'is a test',
     htmlInput: `
             <style>
             label:before { content: "This"; display: block; }
@@ -733,7 +735,9 @@ export const WPT_TEST_CASES: TestCase[] = [
   },
   {
     title: 'Name test case 552',
-    expectedName: 'fancy fruit',
+    // Should be "fancy fruit" but we match browser behaviour by ignoring
+    // :before and :after
+    expectedName: 'fruit',
     htmlInput: `
             <style>
             label:before { content:"fancy "; }
@@ -744,7 +748,9 @@ export const WPT_TEST_CASES: TestCase[] = [
   },
   {
     title: 'Name test case 553',
-    expectedName: 'test content',
+    // Should be "test content" but we match browser behaviour by ignoring
+    // :before and :after
+    expectedName: '',
     htmlInput: `
             <style type="text/css">
             [data-after]:after { content: attr(data-after); }
@@ -1057,7 +1063,7 @@ export const WPT_TEST_CASES: TestCase[] = [
   },
   {
     title: 'Name test case 659',
-    expectedName: 'foo foobaz baz',  // Should be 'foo bar baz',
+    expectedName: 'bar',  // Should be 'foo bar baz',
     htmlInput: `
             <style type="text/css">
             label:before { content: "foo"; }
@@ -1070,7 +1076,7 @@ export const WPT_TEST_CASES: TestCase[] = [
   },
   {
     title: 'Name test case 660',
-    expectedName: 'foo foobaz baz',  // Should be 'foo bar baz',
+    expectedName: 'bar',  // Should be 'foo bar baz',
     htmlInput: `
             <style type="text/css">
             label:before { content: "foo"; }
@@ -1083,7 +1089,7 @@ export const WPT_TEST_CASES: TestCase[] = [
   },
   {
     title: 'Name test case 661',
-    expectedName: 'foo foobaz baz',  // Should be 'foo baz',
+    expectedName: 'bar',  // Should be 'foo baz',
     htmlInput: `
             <style type="text/css">
             label:before { content: "foo"; }
@@ -1096,7 +1102,7 @@ export const WPT_TEST_CASES: TestCase[] = [
   },
   {
     title: 'Name test case 662',
-    expectedName: 'foo foobaz baz',  // Should be 'foo baz',
+    expectedName: 'bar',  // Should be 'foo baz',
     htmlInput: `
             <style type="text/css">
             label:before { content: "foo"; }
@@ -1109,7 +1115,7 @@ export const WPT_TEST_CASES: TestCase[] = [
   },
   {
     title: 'Name test case 663a',
-    expectedName: 'foo foobaz baz',  // Should be 'foo baz',
+    expectedName: 'bar',  // Should be 'foo baz',
     htmlInput: `
             <style type="text/css">
             label:before { content: "foo"; }
@@ -1443,7 +1449,9 @@ export const WPT_TEST_CASES: TestCase[] = [
   },
   {
     title: 'Name test case 753',
-    expectedName: 'fancy fruit',
+    // Should be "fancy fruit" but we match browser behaviour by ignoring
+    // :before and :after
+    expectedName: 'fruit',
     htmlInput: `
             <style>
             label:before { content:"fancy "; }
@@ -1454,7 +1462,9 @@ export const WPT_TEST_CASES: TestCase[] = [
   },
   {
     title: 'Name test case 754',
-    expectedName: 'fancy fruit',
+    // Should be "fancy fruit" but we match browser behaviour by ignoring
+    // :before and :after
+    expectedName: 'fruit',
     htmlInput: `
             <style>
             label:before { content:"fancy "; }
@@ -1465,7 +1475,9 @@ export const WPT_TEST_CASES: TestCase[] = [
   },
   {
     title: 'Name test case 755',
-    expectedName: 'fancy fruit',
+    // Should be "fancy fruit" but we match browser behaviour by ignoring
+    // :before and :after
+    expectedName: 'fruit',
     htmlInput: `
             <style>
             label:before { content:"fancy "; }
@@ -1476,7 +1488,9 @@ export const WPT_TEST_CASES: TestCase[] = [
   },
   {
     title: 'Name test case 756',
-    expectedName: 'fancy fruit',
+    // Should be "fancy fruit" but we match browser behaviour by ignoring
+    // :before and :after
+    expectedName: 'fruit',
     htmlInput: `
             <style>
             label:before { content:"fancy "; }
@@ -1487,7 +1501,9 @@ export const WPT_TEST_CASES: TestCase[] = [
   },
   {
     title: 'Name test case 757',
-    expectedName: 'fancy fruit',
+    // Should be "fancy fruit" but we match browser behaviour by ignoring
+    // :before and :after
+    expectedName: 'fruit',
     htmlInput: `
             <style>
             label:before { content:"fancy "; }
@@ -1498,7 +1514,9 @@ export const WPT_TEST_CASES: TestCase[] = [
   },
   {
     title: 'Name test case 758',
-    expectedName: 'fancy fruit',
+    // Should be "fancy fruit" but we match browser behaviour by ignoring
+    // :before and :after
+    expectedName: 'fancy',
     htmlInput: `
             <style>
             label:after { content:" fruit"; }
@@ -1509,7 +1527,9 @@ export const WPT_TEST_CASES: TestCase[] = [
   },
   {
     title: 'Name test case 759',
-    expectedName: 'fancy fruit',
+    // Should be "fancy fruit" but we match browser behaviour by ignoring
+    // :before and :after
+    expectedName: 'fancy',
     htmlInput: `
             <style>
             label:after { content:" fruit"; }
@@ -1520,7 +1540,9 @@ export const WPT_TEST_CASES: TestCase[] = [
   },
   {
     title: 'Name test case 760',
-    expectedName: 'fancy fruit',
+    // Should be "fancy fruit" but we match browser behaviour by ignoring
+    // :before and :after
+    expectedName: 'fancy',
     htmlInput: `
             <style>
             label:after { content:" fruit"; }
@@ -1531,7 +1553,9 @@ export const WPT_TEST_CASES: TestCase[] = [
   },
   {
     title: 'Name test case 761',
-    expectedName: 'fancy fruit',
+    // Should be "fancy fruit" but we match browser behaviour by ignoring
+    // :before and :after
+    expectedName: 'fancy',
     htmlInput: `
             <style>
             label:after { content:" fruit"; }
@@ -1542,7 +1566,9 @@ export const WPT_TEST_CASES: TestCase[] = [
   },
   {
     title: 'Name test case 762',
-    expectedName: 'fancy fruit',
+    // Should be "fancy fruit" but we match browser behaviour by ignoring
+    // :before and :after
+    expectedName: 'fancy',
     htmlInput: `
             <style>
             label:after { content:" fruit"; }

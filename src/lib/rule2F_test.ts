@@ -53,67 +53,7 @@ describe('The function for rule 2F', () => {
     expect(rule2F(elem!, context)).toBe('Hello world !');
   });
 
-  it('returns a string concatenated with CSS generated text content', () => {
-    render(
-        html`
-        <style>
-          #foo:before {
-            content: 'Hello';
-          }
-          #foo:after {
-            content: '!';
-          }
-        </style>
-        <div id="foo">world</div>
-      `,
-        container);
-    const elem = document.getElementById('foo');
-    const context = getDefaultContext();
-    context.directLabelReference = true;
-    expect(rule2F(elem!, context)).toBe('Helloworld!');
-  });
-
-  it('returns a string concatenated with CSS generated text content', () => {
-    render(
-        html`
-        <style>
-          #foo:before {
-            content: 'Hello';
-            display: block;
-          }
-          #foo:after {
-            content: '!';
-          }
-        </style>
-        <div id="foo">world</div>
-      `,
-        container);
-    const elem = document.getElementById('foo');
-    const context = getDefaultContext();
-    context.directLabelReference = true;
-    expect(rule2F(elem!, context)).toBe('Hello world!');
-  });
-
-  it('doesn\'t include non-textual CSS content', () => {
-    render(
-        html`
-        <style>
-          #foo:before {
-            content: url('a/url/to/some/image');
-          }
-        </style>
-        <div id="foo">
-          Hello world
-        </div>
-      `,
-        container);
-    const elem = document.getElementById('foo');
-    const context = getDefaultContext();
-    context.directLabelReference = true;
-    expect(rule2F(elem!, context)).toBe('Hello world');
-  });
-
-  it('ignores CSS generated text content if includePseudoElements is false',
+  it('returns a string concatenated with CSS generated text content for inline elements if includePseudoElements is true',
      () => {
        render(
            html`
@@ -130,10 +70,73 @@ describe('The function for rule 2F', () => {
            container);
        const elem = document.getElementById('foo');
        const context = getDefaultContext();
-       const options = withDefaults({includePseudoElements: false});
+       const options = withDefaults({includePseudoElements: true});
        context.directLabelReference = true;
-       expect(rule2F(elem!, context, options)).toBe('world');
+       expect(rule2F(elem!, context, options)).toBe('Helloworld!');
      });
+
+  it('returns a string concatenated with CSS generated text content for block elements if includePseudoElements is true',
+     () => {
+       render(
+           html`
+        <style>
+          #foo:before {
+            content: 'Hello';
+            display: block;
+          }
+          #foo:after {
+            content: '!';
+          }
+        </style>
+        <div id="foo">world</div>
+      `,
+           container);
+       const elem = document.getElementById('foo');
+       const context = getDefaultContext();
+       const options = withDefaults({includePseudoElements: true});
+       context.directLabelReference = true;
+       expect(rule2F(elem!, context, options)).toBe('Hello world!');
+     });
+
+  it('doesn\'t include non-textual CSS content', () => {
+    render(
+        html`
+        <style>
+          #foo:before {
+            content: url('a/url/to/some/image');
+          }
+        </style>
+        <div id="foo">
+          Hello world
+        </div>
+      `,
+        container);
+    const elem = document.getElementById('foo');
+    const context = getDefaultContext();
+    const options = withDefaults({includePseudoElements: true});
+    context.directLabelReference = true;
+    expect(rule2F(elem!, context, options)).toBe('Hello world');
+  });
+
+  it('ignores CSS generated text content by default', () => {
+    render(
+        html`
+        <style>
+          #foo:before {
+            content: 'Hello';
+          }
+          #foo:after {
+            content: '!';
+          }
+        </style>
+        <div id="foo">world</div>
+      `,
+        container);
+    const elem = document.getElementById('foo');
+    const context = getDefaultContext();
+    context.directLabelReference = true;
+    expect(rule2F(elem!, context)).toBe('world');
+  });
 
   it('doesn\'t visit the same node twice during a recursive traversal', () => {
     render(

@@ -16,6 +16,5 @@ export interface AccnameOptions {
 
 /** Fills in missing options with their default values */
 export function withDefaults(opts: Partial<AccnameOptions>): AccnameOptions {
-  // TODO(alexlloyd) switch default to false
-  return {includePseudoElements: opts.includePseudoElements ?? true};
+  return {includePseudoElements: opts.includePseudoElements ?? false};
 }
