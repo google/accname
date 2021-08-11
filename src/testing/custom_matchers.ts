@@ -6,7 +6,8 @@
 
 import 'jasmine';
 
-import {ComputationStep, computeTextAlternative} from '../lib/compute_text_alternative';
+import {ComputationStep} from '../lib/computation_details';
+import {computeTextAlternative} from '../lib/compute_text_alternative';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace

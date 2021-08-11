@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {ComputationStep} from './compute_text_alternative';
+import {ComputationStep} from './computation_details';
 
 /**
  * This interface will be used to pass additional information

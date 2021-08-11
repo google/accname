@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import * as cache from './cache';
+import {ComputationDetails, Rule} from './computation_details';
 import {Context, getDefaultContext} from './context';
 import {AccnameOptions, withDefaults} from './options';
 import {rule2A} from './rule2A';
@@ -16,11 +18,6 @@ import {rule2G} from './rule2G';
 import {rule2I} from './rule2I';
 
 // taze: SVG types from //javascript/externs:svg_lib
-
-/**
- * A reference to the rules outlined in the accname spec.
- */
-export type Rule = '2A'|'2B'|'2C'|'2D'|'2E'|'2F'|'2G'|'2I';
 
 /** Type signature for the computeTextAlternative function. */
 export type ComputeTextAlternative =
@@ -47,24 +44,6 @@ const ruleToImpl: {[rule in Rule]: RuleImpl} = {
 };
 
 /**
- * Represents a step in the accessible name computation.
- */
-export interface ComputationStep {
-  rule: Rule;
-  node: Node;
-  text: string;
-}
-
-/**
- * Provides details about the computation of some accessible name, such as
- * the Nodes used and rules applied during computation.
- */
-export interface ComputationDetails {
-  name: string;
-  steps: ComputationStep[];
-}
-
-/**
  * @param node - The node whose text alternative will be calculated
  * @param  context - Additional information relevant to the text alternative
  * computation for node. Optional paramater is 'getDefaultContext' by default.
@@ -73,13 +52,20 @@ export interface ComputationDetails {
 export function computeTextAlternative(
     node: Node, options: Partial<AccnameOptions> = {},
     context: Context = getDefaultContext()): ComputationDetails {
-  const result =
-      computeRawTextAlternative(node, withDefaults(options), context);
-  return {
+  const fullOptions = withDefaults(options);
+  const cached = cache.get(node, fullOptions);
+  if (cached !== null) {
+    return cached;
+  }
+  const rawTextAlternative =
+      computeRawTextAlternative(node, fullOptions, context);
+  const textAlternative = {
     // # SPEC ASSUMPTION: The result of the name computation is trimmed.
-    name: result.name.trim(),
-    steps: result.steps,
+    name: rawTextAlternative.name.trim(),
+    steps: rawTextAlternative.steps,
   };
+  cache.set(node, fullOptions, textAlternative);
+  return textAlternative;
 }
 
 /**

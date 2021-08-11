@@ -3,7 +3,8 @@
  * Copyright 2020 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
-import {ComputationDetails, computeTextAlternative} from './lib/compute_text_alternative';
+import {ComputationDetails} from './lib/computation_details';
+import {computeTextAlternative} from './lib/compute_text_alternative';
 import {AccnameOptions} from './lib/options';
 
 /**
