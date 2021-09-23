@@ -1,4 +1,4 @@
-import {html, render} from 'lit-html';
+import {html, render} from 'lit';
 import {rule2G} from './rule2G';
 
 describe('The function for rule 2G', () => {

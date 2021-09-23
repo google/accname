@@ -1,4 +1,4 @@
-import {html, render} from 'lit-html';
+import {html, render} from 'lit';
 
 import {createRuleRunner} from '../testing/utils';
 import {rule2D as rule2DImpl} from './rule2D';

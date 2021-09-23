@@ -1,4 +1,4 @@
-import {html, render} from 'lit-html';
+import {html, render} from 'lit';
 import {getDefaultContext} from './context';
 import {TEST_ONLY} from './rule2F';
 

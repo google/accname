@@ -1,4 +1,4 @@
-import {html, render} from 'lit-html';
+import {html, render} from 'lit';
 
 import {customMatchers} from '../testing/custom_matchers';
 
