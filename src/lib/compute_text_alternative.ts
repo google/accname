@@ -15,7 +15,6 @@ import {rule2F} from './rule2F';
 import {rule2G} from './rule2G';
 import {rule2I} from './rule2I';
 
-// taze: SVG types from //javascript/externs:svg_lib
 
 /**
  * A reference to the rules outlined in the accname spec.
