@@ -1,5 +1,3 @@
-import 'jasmine';
-
 import {customMatchers} from '../testing/custom_matchers';
 import {WPT_TEST_CASES} from '../testing/wpt_testdata';
 

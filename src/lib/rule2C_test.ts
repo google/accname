@@ -1,6 +1,7 @@
 import {html, render} from 'lit';
 
 import {createRuleRunner} from '../testing/utils';
+
 import {getDefaultContext} from './context';
 import {rule2C as rule2CImpl} from './rule2C';
 

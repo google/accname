@@ -1,6 +1,6 @@
 {
   "name": "accname",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "This library contains a TypeScript implementation of the [Accessible Name Computation](https://www.w3.org/TR/accname-1.1/).",
   "main": "dist/accessible_name.js",
   "module": "dist/accessible_name.js",
@@ -9,6 +9,8 @@
     "doc": "docs"
   },
   "devDependencies": {
+    "@babel/core": "^7.17.7",
+    "@babel/plugin-transform-runtime": "^7.17.0",
     "@types/jasmine": "^3.5.11",
     "@types/node": "^13.11.1",
     "@typescript-eslint/eslint-plugin": "^3.6.0",
@@ -32,7 +34,7 @@
     "karma-spec-reporter": "0.0.32",
     "karma-typescript": "^5.0.3",
     "karma-typescript-es6-transform": "^5.0.3",
-    "lit-html": "^1.2.1",
+    "lit": "^2.0.2",
     "rollup": "^2.41.0",
     "typescript": "^3.9.5"
   },
@@ -40,14 +42,17 @@
     "dist/**/*"
   ],
   "scripts": {
-    "build": "tsc",
-    "test-interactive": "karma start",
-    "test": "karma start --single-run --browsers ChromeHeadless,FirefoxHeadless",
-    "pretest": "npm run build",
-    "fix": "npm run fix-lint && npm run format",
-    "lint": "eslint --ext .ts src",
-    "fix-lint": "eslint --ext .ts --fix src",
-    "format": "clang-format --version; find src | grep '\\.js$\\|\\.ts$' | xargs clang-format --style=file -i"
+    "build": "yarn && tsc",
+    "ibuild": "yarn && tsc --watch",
+    "pretest": "yarn build",
+    "test": "karma start --browsers ChromeHeadless,FirefoxHeadless --single-run --no-auto-watch",
+    "itest": "karma start --browsers Chrome,Firefox",
+    "prepack": "yarn test",
+    "fix": "yarn fix-lint && yarn fix-format",
+    "check-lint": "yarn && eslint --ext .ts src",
+    "fix-lint": "yarn && eslint --ext .ts --fix src",
+    "check-format": "clang-format --version; find src ! -path 'src/lib/parser.ts' | grep '\\.js$\\|\\.ts$' | xargs clang-format --style=file --dry-run -Werror",
+    "fix-format": "clang-format --version; find src ! -path 'src/lib/parser.ts' | grep '\\.js$\\|\\.ts$' | xargs clang-format --style=file -i"
   },
   "repository": {
     "type": "git",
@@ -69,8 +74,8 @@
   "dependencies": {},
   "husky": {
     "hooks": {
-      "pre-commit": "npm run fix",
-      "pre-push": "npm run build && npx rollup dist/accessible_name.js --file bundle.js --format iife --name \"accname\" && git add bundle.js && git commit --amend --no-edit"
+      "pre-commit": "yarn run fix",
+      "pre-push": "yarn run build && npx rollup dist/accessible_name.js --file bundle.js --format iife --name \"accname\" && git add bundle.js && git commit --amend --no-edit"
     }
   }
 }

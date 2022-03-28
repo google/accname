@@ -1,6 +1,7 @@
 import {html, render} from 'lit';
 
 import {createRuleRunner} from '../testing/utils';
+
 import {rule2D as rule2DImpl} from './rule2D';
 
 const rule2D = createRuleRunner(rule2DImpl);

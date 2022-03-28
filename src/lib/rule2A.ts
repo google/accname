@@ -16,7 +16,7 @@ import {isHTMLElement} from './util';
  * @return - whether or not the node is considered hidden
  */
 // #SPEC_ASSUMPTION (A.2) : definition of 'hidden'
-function isHidden(node: Node, context: Context): boolean {
+function isHidden(node: Node): boolean {
   if (!isHTMLElement(node)) {
     return false;
   }
@@ -50,7 +50,7 @@ function isHidden(node: Node, context: Context): boolean {
  */
 function rule2ACondition(node: Node, context: Context): boolean {
   // #SPEC_ASSUMPTION (A.1) : definition of 'directly referenced'
-  return isHidden(node, context) && !context.directLabelReference;
+  return isHidden(node) && !context.directLabelReference;
 }
 
 /**
@@ -61,9 +61,11 @@ function rule2ACondition(node: Node, context: Context): boolean {
  * @return - The text alternative string is returned if condition is true,
  * null is returned otherwise, indicating that the condition of this rule was
  * not satisfied.
+ *
+ * tslint:disable-next-line:enforce-name-casing
  */
-export function rule2A(
-    node: Node, options: AccnameOptions, context: Context): string|null {
+export function rule2A(node: Node, _: AccnameOptions, context: Context): string|
+    null {
   let result = null;
   if (rule2ACondition(node, context)) {
     result = '';

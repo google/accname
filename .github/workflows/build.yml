@@ -17,13 +17,13 @@ jobs:
         with:
           access_token: ${{ github.token }}
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
         with:
-          node-version: 13
+          node-version: 14
       - name: Build accname
         run: |
-          npm install
-          npm run build
+          yarn install --frozen-lockfile
+          yarn run build
       - name: Build validation
         run: |
           npm install

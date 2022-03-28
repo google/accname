@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import 'jasmine';
-
 import {ComputationStep, computeTextAlternative} from '../lib/compute_text_alternative';
 
 declare global {

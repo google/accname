@@ -30,9 +30,12 @@ export type ComputeTextAlternative =
  * We pass the main function to compute textAlternative to avoid having build
  * time circular references between files
  */
-export type RuleImpl =
-    (node: Node, options: AccnameOptions, context: Context,
-     textAlternative: ComputeTextAlternative) => string|null;
+export type RuleImpl = (
+    node: Node,
+    options: AccnameOptions,
+    context: Context,
+    textAlternative: ComputeTextAlternative,
+    ) => string|null;
 
 const ruleToImpl: {[rule in Rule]: RuleImpl} = {
   '2A': rule2A,
@@ -70,8 +73,10 @@ export interface ComputationDetails {
  * @return - The text alternative for node
  */
 export function computeTextAlternative(
-    node: Node, options: Partial<AccnameOptions> = {},
-    context: Context = getDefaultContext()): ComputationDetails {
+    node: Node,
+    options: Partial<AccnameOptions> = {},
+    context: Context = getDefaultContext(),
+    ): ComputationDetails {
   const result =
       computeRawTextAlternative(node, withDefaults(options), context);
   return {
@@ -86,8 +91,10 @@ export function computeTextAlternative(
  * whitespace.
  */
 function computeRawTextAlternative(
-    node: Node, options: AccnameOptions = withDefaults({}),
-    context: Context = getDefaultContext()): ComputationDetails {
+    node: Node,
+    options: AccnameOptions = withDefaults({}),
+    context: Context = getDefaultContext(),
+    ): ComputationDetails {
   // Try each rule sequentially on the target Node.
   for (const [rule, impl] of Object.entries(ruleToImpl)) {
     const result = impl(node, options, context, computeRawTextAlternative);

@@ -17,15 +17,11 @@ jobs:
         with:
           access_token: ${{ github.token }}
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
         with:
-          node-version: 13
+          node-version: 14
       - name: Lint accname
         run: |
-          npm install
-          npm run lint
-      - name: Lint validation
-        run: |
-          npm install
-          npm run check
-        working-directory: ./validation
+          yarn install --frozen-lockfile
+          yarn check-lint
+          yarn check-format
