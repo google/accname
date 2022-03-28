@@ -56,7 +56,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/googleinterns/accessible-name.git"
+    "url": "git+https://github.com/google/accessible-name.git"
   },
   "keywords": [
     "accname",
@@ -68,14 +68,17 @@
   "author": "Oisín Nolan",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/googleinterns/accessible-name/issues"
+    "url": "https://github.com/google/accessible-name/issues"
   },
-  "homepage": "https://github.com/googleinterns/accessible-name#readme",
+  "homepage": "https://github.com/google/accessible-name#readme",
   "dependencies": {},
   "husky": {
     "hooks": {
       "pre-commit": "yarn run fix",
       "pre-push": "yarn run build && npx rollup dist/accessible_name.js --file bundle.js --format iife --name \"accname\" && git add bundle.js && git commit --amend --no-edit"
     }
+  },
+  "publishConfig":{
+    "registry":"https://wombat-dressing-room.appspot.com"
   }
 }
