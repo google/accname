@@ -37,6 +37,17 @@ describe('The function for rule 2I', () => {
     expect(rule2I(document.getElementById('foo')!)).toBe('Hello world');
   });
 
+  it('is resilient to DOM clobbering', () => {
+    render(
+        html`
+        <form id="foo" title="Hello world">
+          <input id="title" name="title" />
+        </form>
+        `,
+        container);
+    expect(rule2I(document.getElementById('foo')!)).toBe('Hello world');
+  });
+
   it('returns title with priority over placeholder', () => {
     render(
         html`

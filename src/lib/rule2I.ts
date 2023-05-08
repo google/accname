@@ -28,8 +28,9 @@ export function rule2I(node: Node): string|null {
     return null;
   }
 
-  if (node.title) {
-    return node.title;
+  const title = node.getAttribute('title');
+  if (title) {
+    return title;
   }
 
   // Placeholder considered if no title is present.
