@@ -63,8 +63,9 @@ export const LABELLABLE_ELEMENT_TYPES = [
 /** Checks if `control` is the element that is labelled by `label` */
 function isLabelledControl(
     label: HTMLLabelElement, control: HTMLElement): boolean {
-  if (label.control !== undefined) {
-    return label.control === control;
+  const labelControl = label.control;
+  if (labelControl !== undefined) {
+    return labelControl === control;
   } else {
     // For ie & edge
     if (label.htmlFor !== '' && label.htmlFor === control.id) {
