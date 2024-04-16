@@ -151,7 +151,7 @@ const getWPTComparison = async () => {
     wptResults.innerHTML = `<div class="bluetext comparisonResultText">View the results for the Web Platform Tests comparison - <a href="/wpt/${wptResultId}" class="linkBtn">Run ${wptResultId}</a></div>`;
   } else if (rawResponse.status === 400) {
     const error = await rawResponse.json();
-    wptResults.innerHTML = `<div class="redtext comparisonResultText">Error: ${error.message}</div>`;
+    wptResults.innerText = `<div class="redtext comparisonResultText">Error: ${error.message}</div>`;
   }
 };
 
