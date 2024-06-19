@@ -18,14 +18,14 @@
     "@types/prismjs": "^1.16.1",
     "@types/puppeteer": "^3.0.1",
     "chrome-remote-debug-protocol": "^1.2.20180422",
-    "gts": "^2.0.2",
+    "gts": "^5.3.1",
     "typescript": "^3.9.7"
   },
   "dependencies": {
     "@types/serve-favicon": "^2.5.0",
     "axe-core": "^4.0.2",
-    "express": "^4.17.1",
-    "node-fetch": "^3.1.1",
+    "express": "^4.19.2",
+    "node-fetch": "^3.2.10",
     "puppeteer": "^5.2.1",
     "serve-favicon": "^2.5.0"
   }
